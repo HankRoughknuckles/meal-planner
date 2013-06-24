@@ -1,0 +1,17 @@
+inc/sensitive/*
+
+inc/nutritionix-demo/*
+
+inc/api-library-php-master/*
+
+test.php
+
+xampp/*
+
+forbidden/*
+
+Resources/*
+
+restricted/*
+
+WAMP_Default_Backup/*
