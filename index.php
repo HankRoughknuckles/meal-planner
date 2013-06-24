@@ -2,7 +2,7 @@
 require_once("/inc/paths.php");
 
 $pageTitle = "Meal Calculator - Index";
-include("/inc/header.php");
+include( HEADER_PATH );
 ?>
 
 	<ul>
@@ -12,4 +12,4 @@ include("/inc/header.php");
 		<li><a href="<?php echo BASE_URL ?>recipes.php">View Recipes</a></li>
 	</ul>
 	
-<?php include( ROOT_PATH . "inc/footer.php"); 
+<?php include( FOOTER_PATH ); 

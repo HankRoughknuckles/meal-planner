@@ -1,7 +1,7 @@
 <?php
 // TODO: implement esha food database functionality.  nutritionix is not so great.
 require_once "/inc/paths.php";
-require_once "/inc/sensitive/login.php";
+require_once LOGIN_PATH;
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%																		   %
@@ -42,9 +42,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 	// ------------------------------------------------------------------
 	if( $_POST["status"] == "save_food" )
 	{
-		require_once( ROOT_PATH . "inc/sensitive/nutritionix.config.inc.php"); //TODO: come up with a better way to make these urls DRY (do not repeat yourself). maybe make an include file with each of them in it
-		require_once( ROOT_PATH . "inc/nutritionix.php");
-		require_once( ROOT_PATH . "inc/sensitive/login.php");
+		require_once( NUTRITIONIX_PATH );
 
 		$nutr = new Nutritionix( NUTRITIONIX_APP_ID, NUTRITIONIX_APP_KEY );
 
@@ -124,7 +122,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 //%																		   %
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $pageTitle = "New Food";
-include( BASE_URL . "inc/header.php");
+include HEADER_PATH;
 
 // ==================================================================
 //
@@ -155,8 +153,7 @@ if( sizeof($_GET) == 0 )
 // ------------------------------------------------------------------
 else if( isset($_GET["status"]) AND $_GET["status"] == "find" ) 
 {
-	// require_once( ROOT_PATH . "inc/sensitive/nutritionix.config.inc.php"); //TODO: come up with a better way to make these urls DRY (do not repeat yourself). maybe make an include file with each of them in it
-	// require_once( ROOT_PATH . "inc/nutritionix.php");
+	// require_once( NUTRITIONIX_PATH );
 
 
 	// %%%%%%% TEST %%%%%%%
@@ -206,9 +203,7 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "find" )
 // ------------------------------------------------------------------
 else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 {
-	require_once( BASE_URL . "inc/sensitive/nutritionix.config.inc.php"); //TODO: come up with a better way to make these urls DRY (do not repeat yourself). maybe make an include file with each of them in it
-	require_once( BASE_URL . "inc/nutritionix.php");
-
+	require_once( NUTRITIONIX_PATH );
 
 
 	// %%%%%%%% test this out !! %%%%%%%%%%%
@@ -307,4 +302,4 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "submitted" )
 ?>
 
 <?php 
-include( BASE_URL . "inc/footer.php");
+include( FOOTER_PATH );

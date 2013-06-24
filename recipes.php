@@ -1,6 +1,6 @@
 <?php
 $pageTitle = "Recipes";
-include("/inc/header.php");
+include( HEADER_PATH );
 ?>
 
 </body>
