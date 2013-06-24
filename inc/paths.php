@@ -11,13 +11,10 @@ define("HEADER_PATH", 	BASE_URL . "inc/header.php");
 define("FOOTER_PATH", 	BASE_URL . "inc/footer.php");
 
 
-//the path to the file that contains sensitive login information
+//the path to the file that contains sensitive login information and api keys
 define("LOGIN_PATH",	BASE_URL . "inc/sensitive/login.php"); 
 
 
 //file that contains nutritionix database functionality
 define("NUTRITIONIX_PATH", 	BASE_URL . "inc/nutritionix.php");
 
-
-//config file containing api key, app-id, etc. for nutritionix database
-define("NUTRITIONIX_CONFIG_PATH", ROOT_PATH . "inc/sensitive/nutritionix.config.inc.php");
