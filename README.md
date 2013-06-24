@@ -25,4 +25,4 @@ For this program to work properly, you must add a folder /inc/sensitive with a f
 
 
 To protect your own privacy, please insert the following line into your .gitignore file if it is not already there:
-	inc/sensitive/*
+`inc/sensitive/*`
