@@ -157,18 +157,21 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "find" )
 
 
 	// %%%%%%% TEST %%%%%%%
-	// $search_result = json_decode( file_get_contents( "http://api.esha.com/foods?apikey=" . ESHA_API_KEY . "&query=" . urlencode( $_GET["name"] ) . '&spell=true' ) ); 
-	// $search_result = $search_result->items;
-	// var_dump( $search_result );
+	$search_result = json_decode( file_get_contents( "http://api.esha.com/foods?apikey=" . ESHA_API_KEY . "&query=" . urlencode( $_GET["name"] ) . '&spell=true' ) ); 
+	$search_result = $search_result->items;
+	var_dump( $search_result );
 	// %%%%%%% END TEST %%%%%%%
 
 
 	//search through each result and try to match according to what they chose
+	echo '<table>';
 	foreach( $search_result as $food ) {
-		echo "<tr>";
-		echo '<td>' . $food->id . '</td>';
-		echo '<td> <a href="' . BASE_URL . 'new_food.php?status=food_selected&name=' . $_GET["name"] . '&id=' . $food->id . '">Select</a>';
+		echo '<tr>';
+		echo '<td>' . $food->description . '</td>';
+		echo '<td><a href="' . BASE_URL . 'new_food.php?status=food_selected&name=' . $_GET["name"] . '&id=' . $food->id . '">Select</a></td>';
+		echo '</tr>';
 	}
+	echo '</table>';
 
 	// $nutr = new Nutritionix( NUTRITIONIX_APP_ID, NUTRITIONIX_APP_KEY );
 	// try
@@ -203,29 +206,40 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "find" )
 // ------------------------------------------------------------------
 else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 {
-	require_once( NUTRITIONIX_PATH );
+	// require_once( NUTRITIONIX_PATH );
 
 
 	// %%%%%%%% test this out !! %%%%%%%%%%%
-	$url = 'http://api.esha.com/analysis?apikey=' . ESHA_API_KEY; 
-	$data = array(
-				'items' => array(
-					'description' => $_GET["name"] 
-				)
-			);
+	// $url = 'http://api.esha.com/analysis?apikey=' . ESHA_API_KEY; 
+	// $data = array(
+	// 			'items' => array(
+	// 				'description' => $_GET["id"] 
+	// 			)
+	// 		);
 
-	// make post request to esha's site
-	$options = array( 
-		'http' => array(
-			'header'  => "Content-type: application/json", //maybe this needs to be changed?
-			'method'  => 'POST', 
-			'content' => json_encode( http_build_query($data) ),
-		)
-	); 
-	$context  = stream_context_create($options); 
-	$result = file_get_contents($url, false, $context); 
+	// // make post request to esha's site
+	// $options = array( 
+	// 	'http' => array(
+	// 		'header'  => "Content-type: application/json", //maybe this needs to be changed?
+	// 		'method'  => 'POST', 
+	// 		'content' => json_encode( http_build_query($data) ),
+	// 	)
+	// ); 
 
-	var_dump($result); 
+	// $context  = stream_context_create($options); 
+	// $result = file_get_contents($url, false, $context); 
+
+	// var_dump($result); 
+	// %%%%%%%% /test this out !! %%%%%%%%%%%
+
+	// %%%%%%%% test this out !! %%%%%%%%%%%
+	$ch = curl_init( "http://api.esha.com/analysis" ); //initialize cURL with the esha URL
+	curl_setopt($ch, CURLOPT_POST 				,1); //specify that it will be a POST request
+	curl_setopt($ch, CURLOPT_POSTFIELDS 		,""); //TODO: put something here 
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION 	,1);
+	curl_setopt($ch, CURLOPT_HEADER				,0);  // DO NOT RETURN HTTP HEADERS
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER		,1);  // RETURN THE CONTENTS OF THE CALL
+	$Rec_Data = curl_exec($ch);
 	// %%%%%%%% /test this out !! %%%%%%%%%%%
 
 	$nutr = new Nutritionix( NUTRITIONIX_APP_ID, NUTRITIONIX_APP_KEY );
