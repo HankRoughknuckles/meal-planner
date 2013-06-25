@@ -3,6 +3,16 @@
 require_once "/inc/paths.php";
 require_once LOGIN_PATH;
 
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%																		   %
+//%								functions 								   %	
+//%																		   %
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// empty for now...
+
+
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%																		   %
 //%								POST stuff 								   %	
@@ -154,6 +164,7 @@ if( sizeof($_GET) == 0 )
 else if( isset($_GET["status"]) AND $_GET["status"] == "find" ) 
 {
 	// require_once( NUTRITIONIX_PATH );
+	require_once( UNITS_TABLE_PATH );
 
 
 	// %%%%%%% TEST %%%%%%%
@@ -162,13 +173,21 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "find" )
 	var_dump( $search_result );
 	// %%%%%%% END TEST %%%%%%%
 
+	// $ch = curl_init( "http://api.esha.com/food-units?apikey=" . ESHA_API_KEY );//DEBUG
+	// curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );//DEBUG
+	// $response = curl_exec( $ch );//DEBUG
+	// var_dump( json_decode( $response ) ); //DEBUG
+
 
 	//search through each result and try to match according to what they chose
 	echo '<table>';
 	foreach( $search_result as $food ) {
 		echo '<tr>';
 		echo '<td>' . $food->description . '</td>';
-		echo '<td><a href="' . BASE_URL . 'new_food.php?status=food_selected&name=' . $_GET["name"] . '&id=' . $food->id . '">Select</a></td>';
+		foreach( $food->units as $unit )
+		{
+			echo '<td><a href="' . BASE_URL . 'new_food.php?status=food_selected&name=' . $_GET["name"] . '&id=' . $food->id . '&unit=' . $unit . '">' . $units[ $unit ] . '</a></td>';
+		}
 		echo '</tr>';
 	}
 	echo '</table>';
@@ -208,45 +227,60 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 {
 	// require_once( NUTRITIONIX_PATH );
 
-
 	// %%%%%%%% test this out !! %%%%%%%%%%%
-	// $url = 'http://api.esha.com/analysis?apikey=' . ESHA_API_KEY; 
-	// $data = array(
-	// 			'items' => array(
-	// 				'description' => $_GET["id"] 
-	// 			)
-	// 		);
 
-	// // make post request to esha's site
-	// $options = array( 
-	// 	'http' => array(
-	// 		'header'  => "Content-type: application/json", //maybe this needs to be changed?
-	// 		'method'  => 'POST', 
-	// 		'content' => json_encode( http_build_query($data) ),
-	// 	)
-	// ); 
+	// use cURL to fetch the detailed information about the selected food from ESHA
+	$header = array(
+		"Accept: application/json",
+		"Content-Type: application/json"
+	);
 
-	// $context  = stream_context_create($options); 
-	// $result = file_get_contents($url, false, $context); 
+	$data = json_encode( 
+		array(
+			'items' => array(
+				'id' => $_GET["id"],  //TODO: this could potentially be a security hole, find a way to get this data through without using GET
+				'quantity' => 0.5, //TODO: change this later
+				'unit' => "urn:uuid:dfad1d25-17ff-4201-bba0-0711e8b88c65" //TODO: change this later
+			)
+		)
+	);
 
-	// var_dump($result); 
-	// %%%%%%%% /test this out !! %%%%%%%%%%%
+	$ch = curl_init( "http://api.esha.com/analysis?apikey=" . ESHA_API_KEY ); 	//initialize cURL with the ESHA URL
+	curl_setopt($ch, CURLOPT_POST,				1); 		//specify that it will be a POST request
+	curl_setopt($ch, CURLOPT_HTTPHEADER,		$header);	//insert the proper header defined above	
+	curl_setopt($ch, CURLOPT_POSTFIELDS,		$data); 	//the data to be sent
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION,	0); 		//do not go to any LOCATION: header that the server sends back
+	curl_setopt($ch, CURLOPT_HEADER,			1);  		// make the response return http headers
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER,	1);  		// make the response return the contents of the call
 
-	// %%%%%%%% test this out !! %%%%%%%%%%%
-	$ch = curl_init( "http://api.esha.com/analysis" ); //initialize cURL with the esha URL
-	curl_setopt($ch, CURLOPT_POST 				,1); //specify that it will be a POST request
-	curl_setopt($ch, CURLOPT_POSTFIELDS 		,""); //TODO: put something here 
-	curl_setopt($ch, CURLOPT_FOLLOWLOCATION 	,1);
-	curl_setopt($ch, CURLOPT_HEADER				,0);  // DO NOT RETURN HTTP HEADERS
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER		,1);  // RETURN THE CONTENTS OF THE CALL
-	$Rec_Data = curl_exec($ch);
-	// %%%%%%%% /test this out !! %%%%%%%%%%%
+	$response = curl_exec( $ch );
 
-	$nutr = new Nutritionix( NUTRITIONIX_APP_ID, NUTRITIONIX_APP_KEY );
-	try
+	//if the database didn't return anything properly, give a fatal error
+	//the conditional has the strpos() > 25 to prevent the response body from containing "200 OK" and potentially allowing the program to continue
+	if ( strpos( $response, "200 OK" ) == false 	OR 		strpos( $response, "200 OK" ) > 25 )
 	{
-		$food = $nutr->getItem( $_GET["id"] );
-		$name = ucwords( $_GET["name"] );
+		echo 'Query response = ';
+		var_dump( $response );
+		die("Query Error: Food not found."); //TODO: handle this more gracefully.  have some kind of error handling
+	}
+
+	$foods = substr( $response, strpos($response, '{"items":') );
+	$foods = json_decode( $foods );
+	var_dump( $foods );
+
+	// Fetch the nutrients array from ESHA
+	$ch = curl_init( "http://api.esha.com/food-units?apikey=" . ESHA_API_KEY );
+	curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
+	$response = curl_exec( $ch );
+	echo json_encode( $response ); //DEBUG
+
+	// %%%%%%%% /test this out !! %%%%%%%%%%%
+
+	// $nutr = new Nutritionix( NUTRITIONIX_APP_ID, NUTRITIONIX_APP_KEY );
+	// try
+	// {
+	// 	$food = $nutr->getItem( $_GET["id"] );
+	// 	$name = ucwords( $_GET["name"] );
 
 		// // %%%%%%% 	START DEBUG 	%%%%%
 		// echo "<pre> food = "; //DEBUG
@@ -255,7 +289,7 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 		// // %%%%%%% 	END DEBUG 	%%%%%
 		
 		//TODO: put in the jquery nutrition label from here: https://github.com/nutritionix/nutrition-label into the page
-		
+		$name = "FOOD_NAME"; //DEBUG
 		echo '<h2>Food: ' . $name . '</h2>';
 		echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
 		echo '<label for="cost">Cost per</label>';
@@ -294,11 +328,11 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 		echo '<input type="hidden" name="status" value="save_food">'; //since there are multiple posts on this page, this field tells the site that the first stage, the food name submission stage is complete
 
 		echo '<input type="submit" value="Save that Food!">';
-	}
-	catch (Exception $e)
-	{
-		die('Nutritionix API Error: ' . $e);
-	}
+	// }
+	// catch (Exception $e)
+	// {
+	// 	die('Nutritionix API Error: ' . $e);
+	// }
 }
 
 
