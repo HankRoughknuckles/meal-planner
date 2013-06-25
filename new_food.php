@@ -9,7 +9,7 @@ require_once LOGIN_PATH;
 //%								functions 								   %	
 //%																		   %
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// empty for now...
+//empty for now...
 
 
 
@@ -116,7 +116,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 			} 
 			else
 			{
-				echo "DATABASE ERROR!!!!";
+				html_echo("DATABASE ERROR!!!!");
 				$error_array["insert"] = true;
 				exit();
 			}
@@ -152,7 +152,6 @@ if( sizeof($_GET) == 0 )
 	echo '<input type="text" name="name" value="">';
 	echo '<input type="hidden" name="status" value="name_selected">'; //since there are multiple posts on this page, this field tells the site that the first stage, the food name submission stage is complete
 	echo '<input type="submit" value="Find Food">';
-
 }
 
 
@@ -168,7 +167,7 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "find" )
 
 
 	// %%%%%%% TEST %%%%%%%
-	$search_result = json_decode( file_get_contents( "http://api.esha.com/foods?apikey=" . ESHA_API_KEY . "&query=" . urlencode( $_GET["name"] ) . '&spell=true' ) ); 
+	$search_result = json_decode( file_get_contents( "http://api.esha.com/foods?apikey=" . ESHA_API_KEY . "&query=" . urlencode( $_GET["name"] ) . '&spell=true' ) ); //TODO: the fact that you're searching with a GET variable could be a security hole.  Find a way to sanitize the query
 	$search_result = $search_result->items;
 	var_dump( $search_result );
 	// %%%%%%% END TEST %%%%%%%
@@ -183,10 +182,10 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "find" )
 	echo '<table>';
 	foreach( $search_result as $food ) {
 		echo '<tr>';
-		echo '<td>' . $food->description . '</td>';
+		echo '<td>' . htmlspecialchars( $food->description ) . '</td>';
 		foreach( $food->units as $unit )
 		{
-			echo '<td><a href="' . BASE_URL . 'new_food.php?status=food_selected&name=' . $_GET["name"] . '&id=' . $food->id . '&unit=' . $unit . '">' . $units[ $unit ] . '</a></td>';
+			echo '<td><a href="' . BASE_URL . 'new_food.php?status=food_selected&name=' . $_GET["name"] . '&id=' . $food->id . '&unit=' . $unit . '">' . $units[ $unit ] . '</a></td>';//TODO: the fact that you're searching with a GET variable could be a security hole.  Find a way to sanitize the query
 		}
 		echo '</tr>';
 	}
@@ -290,7 +289,7 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 		
 		//TODO: put in the jquery nutrition label from here: https://github.com/nutritionix/nutrition-label into the page
 		$name = "FOOD_NAME"; //DEBUG
-		echo '<h2>Food: ' . $name . '</h2>';
+		echo '<h2>Food: ' . htmlspecialchars( $name ) . '</h2>';
 		echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
 		echo '<label for="cost">Cost per</label>';
 
@@ -323,8 +322,8 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 		echo '</select>';
 
 		// hidden inputs
-		echo '<input type="hidden" name="name" value="' . $name . '">';
-		echo '<input type="hidden" name="id" value="' . $_GET["id"] . '">';
+		echo '<input type="hidden" name="name" value="' . htmlspecialchars( $name ) . '">';
+		echo '<input type="hidden" name="id" value="' . htmlspecialchars( $_GET["id"] ) . '">';
 		echo '<input type="hidden" name="status" value="save_food">'; //since there are multiple posts on this page, this field tells the site that the first stage, the food name submission stage is complete
 
 		echo '<input type="submit" value="Save that Food!">';
