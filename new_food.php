@@ -3,6 +3,7 @@
 require_once "/inc/paths.php";
 require_once LOGIN_PATH;
 
+session_start();
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%																		   %
@@ -38,8 +39,11 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 		}
 		else
 		{
-			// if no errors, proceed to the next step, passing GET status=find
-			header( "Location: " . BASE_URL . "new_food.php?status=find&name=" . $_POST["name"] );
+			//store entered name as session variable
+			$_SESSION['searched_food_name'] = htmlspecialchars( $_POST['name'] );
+
+			// if no errors, proceed to the next step, setting $_GET['status']='find'
+			header( "Location: " . BASE_URL . "new_food.php?status=find" );
 		}
 	}
 
@@ -139,7 +143,7 @@ include HEADER_PATH;
 // Step 1 - Searching by food name
 //
 // ------------------------------------------------------------------
-if( sizeof($_GET) == 0 )
+if( !isset( $_GET['status'] ) )
 {
 	echo '<p>Search for a food to add to your pantry</p>';
 
@@ -150,7 +154,7 @@ if( sizeof($_GET) == 0 )
 
 	echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
 	echo '<input type="text" name="name" value="">';
-	echo '<input type="hidden" name="status" value="name_selected">'; //since there are multiple posts on this page, this field tells the site that the first stage, the food name submission stage is complete
+	echo '<input type="hidden" name="status" value="name_selected">' //since there are multiple posts on this page, this field tells the site that the first stage, the food name submission stage is complete
 	echo '<input type="submit" value="Find Food">';
 }
 
@@ -160,15 +164,16 @@ if( sizeof($_GET) == 0 )
 // Step 2 - Choosing a food from the returned database possibilities
 //
 // ------------------------------------------------------------------
-else if( isset($_GET["status"]) AND $_GET["status"] == "find" ) 
+else if( isset($_SESSION['status']) AND $_SESSION['status'] == "find" ) 
 {
 	// require_once( NUTRITIONIX_PATH );
 	require_once( UNITS_TABLE_PATH );
 
 
 	//get the list of foods that match the user-defined query
-	$search_result = json_decode( file_get_contents( "http://api.esha.com/foods?apikey=" . ESHA_API_KEY . "&query=" . urlencode( $_GET["name"] ) . '&spell=true' ) ); //TODO: the fact that you're searching with a GET variable could be a security hole.  Find a way to sanitize the query
+	$search_result = json_decode( file_get_contents( "http://api.esha.com/foods?apikey=" . ESHA_API_KEY . "&query=" . urlencode( $_SESSION['searched_food_name'] ) . '&spell=true' ) ); 
 	$search_result = $search_result->items;
+	$_SESSION['matched_foods'] = $search_result;
 	var_dump( $search_result );
 
 	// $ch = curl_init( "http://api.esha.com/food-units?apikey=" . ESHA_API_KEY );//DEBUG
@@ -182,9 +187,12 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "find" )
 	foreach( $search_result as $food ) {
 		echo '<tr>';
 		echo '<td>' . htmlspecialchars( $food->description ) . '</td>';
+		$i = 0;
 		foreach( $food->units as $unit )
 		{
-			echo '<td><a href="' . BASE_URL . 'new_food.php?status=food_selected&name=' . htmlspecialchars( $_GET["name"] ) . '&id=' . $food->id . '&unit=' . $unit . '">' . $units[ $unit ] . '</a></td>';//TODO: the fact that you're searching with a GET variable could be a security hole.  Find a way to sanitize the query
+			//make links that correspond to each returned food match. idx in the GET corresponds to the index of the selected food in the $_SESSION['matched_foods'] array
+			echo '<td><a href="' . BASE_URL . 'new_food.php?status=food_selected&idx=' . $i . '</a></td>';
+			i++;
 		}
 		echo '</tr>';
 	}
