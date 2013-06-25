@@ -1,5 +1,5 @@
 <?php
-// TODO: implement esha food database functionality.  nutritionix is not so great.
+// TODO: use session variables for re-used variables
 require_once "/inc/paths.php";
 require_once LOGIN_PATH;
 
@@ -166,11 +166,10 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "find" )
 	require_once( UNITS_TABLE_PATH );
 
 
-	// %%%%%%% TEST %%%%%%%
+	//get the list of foods that match the user-defined query
 	$search_result = json_decode( file_get_contents( "http://api.esha.com/foods?apikey=" . ESHA_API_KEY . "&query=" . urlencode( $_GET["name"] ) . '&spell=true' ) ); //TODO: the fact that you're searching with a GET variable could be a security hole.  Find a way to sanitize the query
 	$search_result = $search_result->items;
 	var_dump( $search_result );
-	// %%%%%%% END TEST %%%%%%%
 
 	// $ch = curl_init( "http://api.esha.com/food-units?apikey=" . ESHA_API_KEY );//DEBUG
 	// curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );//DEBUG
@@ -185,7 +184,7 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "find" )
 		echo '<td>' . htmlspecialchars( $food->description ) . '</td>';
 		foreach( $food->units as $unit )
 		{
-			echo '<td><a href="' . BASE_URL . 'new_food.php?status=food_selected&name=' . $_GET["name"] . '&id=' . $food->id . '&unit=' . $unit . '">' . $units[ $unit ] . '</a></td>';//TODO: the fact that you're searching with a GET variable could be a security hole.  Find a way to sanitize the query
+			echo '<td><a href="' . BASE_URL . 'new_food.php?status=food_selected&name=' . htmlspecialchars( $_GET["name"] ) . '&id=' . $food->id . '&unit=' . $unit . '">' . $units[ $unit ] . '</a></td>';//TODO: the fact that you're searching with a GET variable could be a security hole.  Find a way to sanitize the query
 		}
 		echo '</tr>';
 	}
@@ -228,13 +227,18 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 
 	// %%%%%%%% test this out !! %%%%%%%%%%%
 
+	// search for the food selected from the previous page
+	$search_result = json_decode( file_get_contents( "http://api.esha.com/foods?apikey=" . ESHA_API_KEY . "&query=" . urlencode( $_GET["name"] ) . '&spell=true' ) ); //TODO: the fact that you're searching with a GET variable could be a security hole.  Find a way to sanitize the query
+	$search_result = $search_result->items;
+	var_dump( $search_result );
+
 	// use cURL to fetch the detailed information about the selected food from ESHA
 	$header = array(
 		"Accept: application/json",
 		"Content-Type: application/json"
 	);
 
-	$data = json_encode( 
+	$data = json_encode(
 		array(
 			'items' => array(
 				'id' => $_GET["id"],  //TODO: this could potentially be a security hole, find a way to get this data through without using GET
@@ -297,6 +301,12 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 		echo '<input type = "text" name="serving_size" value="1">';
 
 		echo '<select name="serving_units">';
+
+		foreach( $food->units as $unit )
+		{
+			echo '<td><a href="' . BASE_URL . 'new_food.php?status=food_selected&name=' . htmlspecialchars( $_GET["name"] ) . '&id=' . $food->id . '&unit=' . $unit . '">' . $units[ $unit ] . '</a></td>';//TODO: the fact that you're searching with a GET variable could be a security hole.  Find a way to sanitize the query
+		}
+
 		echo '<option value="pound">pound</option>';
 		echo '<option value="piece">piece</option>';
 		echo '<option value="cup">cup</option>';
