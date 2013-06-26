@@ -10,7 +10,164 @@ session_start();
 //%								functions 								   %	
 //%																		   %
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//empty for now...
+
+/**
+*	create_serving_units_dropdown()
+*	===============================
+*
+*	creates a "select" input (aka dropdown menu) for a form based on the 
+*	arguments passed
+*
+*	@param 	$units 	-	A one dimensional array containing the units that 
+*						will be in the dropdown menu
+*
+*						Ex: $units = array("Cup", "Milliliter", "Pound")
+*
+*
+*	@return NULL
+*
+*/
+function create_serving_units_dropdown( $units )
+{
+	//TODO: modify this so that if the serving size is > 1, the units will have an 's' at the end.
+
+	require_once( UNITS_TABLE_PATH );
+
+	//the serving units (i.e. cups, pieces, lbs, etc.) input
+	echo '<select name="serving_units">';
+
+	//output each unit to the dropdown list
+	foreach( $units as $unit )
+	{
+		//if the units are in small, medium, or large, make them into "small piece", "medium piece", etc.
+		if ( strtolower($unit) == "small" 
+			OR strtolower($unit) == "medium"
+			OR strtolower($unit) == "large")
+		{
+			$unit = $unit . " piece";
+		}
+		elseif ( strtolower($unit) == "ounce-weight" )
+		{
+			$unit = "Dry ounce";
+		}
+
+		echo '<option value="' . $unit . '">' . $unit . '</option>';
+	}
+
+	echo '</select>';
+}
+
+
+
+/**
+*	create_currency_dropdown()
+*	==========================
+*
+*	creates a dropdown menu for currencies based on the passed arguments.
+*	If the $default_currency argument is not an element in the 
+*	$currencies array, then there will be no default element in the 
+*	dropdown menu and the function will return false.
+*
+*	@param 	$currencies	-	A one dimensional array containing the currencies
+*							that will be in the dropdown menu
+*
+*							Ex: $units = array("USD", "EUR", "JPY");
+*
+*	@param 	$default_currency	-	a string containing the currency that 
+*									will be selected as the default for the
+*									dropdown menu
+*
+*
+*	@return $isPresent			-	true if $default_currency is present
+*										in the $currencies array
+*									false if $default_currency is not 
+*										present in the array
+*
+*
+*/
+function create_currency_dropdown( $currencies = NULL, $default_currency = "USD" )
+{
+	//initialize the currencies array if nothing is passed as an argument
+	if( $currencies == NULL )
+	{
+		$currencies = array(
+			"USD",
+			"KRW",
+			"EUR",
+			"GBP",
+			"RON"
+		);
+	}
+
+	//build the dropdown menu
+	$isPresent = false;
+	echo '<select name="currency">';
+	foreach( $currencies as $currency )
+	{
+		if( $currency == $default_currency )
+		{
+			echo '<option value="' . $currency . '" selected>' . $currency . '</option>';
+			$isPresent = true;
+		}
+		else
+		{
+			echo '<option value="' . $currency . '">' . $currency . '</option>';
+		}
+	}
+	echo '</select>';
+
+
+	return $isPresent;
+}
+
+
+
+
+/**
+*
+*
+*/
+function fetch_food_details( $food_id, $qty, $unit, $api_key)
+{
+	// use cURL to fetch from ESHA
+	$header = array(
+		"Accept: application/json",
+		"Content-Type: application/json"
+		);
+
+	$data = json_encode(
+		array(
+			'items' => array(
+				'id' => $id,  
+				'quantity' => $qty, 
+				'unit' => $unit 
+				)
+			)
+		);
+
+	$ch = curl_init( "http://api.esha.com/analysis?apikey=" . $api_key ); 	//initialize cURL with the ESHA URL
+	curl_setopt($ch, CURLOPT_POST,				1); 		//specify that it will be a POST request
+	curl_setopt($ch, CURLOPT_HTTPHEADER,		$header);	//insert the proper header defined above	
+	curl_setopt($ch, CURLOPT_POSTFIELDS,		$data); 	//the data to be sent
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION,	0); 		//do not go to any LOCATION: header that the server sends back
+	curl_setopt($ch, CURLOPT_HEADER,			1);  		// make the response return http headers
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER,	1);  		// make the response return the contents of the call
+
+	$response = curl_exec( $ch );
+
+	//if the database didn't return anything properly, give a fatal error
+	//the conditional has the strpos() > 25 to prevent the response body from containing "200 OK" and potentially allowing the program to continue
+	if ( strpos( $response, "200 OK" ) == false 	OR 		strpos( $response, "200 OK" ) > 25 )
+	{
+		echo 'Query response = ';
+		var_dump( $response );
+		die("Query Error: Food not found."); //TODO: handle this more gracefully.  have some kind of error handling
+	}
+
+	$foods = substr( $response, strpos($response, '{"items":') );
+	$foods = json_decode( $foods );
+	var_dump( $foods );
+}
 
 
 
@@ -40,7 +197,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 		else
 		{
 			//store entered name as session variable
-			$_SESSION['searched_food_name'] = htmlspecialchars( $_POST['name'] );
+			$_SESSION['food_name_query'] = htmlspecialchars( $_POST['name'] );
 
 			// if no errors, proceed to the next step, setting $_GET['status']='find'
 			header( "Location: " . BASE_URL . "new_food.php?status=find" );
@@ -154,7 +311,7 @@ if( !isset( $_GET['status'] ) )
 
 	echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
 	echo '<input type="text" name="name" value="">';
-	echo '<input type="hidden" name="status" value="name_selected">' //since there are multiple posts on this page, this field tells the site that the first stage, the food name submission stage is complete
+	echo '<input type="hidden" name="status" value="name_selected">'; //since there are multiple posts on this page, this field tells the site that the first stage, the food name submission stage is complete
 	echo '<input type="submit" value="Find Food">';
 }
 
@@ -164,17 +321,19 @@ if( !isset( $_GET['status'] ) )
 // Step 2 - Choosing a food from the returned database possibilities
 //
 // ------------------------------------------------------------------
-else if( isset($_SESSION['status']) AND $_SESSION['status'] == "find" ) 
+else if( isset($_GET['status']) AND $_GET['status'] == "find" ) 
 {
 	// require_once( NUTRITIONIX_PATH );
 	require_once( UNITS_TABLE_PATH );
 
 
 	//get the list of foods that match the user-defined query
-	$search_result = json_decode( file_get_contents( "http://api.esha.com/foods?apikey=" . ESHA_API_KEY . "&query=" . urlencode( $_SESSION['searched_food_name'] ) . '&spell=true' ) ); 
+	$search_result = json_decode( file_get_contents( "http://api.esha.com/foods?apikey=" . ESHA_API_KEY . "&query=" . urlencode( $_SESSION['food_name_query'] ) . '&spell=true' ) ); 
 	$search_result = $search_result->items;
 	$_SESSION['matched_foods'] = $search_result;
-	var_dump( $search_result );
+
+	echo 'search result = '; // DEBUG
+	var_dump( $search_result ); // DEBUG
 
 	// $ch = curl_init( "http://api.esha.com/food-units?apikey=" . ESHA_API_KEY );//DEBUG
 	// curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );//DEBUG
@@ -182,45 +341,21 @@ else if( isset($_SESSION['status']) AND $_SESSION['status'] == "find" )
 	// var_dump( json_decode( $response ) ); //DEBUG
 
 
-	//search through each result and try to match according to what they chose
+	//put a table at the bottom of the screen displaying all the results
 	echo '<table>';
+	$i = 0;
+
 	foreach( $search_result as $food ) {
 		echo '<tr>';
 		echo '<td>' . htmlspecialchars( $food->description ) . '</td>';
-		$i = 0;
-		foreach( $food->units as $unit )
-		{
-			//make links that correspond to each returned food match. idx in the GET corresponds to the index of the selected food in the $_SESSION['matched_foods'] array
-			echo '<td><a href="' . BASE_URL . 'new_food.php?status=food_selected&idx=' . $i . '</a></td>';
-			i++;
-		}
+
+		//make links that correspond to each returned food match. idx in the GET corresponds to the index of the selected food in the $_SESSION['matched_foods'] array
+		echo '<td><a href="' . BASE_URL . 'new_food.php?status=food_selected&idx=' . $i . '">Select</a></td>';
+		$i++;
+
 		echo '</tr>';
 	}
 	echo '</table>';
-
-	// $nutr = new Nutritionix( NUTRITIONIX_APP_ID, NUTRITIONIX_APP_KEY );
-	// try
-	// {
-	// 	// $search_result = $nutr->search( $_GET["name"], 0, 10, NULL, NULL, "*", NULL );
-	// 	// $search_result = $search_result["hits"];
-
-	// 	echo 'Please choose from one of the selections below';
-
-	// 	echo "<table>";
-
-	// 	//search through each result and try to match according to what they chose
-	// 	foreach( $search_result as $food ) {
-	// 		echo "<tr>";
-	// 		echo '<td>' . $food["fields"]["item_name"] . '</td>';
-	// 		echo '<td> <a href="' . BASE_URL . 'new_food.php?status=food_selected&name=' . $_GET["name"] . '&id=' . $food["fields"]["item_id"] . '">Select</a>';
-	// 	}
-
-	// 	echo "</table>";
-	// } 
-	// catch (Exception $e)
-	// {
-	// 	die('Nutritionix API Error: '.$e);	
-	// }
 }
 
 
@@ -231,125 +366,68 @@ else if( isset($_SESSION['status']) AND $_SESSION['status'] == "find" )
 // ------------------------------------------------------------------
 else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 {
-	// require_once( NUTRITIONIX_PATH );
+	//TODO: implement ability to see nutrition facts on this page based on what serving size the user chooses
+	//TODO: use AJAX (eventually) to show nutrition facts as the user changes the serving size
 
-	// %%%%%%%% test this out !! %%%%%%%%%%%
+	require_once( UNITS_TABLE_PATH );
 
-	// search for the food selected from the previous page
-	$search_result = json_decode( file_get_contents( "http://api.esha.com/foods?apikey=" . ESHA_API_KEY . "&query=" . urlencode( $_GET["name"] ) . '&spell=true' ) ); //TODO: the fact that you're searching with a GET variable could be a security hole.  Find a way to sanitize the query
-	$search_result = $search_result->items;
-	var_dump( $search_result );
+	//retrieve the selected food from the matched_foods array dependent on what idx is in the GET variable
+	$_SESSION['selected_food'] = $_SESSION['matched_foods'][ $_GET['idx'] ];
+	$selected_food = $_SESSION['selected_food'];
+	var_dump( $selected_food ); //DEBUG
 
-	// use cURL to fetch the detailed information about the selected food from ESHA
-	$header = array(
-		"Accept: application/json",
-		"Content-Type: application/json"
-	);
+	//for readability
+	$food_name = $selected_food->description;
 
-	$data = json_encode(
-		array(
-			'items' => array(
-				'id' => $_GET["id"],  //TODO: this could potentially be a security hole, find a way to get this data through without using GET
-				'quantity' => 0.5, //TODO: change this later
-				'unit' => "urn:uuid:dfad1d25-17ff-4201-bba0-0711e8b88c65" //TODO: change this later
-			)
-		)
-	);
-
-	$ch = curl_init( "http://api.esha.com/analysis?apikey=" . ESHA_API_KEY ); 	//initialize cURL with the ESHA URL
-	curl_setopt($ch, CURLOPT_POST,				1); 		//specify that it will be a POST request
-	curl_setopt($ch, CURLOPT_HTTPHEADER,		$header);	//insert the proper header defined above	
-	curl_setopt($ch, CURLOPT_POSTFIELDS,		$data); 	//the data to be sent
-	curl_setopt($ch, CURLOPT_FOLLOWLOCATION,	0); 		//do not go to any LOCATION: header that the server sends back
-	curl_setopt($ch, CURLOPT_HEADER,			1);  		// make the response return http headers
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER,	1);  		// make the response return the contents of the call
-
-	$response = curl_exec( $ch );
-
-	//if the database didn't return anything properly, give a fatal error
-	//the conditional has the strpos() > 25 to prevent the response body from containing "200 OK" and potentially allowing the program to continue
-	if ( strpos( $response, "200 OK" ) == false 	OR 		strpos( $response, "200 OK" ) > 25 )
+	//prepare units array for create_servings_form_inputs
+	$units = array();
+	foreach( $selected_food->units as $unit_code )
 	{
-		echo 'Query response = ';
-		var_dump( $response );
-		die("Query Error: Food not found."); //TODO: handle this more gracefully.  have some kind of error handling
+		$units[] = $units_lookup_table[ $unit_code ];
 	}
+	echo("units array = "); //DEBUG
+	var_dump( $units ); //DEBUG
 
-	$foods = substr( $response, strpos($response, '{"items":') );
-	$foods = json_decode( $foods );
-	var_dump( $foods );
+	echo '<h2>Selected food: ' . htmlspecialchars( $food_name ) . '</h2>';
 
-	// Fetch the nutrients array from ESHA
-	$ch = curl_init( "http://api.esha.com/food-units?apikey=" . ESHA_API_KEY );
-	curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
-	$response = curl_exec( $ch );
-	echo json_encode( $response ); //DEBUG
+	//give the user the option to search for the food's nutrition facts...
+	echo '<h3>Search for Nutrition Facts</h3>';
+	echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
+	echo 	'<input type = "text" name="serving_size" value="">'; //TODO: do form validation for this text input to make sure that it's all numbers input the serving size input
+	create_serving_units_dropdown( $units );
+	echo 	'<input type="hidden" name="status" value="nutrition_facts">'; //tells the site to view the nutrition facts if this is selected
+	echo 	'<input type="submit" value="See Nutrition Facts">';
 
-	// %%%%%%%% /test this out !! %%%%%%%%%%%
 
-	// $nutr = new Nutritionix( NUTRITIONIX_APP_ID, NUTRITIONIX_APP_KEY );
-	// try
+	//...or give them the option to save the food in the database
+	echo '<h3>OR</h3>';
+	echo '<br />';
+	echo '<h3>Save the food in your pantry</h3>';
+	echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
+	echo 	'<label for="user_def_food_name">Name to save it as:</label>';
+	echo 	'<input type="text" name="user_def_food_name" id="user_def_food_name" value="' . $food_name . '">';
+	echo 	'<br>';
+	echo 	'<label for="serving_size">Cost per</label>';
+	echo 	'<input type = "text" name="serving_size" id="serving_size" value="">'; //TODO: do form validation for this text input to make sure that it's all numbers input the serving size input
+	create_serving_units_dropdown( $units );
+	echo 	'=';
+	echo 	'<input type="text" name="cost" value="">';
+	create_currency_dropdown();
+	echo 	'<input type="hidden" name="food_name" value="' . $food_name . '">';
+	echo 	'<input type="hidden" name="status" value="save_food">'; //tells the site to save the food in the database if this is selected
+	echo 	'<input type="submit" value="Save that food!">';
+	
+	// //if the user hasn't already searched for the food nutrients already, fetch the data from ESHA
+	// if( !isset( $_SESSION["food_details"] ) )
 	// {
-	// 	$food = $nutr->getItem( $_GET["id"] );
-	// 	$name = ucwords( $_GET["name"] );
-
-		// // %%%%%%% 	START DEBUG 	%%%%%
-		// echo "<pre> food = "; //DEBUG
-		// var_dump($food); //DEBUG
-		// echo "</pre>"; //DEBUG
-		// // %%%%%%% 	END DEBUG 	%%%%%
-		
-		//TODO: put in the jquery nutrition label from here: https://github.com/nutritionix/nutrition-label into the page
-		$name = "FOOD_NAME"; //DEBUG
-		echo '<h2>Food: ' . htmlspecialchars( $name ) . '</h2>';
-		echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
-		echo '<label for="cost">Cost per</label>';
-
-		//TODO: do form validation for this text input to make sure that it's all numbers input
-		echo '<input type = "text" name="serving_size" value="1">';
-
-		echo '<select name="serving_units">';
-
-		foreach( $food->units as $unit )
-		{
-			echo '<td><a href="' . BASE_URL . 'new_food.php?status=food_selected&name=' . htmlspecialchars( $_GET["name"] ) . '&id=' . $food->id . '&unit=' . $unit . '">' . $units[ $unit ] . '</a></td>';//TODO: the fact that you're searching with a GET variable could be a security hole.  Find a way to sanitize the query
-		}
-
-		echo '<option value="pound">pound</option>';
-		echo '<option value="piece">piece</option>';
-		echo '<option value="cup">cup</option>';
-		echo '<option value="liter">liter</option>';
-		echo '<option value="milliliter">milliliter</option>';
-		echo '<option value="fluid_oz">fluid ounce</option>';
-		echo '<option value="dry_oz">dry ounce</option>';
-		echo '<option value="gram">gram</option>';
-		echo '<option value="kilogram">kilogram</option>';
-		echo '<option value="none">(no units)</option>';
-		echo '</select>';
-		echo ':   ';
-
-		echo '<input type="text" name="cost" id="cost" value="">';
-
-		echo '<select name="currency">';
-		//TODO find a way to store these currencies in an array or as json somewhere to make it easily extensible and portable
-		echo '<option value="USD" selected>USD</option>';
-		echo '<option value="KRW">KRW</option>';
-		echo '<option value="EUR">EUR</option>';
-		echo '<option value="GBP">GBP</option>';
-		echo '<option value="RON">RON</option>';
-		echo '</select>';
-
-		// hidden inputs
-		echo '<input type="hidden" name="name" value="' . htmlspecialchars( $name ) . '">';
-		echo '<input type="hidden" name="id" value="' . htmlspecialchars( $_GET["id"] ) . '">';
-		echo '<input type="hidden" name="status" value="save_food">'; //since there are multiple posts on this page, this field tells the site that the first stage, the food name submission stage is complete
-
-		echo '<input type="submit" value="Save that Food!">';
+	// 	fetch_food_details( $_SESSION['selected_food']->id, $qty, $unit, ESHA_API_KEY );
 	// }
-	// catch (Exception $e)
-	// {
-	// 	die('Nutritionix API Error: ' . $e);
-	// }
+
+	// // Fetch the nutrients array from ESHA
+	// $ch = curl_init( "http://api.esha.com/food-units?apikey=" . ESHA_API_KEY );
+	// curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
+	// $response = curl_exec( $ch );
+	// echo json_encode( $response ); //DEBUG
 }
 
 
