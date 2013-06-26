@@ -1,15 +1,36 @@
 <?php
-// TODO: use session variables for re-used variables
 require_once "/inc/paths.php";
 require_once LOGIN_PATH;
 
 session_start();
+
+$_SESSION['page_title'] = "New Food";
+
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%																		   %
 //%								functions 								   %	
 //%																		   %
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/**
+*	display_page_header()
+*	=====================
+*
+*	Takes in a string and sets the title of the page and the headline
+*	to it
+*
+*	@param 	-	$inTitle 	-	the title to be displayed
+*
+*
+*	@return -	NULL
+*/
+function display_page_header( $inTitle )
+{
+	$pageTitle = $inTitle;
+	include HEADER_PATH;
+}
+
 
 /**
 *	create_serving_units_dropdown()
@@ -171,6 +192,7 @@ function fetch_food_details( $food_id, $qty, $unit, $api_key)
 
 
 
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%																		   %
 //%								POST stuff 								   %	
@@ -292,8 +314,6 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 //%								non-POST stuff							   %	
 //%																		   %
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-$pageTitle = "New Food";
-include HEADER_PATH;
 
 // ==================================================================
 //
@@ -302,6 +322,9 @@ include HEADER_PATH;
 // ------------------------------------------------------------------
 if( !isset( $_GET['status'] ) )
 {
+	//display the page title
+	display_page_header( $_SESSION['page_title'] );
+
 	echo '<p>Search for a food to add to your pantry</p>';
 
 	if( isset($error_array["name"]) AND $error_array["name"] == true )
@@ -323,6 +346,9 @@ if( !isset( $_GET['status'] ) )
 // ------------------------------------------------------------------
 else if( isset($_GET['status']) AND $_GET['status'] == "find" ) 
 {
+	//display the page title
+	display_page_header( $_SESSION['page_title'] );
+
 	// require_once( NUTRITIONIX_PATH );
 	require_once( UNITS_TABLE_PATH );
 
@@ -369,15 +395,19 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 	//TODO: implement ability to see nutrition facts on this page based on what serving size the user chooses
 	//TODO: use AJAX (eventually) to show nutrition facts as the user changes the serving size
 
+
 	require_once( UNITS_TABLE_PATH );
 
 	//retrieve the selected food from the matched_foods array dependent on what idx is in the GET variable
 	$_SESSION['selected_food'] = $_SESSION['matched_foods'][ $_GET['idx'] ];
 	$selected_food = $_SESSION['selected_food'];
-	var_dump( $selected_food ); //DEBUG
+	// var_dump( $selected_food ); //DEBUG
 
 	//for readability
 	$food_name = $selected_food->description;
+
+	//display the page title
+	display_page_header( $_SESSION['page_title'] . $food_name );
 
 	//prepare units array for create_servings_form_inputs
 	$units = array();
@@ -440,6 +470,9 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 // ------------------------------------------------------------------
 else if( isset($_GET["status"]) AND $_GET["status"] == "submitted" )
 {
+	//display the page title
+	display_page_header( "Save Successful" );
+
 	echo "<p>Food saved!</p>";
 	echo '<a href="' . BASE_URL . 'new_food.php">Enter a new food</a>';
 	exit();
