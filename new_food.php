@@ -385,8 +385,8 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 	{
 		$units[] = $units_lookup_table[ $unit_code ];
 	}
-	echo("units array = "); //DEBUG
-	var_dump( $units ); //DEBUG
+	// echo("units array = "); //DEBUG
+	// var_dump( $units ); //DEBUG
 
 	echo '<h2>Selected food: ' . htmlspecialchars( $food_name ) . '</h2>';
 
@@ -399,9 +399,11 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 	echo 	'<input type="submit" value="See Nutrition Facts">';
 
 
-	//...or give them the option to save the food in the database
+	echo '<hr>';
 	echo '<h3>OR</h3>';
-	echo '<br />';
+	// echo '<hr>';
+
+	//...or give them the option to save the food in the database
 	echo '<h3>Save the food in your pantry</h3>';
 	echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
 	echo 	'<label for="user_def_food_name">Name to save it as:</label>';
