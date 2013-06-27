@@ -46,3 +46,5 @@ define("UNITS_TABLE_PATH", 	INCLUDE_PATH . "units_table.php");
 
 //the name of the mySQL database
 define("DB_NAME", 	"meal_planner");
+
+define("DB_HOST",	"localhost");

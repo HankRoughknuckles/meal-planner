@@ -1,4 +1,5 @@
 <?php
+//TODO: implement nutrition fact checking
 require_once "/inc/config.php";
 require_once LOGIN_PATH;
 
@@ -243,7 +244,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 		$cost 					= trim( $_POST['cost'] ); //this is the cost per serving size specified in $serving_size
 		$currency 				= trim( $_POST['currency'] );
 		$json_esha				= json_encode( $_SESSION['selected_food'] ); //the json encoded esha information about the food
-		$esha_id				= trim( $_SESSION['selected_food']->id ); //the food id as found in the esha database
+		$esha_food_id			= trim( $_SESSION['selected_food']->id ); //the food id as found in the esha database
 
 
 		// replace any blank fields with NULL instead
@@ -272,35 +273,39 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 
 		// Set up and insert data into the database if there are no errors
 		if( count( $error_array ) == 0 ){
-			// set up the database connection and select the calorie_counter db
-			$mysqli = mysqli_connect("localhost", SQL_USERNM, SQL_PSWD, DB_NAME )or die("cannot connect to mySQL"); //TODO: handle the error more gracefully
 
-			mysqli_select_db( $mysqli, DB_NAME )or die("cannot use the " . DB_NAME . " db"); //TODO: handle the error more gracefully
+			//using PDO prepared statements...
+			$conn = new PDO( 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, SQL_USERNM, SQL_PSWD );
 
-			// TODO: secure the query against sql injection attacks.  check out the following sites:
-			// 	http://stackoverflow.com/questions/60174/how-to-prevent-sql-injection-in-php
-			// 	http://php.net/manual/en/mysqli.prepare.php
-			// 	http://php.net/manual/en/mysqli-stmt.bind-param.php
-			$query = 'INSERT INTO t_foods (user_def_food_name, serving_size, serving_units_esha, cost, currency, json_esha, esha_id, user_id) VALUES ("' . $user_def_food_name .'", "'. $serving_size .'", "'. $serving_units_esha .'", "'. $cost .'", "'. $currency .'", "'. $json_esha .'", "'. $esha_id . '", "' . $user_id . '")';
+			$sql = 'INSERT INTO t_foods (user_def_food_name, serving_size, serving_units_esha, cost, currency, json_esha, esha_food_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 
-			echo $query;
+			//the params to go into the ?'s in $sql
+			$params = array(
+				$user_def_food_name,
+				$serving_size,
+				$serving_units_esha,
+				$cost,
+				$currency,
+				$json_esha,
+				$esha_food_id,
+				$user_id
+			);
 
-			$result = mysqli_query( $mysqli, $query );
-
-			mysqli_close($mysqli);
-
-			//check to make sure the insertion worked properly
-			if( $result )
+			//prepare the sql statement
+			$query = $conn->prepare( $sql ); 
+			if( !$query )
 			{
-				//reload the page as GET instead of POST
-				header("Location: " . BASE_URL . "new_food.php/?status=submitted");
-			} 
-			else
-			{
-				echo "DATABASE ERROR!!!!";
-				$error_array["insert"] = true;
-				exit();
+				echo 'Query preparation failed! - (' . $query->errno . ') ' . $query->error;
 			}
+
+			//crank the parameters into the statement and execute
+			$query = $query->execute( $params ); 
+			if( !$query )
+			{
+				echo 'Query execution failed! - (' . $query->errno . ') ' . $query->error;
+			}
+
+			$conn = null; //close the connection by setting it to null
 		}
 		echo '<p>Food Saved!</p>';
 	}
