@@ -1,6 +1,12 @@
 <?php
 
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%																			%
+//%									PATHS									%
+//%																			%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 define("BASE_URL",		"/");
+
 define("ROOT_PATH",		$_SERVER["DOCUMENT_ROOT"] . "/");
 
 //the path of the folder that contains all the include files
@@ -29,3 +35,14 @@ define("NUTRIENTS_TABLE_PATH", 	INCLUDE_PATH . "nutrients_table.php");
 
 //path to the file that holds the units lookup table for esha unit ID's
 define("UNITS_TABLE_PATH", 	INCLUDE_PATH . "units_table.php");
+
+
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%																			%
+//%							DATABASE INFORMATION							%
+//%																			%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+//the name of the mySQL database
+define("DB_NAME", 	"meal_planner");

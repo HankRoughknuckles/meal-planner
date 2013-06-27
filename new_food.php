@@ -1,11 +1,11 @@
 <?php
-require_once "/inc/paths.php";
+require_once "/inc/config.php";
 require_once LOGIN_PATH;
 
 session_start();
 
 $_SESSION['page_title'] = "New Food";
-
+$_SESSION['user_id'] = "-1"; //THIS IS JUST FOR TESTING UNTIL WE IMPLEMENT USER ACCOUNTS
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%																		   %
@@ -229,63 +229,61 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 
 	// ==================================================================
 	//
-	// When the user is ready to save the food information in the 
-	// database
+	//	The last step - saving the user's choices to the database
+	//	(note, the steps in between are below, in the non-POST section)
 	//
 	// ------------------------------------------------------------------
-	if( $_POST["status"] == "save_food" )
+	else if( $_POST["status"] == "save_food" )
 	{
-		require_once( NUTRITIONIX_PATH );
+		//import the variables from _POST and _SESSION
+		$user_id				= trim( $_SESSION['user_id'] ); //the id of the user currently logged in
+		$user_def_food_name 	= trim( $_POST['user_def_food_name'] ); //the name the user saved the food as
+		$serving_size 			= trim( $_POST['serving_size'] );
+		$serving_units_esha		= trim( $_POST['serving_units'] );
+		$cost 					= trim( $_POST['cost'] ); //this is the cost per serving size specified in $serving_size
+		$currency 				= trim( $_POST['currency'] );
+		$json_esha				= json_encode( $_SESSION['selected_food'] ); //the json encoded esha information about the food
+		$esha_id				= trim( $_SESSION['selected_food']->id ); //the food id as found in the esha database
 
-		$nutr = new Nutritionix( NUTRITIONIX_APP_ID, NUTRITIONIX_APP_KEY );
 
-		//import the variables from _POST
-		$q_name = trim( $_POST["name"] );
-		$q_json_food = json_encode( $nutr->getItem( $_POST['id'] ) );
-		$q_serving_size = trim( $_POST["serving_size"] );
-		$q_serving_units = trim( $_POST["serving_units"] );
-		$q_cost = trim( $_POST["cost"] );
-		$q_currency = trim( $_POST["currency"] );
+		// replace any blank fields with NULL instead
+		if( $user_def_food_name == "" ){
+			$user_def_food_name = NULL;
+		}
+		if( $serving_size == "" ){
+			$serving_size = NULL;
+		}
+		if( $serving_units_esha == "" ){
+			$serving_units_esha = NULL;
+		}
+		if( $cost == "" ){
+			$cost = NULL;
+		}
+		if( $currency == "" ){
+			$currency = NULL;
+		}
 
 		//TODO: do any error checking / form validation here
 		$error_array = array();
 
-		// replace any blank fields with NULL instead
-		if( $q_name == "" ) {
-			$q_ = NULL;
-		}
-		if( $q_json_food == "" ) {
-			$q_json_food = NULL;
-		}
-		if( $q_serving_size == "" ) {
-			$q_serving_size = NULL;
-		}
-		if( $q_serving_units == "" ) {
-			$q_serving_units = NULL;
-		}
-		if( $q_cost == "" ) {
-			$q_cost = NULL;
-		}
-		if( $q_currency == "" ) {
-			$q_currency = NULL;
-		}
-
-		//escape all double quotation marks in q_json_food
-		$q_json_food = addslashes( $q_json_food );
+		//escape all double quotation marks in json_esha
+		$json_esha = addslashes( $json_esha );
 
 
 		// Set up and insert data into the database if there are no errors
 		if( count( $error_array ) == 0 ){
 			// set up the database connection and select the calorie_counter db
-			$mysqli = mysqli_connect("localhost", $SQL_USERNM, $SQL_PSWD, "calorie_calculator")or die("cannot connect to mySQL");
+			$mysqli = mysqli_connect("localhost", SQL_USERNM, SQL_PSWD, DB_NAME )or die("cannot connect to mySQL"); //TODO: handle the error more gracefully
 
-			mysqli_select_db( $mysqli, "calorie_calculator" )or die("cannot use the calorie_calculator db");
+			mysqli_select_db( $mysqli, DB_NAME )or die("cannot use the " . DB_NAME . " db"); //TODO: handle the error more gracefully
 
-			// TODO secure the query against sql injection attacks.  check out the following sites:
+			// TODO: secure the query against sql injection attacks.  check out the following sites:
 			// 	http://stackoverflow.com/questions/60174/how-to-prevent-sql-injection-in-php
 			// 	http://php.net/manual/en/mysqli.prepare.php
 			// 	http://php.net/manual/en/mysqli-stmt.bind-param.php
-			$query = 'INSERT INTO t_foods (name, serving_size, serving_units, cost_per_package, food_object) VALUES ("' . $q_name . '", ' . $q_serving_size . ', "' . $q_serving_units . '", ' . $q_cost . ', "' . $q_json_food . '")';
+			$query = 'INSERT INTO t_foods (user_def_food_name, serving_size, serving_units_esha, cost, currency, json_esha, esha_id, user_id) VALUES ("' . $user_def_food_name .'", "'. $serving_size .'", "'. $serving_units_esha .'", "'. $cost .'", "'. $currency .'", "'. $json_esha .'", "'. $esha_id . '", "' . $user_id . '")';
+
+			echo $query;
 
 			$result = mysqli_query( $mysqli, $query );
 
@@ -299,7 +297,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 			} 
 			else
 			{
-				html_echo("DATABASE ERROR!!!!");
+				echo "DATABASE ERROR!!!!";
 				$error_array["insert"] = true;
 				exit();
 			}
@@ -444,9 +442,7 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 	</form>
 
 
-	<!-- <hr> -->
 	<h2>OR</h2>
-	<!-- <hr> -->
 
 
 	<!-- ...or give them the option to save the food in the database -->
@@ -485,7 +481,6 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 					<?php create_currency_dropdown(); ?>
 				</td>
 				<td>
-					<input type="hidden" name="food_name" value="' . $food_name . '">
 					<input type="hidden" name="status" value="save_food"> <!--//tells the site to save the food in the database if this is selected -->
 					<input type="submit" value="Save that food!">
 				</td>

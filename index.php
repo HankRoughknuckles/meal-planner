@@ -1,5 +1,5 @@
 <?php
-require_once("/inc/paths.php");
+require_once("/inc/config.php");
 
 $pageTitle = "Meal Calculator - Index";
 include( HEADER_PATH );
