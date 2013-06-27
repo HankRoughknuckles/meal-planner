@@ -117,7 +117,7 @@ function create_currency_dropdown( $currencies = NULL, $default_currency = "USD"
 			"EUR",
 			"GBP",
 			"RON"
-		);
+			);
 	}
 
 	//build the dropdown menu
@@ -407,7 +407,7 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 	$food_name = $selected_food->description;
 
 	//display the page title
-	display_page_header( $_SESSION['page_title'] . $food_name );
+	display_page_header( $_SESSION['page_title'] . ' - ' . $food_name );
 
 	//prepare units array for create_servings_form_inputs
 	$units = array();
@@ -417,38 +417,84 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 	}
 	// echo("units array = "); //DEBUG
 	// var_dump( $units ); //DEBUG
+	?>
 
-	echo '<h2>Selected food: ' . htmlspecialchars( $food_name ) . '</h2>';
+	<!-- //TODO: Hopefully this will look prettier with some CSS -->
+	<!-- //give the user the option to search for the food's nutrition facts... -->
+	<hr>
+	<h3>Search for Nutrition Facts</h3>
+	<form name="input" action="<?php echo BASE_URL . 'new_food.php'; ?>" method="post">
+		<table>
+			<tr>
+				<th>Amount</th>
+				<th>Units</th>
+			</tr>
 
-	//give the user the option to search for the food's nutrition facts...
-	echo '<h3>Search for Nutrition Facts</h3>';
-	echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
-	echo 	'<input type = "text" name="serving_size" value="">'; //TODO: do form validation for this text input to make sure that it's all numbers input the serving size input
-	create_serving_units_dropdown( $units );
-	echo 	'<input type="hidden" name="status" value="nutrition_facts">'; //tells the site to view the nutrition facts if this is selected
-	echo 	'<input type="submit" value="See Nutrition Facts">';
+			<tr>
+				<td><input type = "text" name="serving_size" value=""></td> <!-- //TODO: do form validation for this text input to make sure that it all numbers input the serving size input -->
+				<td>
+					<?php create_serving_units_dropdown( $units ); ?>
+				</td>
+				<td>
+					<input type="hidden" name="status" value="nutrition_facts"><!--//tells the site to view the nutrition facts if this is selected -->
+					<input type="submit" value="See Nutrition Facts">
+				</td>
+			</tr>
+		</table>
+	</form>
 
 
-	echo '<hr>';
-	echo '<h3>OR</h3>';
-	// echo '<hr>';
+	<!-- <hr> -->
+	<h2>OR</h2>
+	<!-- <hr> -->
 
-	//...or give them the option to save the food in the database
-	echo '<h3>Save the food in your pantry</h3>';
-	echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
-	echo 	'<label for="user_def_food_name">Name to save it as:</label>';
-	echo 	'<input type="text" name="user_def_food_name" id="user_def_food_name" value="' . $food_name . '">';
-	echo 	'<br>';
-	echo 	'<label for="serving_size">Cost per</label>';
-	echo 	'<input type = "text" name="serving_size" id="serving_size" value="">'; //TODO: do form validation for this text input to make sure that it's all numbers input the serving size input
-	create_serving_units_dropdown( $units );
-	echo 	'=';
-	echo 	'<input type="text" name="cost" value="">';
-	create_currency_dropdown();
-	echo 	'<input type="hidden" name="food_name" value="' . $food_name . '">';
-	echo 	'<input type="hidden" name="status" value="save_food">'; //tells the site to save the food in the database if this is selected
-	echo 	'<input type="submit" value="Save that food!">';
-	
+
+	<!-- ...or give them the option to save the food in the database -->
+	<h3>Save the food in your pantry</h3>
+	<form name="input" action="<?php echo BASE_URL . 'new_food.php'; ?>" method="post">
+		<table>
+			<tr>
+				<th><label for="user_def_food_name">Name:</label></th>
+				<td><input type="text" name="user_def_food_name" id="user_def_food_name" value="<?php echo $food_name;?>" size="<?php echo (strlen($food_name) + 5); ?>"></td>
+			</tr>
+		</table>
+		<p>How much is it?</p>
+		<table>
+			<tr>
+				<th>Amount</th>
+				<th>Units</th>
+			</tr>
+			<tr>
+				<td>
+					<input type="text" name="serving_size" id="serving_size" value="1">
+				</td> <!-- //TODO: do form validation for this text input to make sure that it all numbers input the serving size input -->
+				<td>
+					<?php create_serving_units_dropdown( $units ); ?>
+				</td>
+			</tr>
+		</table>
+
+		<p>Costs</p>
+
+		<table>
+			<tr>
+				<td>
+					<input type="text" name="cost" value="">
+				</td>
+				<td>
+					<?php create_currency_dropdown(); ?>
+				</td>
+				<td>
+					<input type="hidden" name="food_name" value="' . $food_name . '">
+					<input type="hidden" name="status" value="save_food"> <!--//tells the site to save the food in the database if this is selected -->
+					<input type="submit" value="Save that food!">
+				</td>
+			</tr>
+		</table>
+	</form>
+
+	<?php
+
 	// //if the user hasn't already searched for the food nutrients already, fetch the data from ESHA
 	// if( !isset( $_SESSION["food_details"] ) )
 	// {
@@ -470,7 +516,7 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 // ------------------------------------------------------------------
 else if( isset($_GET["status"]) AND $_GET["status"] == "submitted" )
 {
-	//display the page title
+					//display the page title
 	display_page_header( "Save Successful" );
 
 	echo "<p>Food saved!</p>";
