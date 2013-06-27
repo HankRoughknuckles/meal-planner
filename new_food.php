@@ -146,7 +146,7 @@ function create_currency_dropdown( $currencies = NULL, $default_currency = "USD"
 
 
 /**
-*
+* //TODO: fill this out
 *
 */
 function fetch_food_details( $food_id, $qty, $unit, $api_key)
@@ -231,7 +231,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 	// ==================================================================
 	//
 	//	The last step - saving the user's choices to the database
-	//	(note, the steps in between are below, in the non-POST section)
+	//	(Note: the steps in between are below - in the non-POST section)
 	//
 	// ------------------------------------------------------------------
 	else if( $_POST["status"] == "save_food" )
