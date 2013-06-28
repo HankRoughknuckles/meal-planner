@@ -496,11 +496,7 @@ else if( isset($_GET['status']) AND $_GET['status'] == "find" )
 // ------------------------------------------------------------------
 else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 {
-	//TODO: implement ability to see nutrition facts on this page based on what serving size the user chooses
-	//TODO: use AJAX (eventually) to show nutrition facts as the user changes the serving size
-
-
-	// require_once( UNITS_TABLE_PATH );
+	//TODO: use AJAX (eventually) to show nutrition facts as the user changes the serving size on this page
 
 	//retrieve the selected food from the matched_foods array dependent on what idx is in the GET variable
 	$_SESSION['selected_food'] = $_SESSION['matched_foods'][ $_GET['idx'] ];
