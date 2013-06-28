@@ -7,7 +7,9 @@
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 define("BASE_URL",		"/");
 
+
 define("ROOT_PATH",		$_SERVER["DOCUMENT_ROOT"] . "/");
+
 
 //the path of the folder that contains all the include files
 define("INCLUDE_PATH", 	BASE_URL . "inc/");
@@ -23,10 +25,6 @@ define("FOOTER_PATH", 	INCLUDE_PATH . "footer.php");
 
 //the path to the file that contains sensitive login information and api keys
 define("LOGIN_PATH",	INCLUDE_PATH . "sensitive/login.php"); 
-
-
-//file that contains nutritionix database functionality
-define("NUTRITIONIX_PATH", 	INCLUDE_PATH . "nutritionix.php");
 
 
 //path to the file that holds the nutrients lookup table for esha nutrient ID's

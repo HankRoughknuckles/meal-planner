@@ -1,4 +1,5 @@
 <?php
+//TODO: parse the esha query results into a class that you can standardize and work with
 //TODO: implement nutrition fact checking
 require_once "/inc/config.php";
 require_once LOGIN_PATH;
@@ -6,7 +7,7 @@ require_once LOGIN_PATH;
 session_start();
 
 $_SESSION['page_title'] = "New Food";
-$_SESSION['user_id'] = "-1"; //THIS IS JUST FOR TESTING UNTIL WE IMPLEMENT USER ACCOUNTS
+$_SESSION['user_id'] = "-1"; //TODO: implement user accounts since THIS IS JUST FOR TESTING UNTIL WE IMPLEMENT USER ACCOUNTS
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%																		   %
@@ -31,6 +32,41 @@ function display_page_header( $inTitle )
 	$pageTitle = $inTitle;
 	include HEADER_PATH;
 }
+
+
+
+/**
+*	create_units_array()
+*	====================
+*
+*	takes in an ESHA returned food object and makes an 
+*	array of all possible units it has available. It 
+*	creates this units array from the $food->units array
+*	inside of it.  However, since the $food->units array 
+*	is full of ESHA id numbers, this takes the 
+*	$food->units array and converts to human-readable form.
+*
+*	@param $food 	-	an object returned from an ESHA query
+*
+*	@return $units 	-	a non-associative array containing 
+*						the human readable forms of the ESHA 
+*						units that $food can be measured in
+*
+*/
+function create_units_array ( $food )
+{
+	require( UNITS_TABLE_PATH );
+
+	$units = array();
+	foreach( $food->units as $unit_code )
+	{
+		$units[] = $units_lookup_table[ $unit_code ];
+	}
+
+
+	return $units;
+}
+
 
 
 /**
@@ -65,6 +101,54 @@ function create_serving_units_dropdown( $units )
 	}
 
 	echo '</select>';
+}
+
+
+/**
+* TODO: make description of create_pantry_save_form() later
+*/
+function create_pantry_save_form( $default_food_name, $unit_list )
+{
+	echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
+	echo 	'<table>';
+	echo 		'<tr>';
+	echo 			'<th><label for="user_def_food_name">Name:</label></th>';
+	echo 			'<td><input type="text" name="user_def_food_name" id="user_def_food_name" value="' . $default_food_name . '" size="' . (strlen($default_food_name) + 5) . '"></td>';
+	echo 		'</tr>';
+	echo 	'</table>';
+	echo 	'<p>How much is it?</p>';
+	echo 	'<table>';
+	echo 		'<tr>';
+	echo 			'<th>Amount</th>';
+	echo 			'<th>Units</th>';
+	echo 		'</tr>';
+	echo 		'<tr>';
+	echo 			'<td>';
+	echo 				'<input type="text" name="serving_size" id="serving_size" value="1">';
+	echo 			'</td>'; //TODO: do form validation for this text input to make sure that it all numbers input the serving size input
+	echo 			'<td>';
+	create_serving_units_dropdown( $unit_list );
+	echo 			'</td>';
+	echo 		'</tr>';
+	echo 	'</table>';
+
+	echo 	'<p>Costs</p>';
+
+	echo 	'<table>';
+	echo 		'<tr>';
+	echo 			'<td>';
+	echo 				'<input type="text" name="cost" value="">';
+	echo 			'</td>';
+	echo 			'<td>';
+	create_currency_dropdown();
+	echo 			'</td>';
+	echo 			'<td>';
+	echo 				'<input type="hidden" name="status" value="save_food">'; //tells the site to save the food in the database if this is selected
+	echo 				'<input type="submit" value="Save that food!">';
+	echo 			'</td>';
+	echo 		'</tr>';
+	echo 	'</table>';
+	echo '</form>';
 }
 
 
@@ -131,6 +215,7 @@ function create_currency_dropdown( $currencies = NULL, $default_currency = "USD"
 }
 
 
+
 /**
 * //TODO: fill this out
 *
@@ -142,6 +227,7 @@ function my_var_dump( $var_name, $variable )
 	var_dump( $variable );
 	echo "</pre>";
 }
+
 
 
 /**
@@ -380,9 +466,6 @@ else if( isset($_GET['status']) AND $_GET['status'] == "find" )
 	//display the page title
 	display_page_header( $_SESSION['page_title'] );
 
-	require_once( UNITS_TABLE_PATH );
-
-
 	//get the list of foods that match the user-defined query
 	$search_result = json_decode( file_get_contents( "http://api.esha.com/foods?apikey=" . ESHA_API_KEY . "&query=" . urlencode( $_SESSION['food_name_query'] ) . '&spell=true' ) ); 
 	$search_result = $search_result->items;
@@ -420,7 +503,7 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 	//TODO: use AJAX (eventually) to show nutrition facts as the user changes the serving size
 
 
-	require_once( UNITS_TABLE_PATH );
+	// require_once( UNITS_TABLE_PATH );
 
 	//retrieve the selected food from the matched_foods array dependent on what idx is in the GET variable
 	$_SESSION['selected_food'] = $_SESSION['matched_foods'][ $_GET['idx'] ];
@@ -432,12 +515,7 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 	//display the page title
 	display_page_header( $_SESSION['page_title'] . ' - ' . $food_name );
 
-	//prepare units array for create_servings_form_inputs
-	$units = array();
-	foreach( $selected_food->units as $unit_code )
-	{
-		$units[] = $units_lookup_table[ $unit_code ];
-	}
+	$units = create_units_array( $_SESSION['selected_food'] );
 	?>
 
 	<!-- //TODO: Hopefully this will look prettier with some CSS -->
@@ -470,55 +548,9 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 
 	<!-- ...or give them the option to save the food in the database -->
 	<h3>Save the food in your pantry</h3>
-	<form name="input" action="<?php echo BASE_URL . 'new_food.php'; ?>" method="post">
-		<table>
-			<tr>
-				<th><label for="user_def_food_name">Name:</label></th>
-				<td><input type="text" name="user_def_food_name" id="user_def_food_name" value="<?php echo $food_name;?>" size="<?php echo (strlen($food_name) + 5); ?>"></td>
-			</tr>
-		</table>
-		<p>How much is it?</p>
-		<table>
-			<tr>
-				<th>Amount</th>
-				<th>Units</th>
-			</tr>
-			<tr>
-				<td>
-					<input type="text" name="serving_size" id="serving_size" value="1">
-				</td> <!-- //TODO: do form validation for this text input to make sure that it all numbers input the serving size input -->
-				<td>
-					<?php create_serving_units_dropdown( $units ); ?>
-				</td>
-			</tr>
-		</table>
-
-		<p>Costs</p>
-
-		<table>
-			<tr>
-				<td>
-					<input type="text" name="cost" value="">
-				</td>
-				<td>
-					<?php create_currency_dropdown(); ?>
-				</td>
-				<td>
-					<input type="hidden" name="status" value="save_food"> <!--//tells the site to save the food in the database if this is selected -->
-					<input type="submit" value="Save that food!">
-				</td>
-			</tr>
-		</table>
-	</form>
-
 
 	<?php
-
-	// //if the user hasn't already searched for the food nutrients already, fetch the data from ESHA
-	// if( !isset( $_SESSION["food_details"] ) )
-	// {
-	// 	fetch_food_details( $_SESSION['selected_food']->id, $qty, $unit, ESHA_API_KEY );
-	// }
+	create_pantry_save_form( $selected_food->description, $units );	
 }
 
 
@@ -529,7 +561,7 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 // ------------------------------------------------------------------
 else if( isset($_GET['status']) AND $_GET['status'] == 'nutrition_facts' )
 {
-	require_once( UNITS_TABLE_PATH );
+	require( UNITS_TABLE_PATH );
 	require_once( NUTRIENTS_TABLE_PATH );
 
 	display_page_header( "Nutrition Facts - " . $_SESSION['selected_food']->description );
@@ -572,6 +604,11 @@ else if( isset($_GET['status']) AND $_GET['status'] == 'nutrition_facts' )
 	}
 	echo '</table>';
 
+	echo '<hr>';
+	echo '<p>' . htmlspecialchars('If you want to save this food in your pantry, please specify how much it costs:') . '</p>';
+
+	$units = create_units_array( $_SESSION['selected_food'] );
+	create_pantry_save_form( $_SESSION['selected_food']->description, $units );
 }
 
 
