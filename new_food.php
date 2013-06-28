@@ -61,18 +61,6 @@ function create_serving_units_dropdown( $units )
 	//output each unit to the dropdown list
 	foreach( $units as $unit )
 	{
-		//if the units are in small, medium, or large, make them into "small piece", "medium piece", etc.
-		if ( strtolower($unit) == "small" 
-			OR strtolower($unit) == "medium"
-			OR strtolower($unit) == "large")
-		{
-			$unit = $unit . " piece";
-		}
-		elseif ( strtolower($unit) == "ounce-weight" )
-		{
-			$unit = "Dry ounce";
-		}
-
 		echo '<option value="' . $unit . '">' . $unit . '</option>';
 	}
 
@@ -143,6 +131,17 @@ function create_currency_dropdown( $currencies = NULL, $default_currency = "USD"
 }
 
 
+/**
+* //TODO: fill this out
+*
+*/
+function my_var_dump( $var_name, $variable )
+{
+	echo " VAR_DUMP OF $var_name";
+	echo "<pre>";
+	var_dump( $variable );
+	echo "</pre>";
+}
 
 
 /**
@@ -160,12 +159,13 @@ function fetch_food_details( $food_id, $qty, $unit, $api_key)
 	$data = json_encode(
 		array(
 			'items' => array(
-				'id' => $id,  
+				'id' => $food_id,  
 				'quantity' => $qty, 
 				'unit' => $unit 
-				)
 			)
-		);
+		)
+	);
+
 
 	$ch = curl_init( "http://api.esha.com/analysis?apikey=" . $api_key ); 	//initialize cURL with the ESHA URL
 	curl_setopt($ch, CURLOPT_POST,				1); 		//specify that it will be a POST request
@@ -174,6 +174,7 @@ function fetch_food_details( $food_id, $qty, $unit, $api_key)
 	curl_setopt($ch, CURLOPT_FOLLOWLOCATION,	0); 		//do not go to any LOCATION: header that the server sends back
 	curl_setopt($ch, CURLOPT_HEADER,			1);  		// make the response return http headers
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER,	1);  		// make the response return the contents of the call
+	curl_setopt($ch, CURLOPT_VERBOSE,	1);  				// make the response verbose.  FOR DEBUGGING PURPOSES
 
 	$response = curl_exec( $ch );
 
@@ -186,9 +187,11 @@ function fetch_food_details( $food_id, $qty, $unit, $api_key)
 		die("Query Error: Food not found."); //TODO: handle this more gracefully.  have some kind of error handling
 	}
 
+	//knock off the html headers and start at the beginning of the actual query results (note: they're in JSON so we have to decode them)
 	$foods = substr( $response, strpos($response, '{"items":') );
 	$foods = json_decode( $foods );
-	var_dump( $foods );
+
+	return $foods->results;
 }
 
 
@@ -225,6 +228,31 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 			// if no errors, proceed to the next step, setting $_GET['status']='find'
 			header( "Location: " . BASE_URL . "new_food.php?status=find" );
 		}
+	}
+
+
+	// ==================================================================
+	//
+	//	Searching for nutrition facts
+	//
+	// ------------------------------------------------------------------
+	else if( $_POST['status'] == 'nutrition_facts' )
+	{
+		require_once( UNITS_TABLE_PATH );
+
+		//these two variables are to be used in searching for nutrition facts, they are not necessarily the units that will be used to store the food in the user's pantry (db).  I decided to use _SESSION instead of using GET to keep things more secure
+		$_SESSION['lookup_serving_size'] = $_POST['serving_size'];
+
+		//since $units_lookup_table is structured as $id => $unit_name, search through the table to find which id matches the POSTed unit
+		foreach( $units_lookup_table as $id => $table_unit )
+		{
+			if( $table_unit == $_POST['serving_units'] )
+			{
+				$_SESSION['lookup_serving_units_id'] = $id;
+			}
+		}
+
+		header( "Location: " . BASE_URL . "new_food.php?status=nutrition_facts" );
 	}
 
 
@@ -363,12 +391,6 @@ else if( isset($_GET['status']) AND $_GET['status'] == "find" )
 	echo 'search result = '; // DEBUG
 	var_dump( $search_result ); // DEBUG
 
-	// $ch = curl_init( "http://api.esha.com/food-units?apikey=" . ESHA_API_KEY );//DEBUG
-	// curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );//DEBUG
-	// $response = curl_exec( $ch );//DEBUG
-	// var_dump( json_decode( $response ) ); //DEBUG
-
-
 	//put a table at the bottom of the screen displaying all the results
 	echo '<table>';
 	$i = 0;
@@ -403,7 +425,6 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 	//retrieve the selected food from the matched_foods array dependent on what idx is in the GET variable
 	$_SESSION['selected_food'] = $_SESSION['matched_foods'][ $_GET['idx'] ];
 	$selected_food = $_SESSION['selected_food'];
-	// var_dump( $selected_food ); //DEBUG
 
 	//for readability
 	$food_name = $selected_food->description;
@@ -417,8 +438,6 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 	{
 		$units[] = $units_lookup_table[ $unit_code ];
 	}
-	// echo("units array = "); //DEBUG
-	// var_dump( $units ); //DEBUG
 	?>
 
 	<!-- //TODO: Hopefully this will look prettier with some CSS -->
@@ -492,6 +511,7 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 		</table>
 	</form>
 
+
 	<?php
 
 	// //if the user hasn't already searched for the food nutrients already, fetch the data from ESHA
@@ -499,12 +519,59 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 	// {
 	// 	fetch_food_details( $_SESSION['selected_food']->id, $qty, $unit, ESHA_API_KEY );
 	// }
+}
 
-	// // Fetch the nutrients array from ESHA
-	// $ch = curl_init( "http://api.esha.com/food-units?apikey=" . ESHA_API_KEY );
-	// curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
-	// $response = curl_exec( $ch );
-	// echo json_encode( $response ); //DEBUG
+
+// ==================================================================
+//
+// Step 3.5 - Look at food nutrition facts
+//
+// ------------------------------------------------------------------
+else if( isset($_GET['status']) AND $_GET['status'] == 'nutrition_facts' )
+{
+	require_once( UNITS_TABLE_PATH );
+	require_once( NUTRIENTS_TABLE_PATH );
+
+	display_page_header( "Nutrition Facts - " . $_SESSION['selected_food']->description );
+	$nutrition_facts = fetch_food_details( 
+		$_SESSION['selected_food']->id, 
+		$_SESSION['lookup_serving_size'], 
+		$_SESSION['lookup_serving_units_id'],  
+		ESHA_API_KEY
+	);
+
+	//show the serving size and units
+	echo '<table>';
+	echo 	'<tr>';
+	echo 		'<th>Serving Size:</th>';
+
+	//put the units in plural if the serving is != 1
+	//TODO: implement inch'es' instead of 'inchs'.  Make the units correctly either have 's' or 'es' at the end, depending on the word
+	if(	$_SESSION['lookup_serving_size'] == 1 )
+	{
+		echo 	'<td>' . $_SESSION['lookup_serving_size'] . ' ' . $units_lookup_table[ $_SESSION['lookup_serving_units_id'] ];
+	}
+	else
+	{
+		echo 	'<td>' . $_SESSION['lookup_serving_size'] . ' ' . $units_lookup_table[ $_SESSION['lookup_serving_units_id'] ] . 's';
+	}
+	echo 	'</tr>';
+
+	//show each of the nutrients in it
+	foreach ($nutrition_facts as $fact) 
+	{
+		echo '<tr>';
+
+		$nutrient = $nutrients_lookup_table[ $fact->nutrient ]['description'];
+		$nutrient_unit = $nutrients_lookup_table[ $fact->nutrient ]['unit']; 
+
+		echo '<th>' . $nutrient . ':</th>';
+		echo '<td>' . $fact->value . ' ' . $nutrient_unit . '</td>';
+
+		echo '</tr>';
+	}
+	echo '</table>';
+
 }
 
 
