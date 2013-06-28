@@ -1,6 +1,6 @@
 <?php
 //TODO: parse the esha query results into a class that you can standardize and work with
-//TODO: implement nutrition fact checking
+//TODO: implement error handling in case the user inputs a letter where only numbers should be.
 require_once "/inc/config.php";
 require_once LOGIN_PATH;
 
@@ -269,7 +269,6 @@ function fetch_food_details( $food_id, $qty, $unit, $api_key)
 	if ( strpos( $response, "200 OK" ) == false 	OR 		strpos( $response, "200 OK" ) > 25 )
 	{
 		echo 'Query response = ';
-		var_dump( $response );
 		die("Query Error: Food not found."); //TODO: handle this more gracefully.  have some kind of error handling
 	}
 
@@ -353,9 +352,9 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 		//import the variables from _POST and _SESSION
 		$user_id				= trim( $_SESSION['user_id'] ); //the id of the user currently logged in
 		$user_def_food_name 	= trim( $_POST['user_def_food_name'] ); //the name the user saved the food as
-		$serving_size 			= trim( $_POST['serving_size'] );
+		$serving_size 			= $_POST['serving_size'];
 		$serving_units_esha		= trim( $_POST['serving_units'] );
-		$cost 					= trim( $_POST['cost'] ); //this is the cost per serving size specified in $serving_size
+		$cost 					= $_POST['cost']; //this is the cost per serving size specified in $serving_size
 		$currency 				= trim( $_POST['currency'] );
 		$json_esha				= json_encode( $_SESSION['selected_food'] ); //the json encoded esha information about the food
 		$esha_food_id			= trim( $_SESSION['selected_food']->id ); //the food id as found in the esha database
@@ -464,15 +463,13 @@ if( !isset( $_GET['status'] ) )
 else if( isset($_GET['status']) AND $_GET['status'] == "find" ) 
 {
 	//display the page title
-	display_page_header( $_SESSION['page_title'] );
+	display_page_header( htmlspecialchars( $_SESSION['page_title']. ' - Search Results for "' . $_SESSION['food_name_query'] ) . '"');
 
 	//get the list of foods that match the user-defined query
 	$search_result = json_decode( file_get_contents( "http://api.esha.com/foods?apikey=" . ESHA_API_KEY . "&query=" . urlencode( $_SESSION['food_name_query'] ) . '&spell=true' ) ); 
 	$search_result = $search_result->items;
 	$_SESSION['matched_foods'] = $search_result;
 
-	echo 'search result = '; // DEBUG
-	var_dump( $search_result ); // DEBUG
 
 	//put a table at the bottom of the screen displaying all the results
 	echo '<table>';
