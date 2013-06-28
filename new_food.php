@@ -352,7 +352,6 @@ else if( isset($_GET['status']) AND $_GET['status'] == "find" )
 	//display the page title
 	display_page_header( $_SESSION['page_title'] );
 
-	// require_once( NUTRITIONIX_PATH );
 	require_once( UNITS_TABLE_PATH );
 
 
