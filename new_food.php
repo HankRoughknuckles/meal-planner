@@ -87,7 +87,7 @@ function create_units_array ( $food )
 */
 function create_serving_units_dropdown( $units )
 {
-	//TODO: modify this so that if the serving size is > 1, the units will have an 's' at the end.
+	//TODO: modify this so that if the serving size is > 1, the units will have an 's' at the end. This will probably require some javascript
 
 	require_once( UNITS_TABLE_PATH );
 
@@ -97,7 +97,7 @@ function create_serving_units_dropdown( $units )
 	//output each unit to the dropdown list
 	foreach( $units as $unit )
 	{
-		echo '<option value="' . $unit . '">' . $unit . '</option>';
+		echo '<option value="' . $unit . '">' . $unit . '(s)</option>';
 	}
 
 	echo '</select>';
@@ -105,7 +105,23 @@ function create_serving_units_dropdown( $units )
 
 
 /**
-* TODO: make description of create_pantry_save_form() later
+*	create_pantry_save_form()
+*	=========================
+*
+*	Creates a form in HTML that has the layout for saving a food in the user's
+*	pantry. This form has information for the user to input like food name,
+*	serving size, serving units, Cost per serving size, and the currency that
+*	cost is denominated in.
+*
+*	@param 	-	$default_food_name	-	The name of the food that will show up
+*										in the "food name" field when the page
+*										first loads up.
+*
+*	@param 	-	$unit_list			-	an array containing the desired serving
+*										units to be displayed
+*
+*	@return -	NULL
+*
 */
 function create_pantry_save_form( $default_food_name, $unit_list )
 {
@@ -125,7 +141,7 @@ function create_pantry_save_form( $default_food_name, $unit_list )
 	echo 		'<tr>';
 	echo 			'<td>';
 	echo 				'<input type="text" name="serving_size" id="serving_size" value="1">';
-	echo 			'</td>'; //TODO: do form validation for this text input to make sure that it all numbers input the serving size input
+	echo 			'</td>'; //TODO: do form validation for this text input to make sure all the inputs are in number fomat
 	echo 			'<td>';
 	create_serving_units_dropdown( $unit_list );
 	echo 			'</td>';
@@ -217,8 +233,18 @@ function create_currency_dropdown( $currencies = NULL, $default_currency = "USD"
 
 
 /**
-* //TODO: fill this out
+*	my_var_dump()
+*	=============
 *
+*	displays the name of the variable to be displayed in var_dump() 
+*	and then calls var_dump() after
+*
+*	@param 	-	 $var_name 	-	 the name to be displayed before var_dump
+*
+*	@param 	-	 $variable 	-	the variable to be fed into var_dump
+*
+*
+*	@return -	NULL
 */
 function my_var_dump( $var_name, $variable )
 {
@@ -231,8 +257,25 @@ function my_var_dump( $var_name, $variable )
 
 
 /**
-* //TODO: fill this out
+*	fetch_food_details()
+*	=====================
 *
+*	sends an HTTP POST request to the ESHA servers to retrieve 
+*	the nutrient information about the food selected.
+*
+*	@param 	-	$food_id 	-	the ESHA food ID code. (This value can 
+								usually be retrieved by a GET request to 
+								http://api.esha.com/foods?apikey=[YOUR API KEY]&query=[FOOD TO BE SEARCHED FOR]
+								)
+*
+*	@param 	-	$qty 		-	the serving size to be searched for.
+*
+*	@param 	-	$unit 		-	the ESHA id code for the units that $qty will be denominated 
+	`							in (e.g. urn:uuid:dfad1d25-17ff-4201-bba0-0711e8b88c65 = cups).
+
+*
+*	@param 	-	$api_key 	-	your ESHA api key
+*/
 */
 function fetch_food_details( $food_id, $qty, $unit, $api_key)
 {
@@ -392,7 +435,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 
 			$sql = 'INSERT INTO t_foods (user_def_food_name, serving_size, serving_units_esha, cost, currency, json_esha, esha_food_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 
-			//the params to go into the ?'s in $sql
+			//the params to go into the ?'s in the $sql variable
 			$params = array(
 				$user_def_food_name,
 				$serving_size,
