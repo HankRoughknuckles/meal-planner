@@ -126,6 +126,7 @@ function create_serving_units_dropdown( $units )
 */
 function create_pantry_save_form( $default_food_name, $unit_list )
 {
+	//TODO: make this return a string that contains all the html code instead of directly outputting it through echo.
 	echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
 	echo 	'<table>';
 	echo 		'<tr>';
