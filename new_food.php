@@ -1,4 +1,5 @@
 <?php
+//TODO: make individual folders for URLs. (i.e. - instead of having /new_food.php, have /newFood/, or something)
 //TODO: parse the esha query results into a class that you can standardize and work with
 //TODO: implement error handling in case the user inputs a letter where only numbers should be.
 require_once "/inc/config.php";
@@ -325,11 +326,11 @@ function fetch_food_details( $food_id, $qty, $unit, $api_key)
 
 
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//%																		   %
-//%								POST stuff 								   %	
-//%																		   %
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%																			%
+//%								POST handling								%
+//%																			%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if( $_SERVER["REQUEST_METHOD"] == "POST")
 {
 	$error_array = array();
