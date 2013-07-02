@@ -30,7 +30,8 @@ else
 	$body_html .= '<input type="text" name="recipe_name" id="recipe_name" size="70">';
 	$body_html .= '<h2>Ingredients</h2>';
 
-	$body_html .= '<table>';
+	// $body_html .= '<div class="ingredient_list">';
+	$body_html .= '<table id="ingredient_list">';
 	$body_html .= '<tr>	';
 	$body_html .= '<th>Amount</th>';
 	$body_html .= '<th>Unit</th>';
@@ -42,21 +43,22 @@ else
 
 	<!-- Save the current number of ingredient fields present on the screen in case we need to add more -->
 	<script>
-		var numIngredients =  <?php echo json_encode( DEFAULT_FIELD_AMOUNT + $field_offset ) ?>;
+	var numIngredients =  <?php echo json_encode( DEFAULT_FIELD_AMOUNT + $field_offset ) ?>;
 	</script>
 
 	<?php
 	//TODO: use AJAX to suggest saved foods based on what the user types
 	for( $i = 0; $i < DEFAULT_FIELD_AMOUNT + $field_offset; $i++ )
 	{
-		$body_html .= '<tr>';
+		$body_html .= '<tr id="ingredient_row_' . $i . '">';
 		$body_html .= '<td><input type="text" name="ing_' . $i . '_amt" id="ing_' . $i . '_amt"></td>';
 		$body_html .= '<td><input type="text" name="ing_' . $i . '_unit" id="ing_' . $i . '_unit"></td>';
 		$body_html .= '<td><input type="text" name="ing_' . $i . '_name" id="ing_' . $i . '_name"></td>';
 		$body_html .= '</tr>';
 	}
 	$body_html .= '</table>';
-	
+	// $body_html .= '</div>'; //END ingredient_list div
+
 
 	//Button to display more ingredients for the user to enter
 	$body_html .= '<a href=# onclick="moreIngredients()">Add more ingredients</a>';
@@ -78,23 +80,38 @@ else
 
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 	<script>
-		function moreIngredients()
-		{
-			alert("you touched a button!");
+	function moreIngredients()
+	{
+		var extraRowAmount = 5; //The number of rows to increase the ingredients table by
+		var ingPrefix = "#ing_" + (numIngredients) + "_";
+		var lastRow = $( "#ingredient_row_" + (numIngredients - 1) ); //select the last row in the ingredient list
 
-			$("#ing_9_name").attr("value", "hi!"); //DEBUG
-			var ingPrefix = "#ing_" + (numIngredients) + "_";
-			var endIngredient = $( "#ing_" + (numIngredients - 1) + "_name" ); //select the last ingredient in the list
+		alert("wait a second!"); //DEBUG
+		lastRow.attr("value", "second time");	 //DEBUG
 
-			endIngredient.attr("value", "second time");	 //DEBUG
+		//insert {extraRowAmount} of wrows after the last row in the table
+		lastRow.after( function() {
+			ingredientRows = "";
+			var rowNum;
+			for( var i = 0; i < extraRowAmount; i++ )
+			{
+				rowNum = numIngredients + i;
+				ingredientRows = ingredientRows + '<tr id="ingredient_row_' + rowNum + '">';
+				ingredientRows = ingredientRows + '<td><input type="text" name="ing_' + rowNum + '_amt" id="ing_' + rowNum + '_amt"></td>';
+				ingredientRows = ingredientRows + '<td><input type="text" name="ing_' + rowNum + '_unit" id="ing_' + rowNum + '_unit"></td>';
+				ingredientRows = ingredientRows + '<td><input type="text" name="ing_' + rowNum + '_name" id="ing_' + rowNum + '_name"></td>';
+				ingredientRows = ingredientRows + '</tr>';
+			}
 
+			return ingredientRows;
+		});
 
-			endIngredient.append( $("<p>HI!</p>") );
-			// endIngredient.append( $('<td><input type="text" name="' + ingPrefix + 'name" id="' + ingPrefix + 'name"></td>'))
-		}
+		numIngredients += extraRowAmount; //TODO: TEST ALL THIS
+		// endIngredient.append( $('<td><input type="text" name="' + ingPrefix + 'name" id="' + ingPrefix + 'name"></td>'))
+	}
 	</script>
 
-<?php
+	<?php
 }
 
 include( FOOTER_PATH ); 
