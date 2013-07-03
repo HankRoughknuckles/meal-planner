@@ -53,7 +53,7 @@ else
 		$body_html .= '<tr id="ingredient_row_' . $i . '">';
 		$body_html .= '<td><input type="text" name="ing_' . $i . '_amt" id="ing_' . $i . '_amt"></td>';
 		$body_html .= '<td><input type="text" name="ing_' . $i . '_unit" id="ing_' . $i . '_unit"></td>';
-		$body_html .= '<td><input type="text" name="ing_' . $i . '_name" id="ing_' . $i . '_name"></td>';
+		$body_html .= '<td><input type="text" name="ing_' . $i . '_name" id="ing_' . $i . '_name" onchange="recommendation()"></td>';
 		$body_html .= '</tr>';
 	}
 	$body_html .= '</table>';
@@ -71,7 +71,7 @@ else
 	$body_html .= '<br />';
 
 	$body_html .= '<input type="submit" value="Save Recipe">';
-	$body_html .= '<input type="checkbox" name="save_unregistered_foods">Store all ingredients in My Pantry';
+	$body_html .= '<input type="checkbox" name="save_unregistered_foods" checked>Store all new ingredients in My Pantry'; //TODO: if this is unchecked and there are new ingredients entered, make an alert message pop up asking them if they're sure they want to proceed without saving the foods.
 	$body_html .= '</form>';
 
 	echo $body_html;
@@ -80,6 +80,15 @@ else
 
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 	<script>
+
+	/**
+	*	moreIngredients()
+	*	=================
+	*
+	*	Function that adds more ingredient fields to the ingredients table on the page.
+	*	The number added is stored in the variable extraRowAmount;
+	*
+	*/
 	function moreIngredients()
 	{
 		var extraRowAmount = 10; //The number of rows to increase the ingredients table by
@@ -105,6 +114,20 @@ else
 
 		numIngredients += extraRowAmount; //TODO: TEST ALL THIS
 		// endIngredient.append( $('<td><input type="text" name="' + ingPrefix + 'name" id="' + ingPrefix + 'name"></td>'))
+	}
+
+
+	/**
+	*	recommendation()
+	*	=================
+	*
+	*	makes a suggestion box appear below the text input being typed in.  This function gives suggestions based on
+	*	what foods the user has stored in his or her pantry.
+	*
+	*/
+	function recommendation()
+	{
+
 	}
 	</script>
 
