@@ -82,14 +82,11 @@ else
 	<script>
 	function moreIngredients()
 	{
-		var extraRowAmount = 5; //The number of rows to increase the ingredients table by
+		var extraRowAmount = 10; //The number of rows to increase the ingredients table by
 		var ingPrefix = "#ing_" + (numIngredients) + "_";
 		var lastRow = $( "#ingredient_row_" + (numIngredients - 1) ); //select the last row in the ingredient list
 
-		alert("wait a second!"); //DEBUG
-		lastRow.attr("value", "second time");	 //DEBUG
-
-		//insert {extraRowAmount} of wrows after the last row in the table
+		//insert {extraRowAmount} of rows after the last row in the table
 		lastRow.after( function() {
 			ingredientRows = "";
 			var rowNum;

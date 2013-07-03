@@ -278,7 +278,6 @@ function my_var_dump( $var_name, $variable )
 *
 *	@param 	-	$api_key 	-	your ESHA api key
 */
-*/
 function fetch_food_details( $food_id, $qty, $unit, $api_key)
 {
 	// use cURL to fetch from ESHA
