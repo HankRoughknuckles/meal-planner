@@ -1,5 +1,8 @@
 <?php
 require_once("/inc/config.php");
+require_once( LOGIN_PATH );
+
+session_start();
 
 $pageTitle = "New Recipe";
 include( HEADER_PATH );
@@ -25,17 +28,46 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 else
 {
+	//TODO: put this query method into another file as a function to keep the code DRY
+	//using PDO prepared statements for SQL query
+	$conn = new PDO( 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, SQL_USERNM, SQL_PSWD );
+
+	$sql = 'SELECT * FROM t_foods WHERE user_id = ?';
+
+	//the param to go into the ? in the $sql variable
+	$params = array( $_SESSION[ 'user_id' ] );
+
+	//prepare the sql statement
+	$query = $conn->prepare( $sql ); 
+	if( !$query )
+	{
+		echo 'Query preparation failed! - (' . $query->errno . ') ' . $query->error;
+	}
+
+	//crank the parameters into the statement and execute
+	$result = $query->execute( $params ); 
+	if( !$result )
+	{
+		echo 'Query execution failed! - (' . $result->errno . ') ' . $result->error;
+	}
+
+	$_SESSION['saved_foods'] = $query->fetchAll( PDO::FETCH_ASSOC ); //this will be used in food_recommendation.php to reduce the number of SQL queries
+	$conn = null; //close the connection by setting it to null
+
+
 	$body_html = '<h2><label for="recipe_name">Recipe Name</h2>';
 	$body_html .= '<form name="input" action="' . BASE_URL . 'new_recipe.php' . '" method="post">'; //concatenate this to $body_html
 	$body_html .= '<input type="text" name="recipe_name" id="recipe_name" size="70">';
 	$body_html .= '<h2>Ingredients</h2>';
 
+	$body_html .= '<div id="output">OUTPUT!</div>';
+
 	// $body_html .= '<div class="ingredient_list">';
 	$body_html .= '<table id="ingredient_list">';
 	$body_html .= '<tr>	';
+	$body_html .= '<th>Ingredient Name</th>';
 	$body_html .= '<th>Amount</th>';
 	$body_html .= '<th>Unit</th>';
-	$body_html .= '<th>Ingredient Name</th>';
 	$body_html .= '</tr>';
 
 	if( !isset( $field_offset ) ){ $field_offset = 0; }
@@ -51,9 +83,9 @@ else
 	for( $i = 0; $i < DEFAULT_FIELD_AMOUNT + $field_offset; $i++ )
 	{
 		$body_html .= '<tr id="ingredient_row_' . $i . '">';
+		$body_html .= '<td><input type="text" name="ing_' . $i . '_name" id="ing_' . $i . '_name" onkeyup="recommendation(this)"></td>';
 		$body_html .= '<td><input type="text" name="ing_' . $i . '_amt" id="ing_' . $i . '_amt"></td>';
 		$body_html .= '<td><input type="text" name="ing_' . $i . '_unit" id="ing_' . $i . '_unit"></td>';
-		$body_html .= '<td><input type="text" name="ing_' . $i . '_name" id="ing_' . $i . '_name" onchange="recommendation()"></td>';
 		$body_html .= '</tr>';
 	}
 	$body_html .= '</table>';
@@ -103,17 +135,16 @@ else
 			{
 				rowNum = numIngredients + i;
 				ingredientRows = ingredientRows + '<tr id="ingredient_row_' + rowNum + '">';
+				ingredientRows = ingredientRows + '<td><input type="text" name="ing_' + rowNum + '_name" id="ing_' + rowNum + '_name" onkeyup="recommendation(this)"></td>';
 				ingredientRows = ingredientRows + '<td><input type="text" name="ing_' + rowNum + '_amt" id="ing_' + rowNum + '_amt"></td>';
 				ingredientRows = ingredientRows + '<td><input type="text" name="ing_' + rowNum + '_unit" id="ing_' + rowNum + '_unit"></td>';
-				ingredientRows = ingredientRows + '<td><input type="text" name="ing_' + rowNum + '_name" id="ing_' + rowNum + '_name"></td>';
 				ingredientRows = ingredientRows + '</tr>';
 			}
 
 			return ingredientRows;
 		});
 
-		numIngredients += extraRowAmount; //TODO: TEST ALL THIS
-		// endIngredient.append( $('<td><input type="text" name="' + ingPrefix + 'name" id="' + ingPrefix + 'name"></td>'))
+		numIngredients += extraRowAmount;
 	}
 
 
@@ -121,14 +152,29 @@ else
 	*	recommendation()
 	*	=================
 	*
-	*	makes a suggestion box appear below the text input being typed in.  This function gives suggestions based on
-	*	what foods the user has stored in his or her pantry.
+	*	This function displays a drop-down menu with already saved foods based on the user's input.
+	*	This function is supposed to be called when the contents of an element are modified
 	*
+	*	@param 	-	element 	-	the html element being modified
 	*/
-	function recommendation()
+	function recommendation( element )
 	{
+		//TODO: retrieve text from element
+		// $("#output").html( "<p>" + element.value + "</p>" );
+		var queryString = { 
+							user_input: element.value
+								 };
+		$.getJSON( 	'/inc/food_recommendation.php?' + jQuery.param(queryString),
+					function( matches )
+					{
+						console.log( matches );
+					} ); //use AJAX to get the saved foods that correspond to the names
 
+		//TODO: send request to a php file via ajax
+
+		//TODO: make php file perform a sql query and return results
 	}
+
 	</script>
 
 	<?php

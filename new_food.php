@@ -1,5 +1,6 @@
 <?php
 //TODO: make individual folders for URLs. (i.e. - instead of having /new_food.php, have /newFood/, or something)
+//TODO: make the program inform the user if there is already a food saved of the same type as what they are entering
 //TODO: parse the esha query results into a class that you can standardize and work with
 //TODO: implement error handling in case the user inputs a letter where only numbers should be.
 require_once "/inc/config.php";
