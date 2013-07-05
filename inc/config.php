@@ -1,5 +1,4 @@
 <?php
-
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%																			%
 //%									PATHS									%
@@ -33,6 +32,18 @@ define("NUTRIENTS_TABLE_PATH", 	INCLUDE_PATH . "nutrients_table.php");
 
 //path to the file that holds the units lookup table for esha unit ID's
 define("UNITS_TABLE_PATH", 	INCLUDE_PATH . "units_table.php");
+
+
+//path to the default style sheet
+define("STYLE_PATH", 	BASE_URL . "css/style.css");
+
+
+//path to the jQuery UI source code
+define("JQUERY_UI_PATH", 	BASE_URL . "js/jquery-ui.custom.min.js");
+
+
+//path to the jQuery UI style sheet
+define("JQUERY_UI_STYLE_PATH", 	BASE_URL . "css/smoothness/jquery-ui.custom.css");
 
 
 

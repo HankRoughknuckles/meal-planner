@@ -83,7 +83,8 @@ else
 	for( $i = 0; $i < DEFAULT_FIELD_AMOUNT + $field_offset; $i++ )
 	{
 		$body_html .= '<tr id="ingredient_row_' . $i . '">';
-		$body_html .= '<td><input type="text" name="ing_' . $i . '_name" id="ing_' . $i . '_name" onkeyup="recommendation(this)"></td>';
+		$body_html .= '<td><input type="text" name="ing_' . $i . '_name" id="ing_' . $i . '_name" onkeyup="getRecommendation(this)"></td>';
+		$body_html = $body_html . '<div class=recommendation id=' . $i . '><ul><li>hi</li><li>hello</li></ul></div>'; //make suggestions box
 		$body_html .= '<td><input type="text" name="ing_' . $i . '_amt" id="ing_' . $i . '_amt"></td>';
 		$body_html .= '<td><input type="text" name="ing_' . $i . '_unit" id="ing_' . $i . '_unit"></td>';
 		$body_html .= '</tr>';
@@ -110,7 +111,6 @@ else
 
 	?>
 
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 	<script>
 
 	/**
@@ -135,7 +135,8 @@ else
 			{
 				rowNum = numIngredients + i;
 				ingredientRows = ingredientRows + '<tr id="ingredient_row_' + rowNum + '">';
-				ingredientRows = ingredientRows + '<td><input type="text" name="ing_' + rowNum + '_name" id="ing_' + rowNum + '_name" onkeyup="recommendation(this)"></td>';
+				ingredientRows = ingredientRows + '<td><input type="text" name="ing_' + rowNum + '_name" id="ing_' + rowNum + '_name" onkeyup="getRecommendation(this)"></td>';
+				ingredientRows = ingredientRows + '<div class=recommendation id=' + rowNum + '><ul><li>hi</li><li>hello</li></ul></div>';
 				ingredientRows = ingredientRows + '<td><input type="text" name="ing_' + rowNum + '_amt" id="ing_' + rowNum + '_amt"></td>';
 				ingredientRows = ingredientRows + '<td><input type="text" name="ing_' + rowNum + '_unit" id="ing_' + rowNum + '_unit"></td>';
 				ingredientRows = ingredientRows + '</tr>';
@@ -149,7 +150,7 @@ else
 
 
 	/**
-	*	recommendation()
+	*	getRecommendation()
 	*	=================
 	*
 	*	This function displays a drop-down menu with already saved foods based on the user's input.
@@ -157,22 +158,21 @@ else
 	*
 	*	@param 	-	element 	-	the html element being modified
 	*/
-	function recommendation( element )
+	function getRecommendation( element )
 	{
-		//TODO: retrieve text from element
-		// $("#output").html( "<p>" + element.value + "</p>" );
-		var queryString = { 
-							user_input: element.value
-								 };
-		$.getJSON( 	'/inc/food_recommendation.php?' + jQuery.param(queryString),
-					function( matches )
-					{
-						console.log( matches );
-					} ); //use AJAX to get the saved foods that correspond to the names
+		var queryString =	{ 
+								user_input: element.value
+							};
 
-		//TODO: send request to a php file via ajax
+		//use AJAX to get the saved foods that correspond to the names
+		$.getJSON( 	
+			'/inc/food_recommendation.php?' + jQuery.param(queryString),
+			function( matches )
+			{
+				console.log( matches );
+			} 
+		); 
 
-		//TODO: make php file perform a sql query and return results
 	}
 
 	</script>
