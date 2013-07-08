@@ -83,8 +83,8 @@ else
 	for( $i = 0; $i < DEFAULT_FIELD_AMOUNT + $field_offset; $i++ )
 	{
 		$body_html .= '<tr id="ingredient_row_' . $i . '">';
-		$body_html .= '<td><input type="text" name="ing_' . $i . '_name" id="ing_' . $i . '_name" onkeyup="getRecommendation(this)"></td>';
-		$body_html = $body_html . '<div class=recommendation id=' . $i . '><ul><li>hi</li><li>hello</li></ul></div>'; //make suggestions box
+		$body_html .= '<td><input type="text" class="recommendation" name="ing_' . $i . '_name" id="ing_' . $i . '_name"></td>';
+		// $body_html = $body_html . '<div class=recommendation id=' . $i . '><ul><li>hi</li><li>hello</li></ul></div>'; //make suggestions box
 		$body_html .= '<td><input type="text" name="ing_' . $i . '_amt" id="ing_' . $i . '_amt"></td>';
 		$body_html .= '<td><input type="text" name="ing_' . $i . '_unit" id="ing_' . $i . '_unit"></td>';
 		$body_html .= '</tr>';
@@ -148,33 +148,87 @@ else
 		numIngredients += extraRowAmount;
 	}
 
+	</script>
 
-	/**
-	*	getRecommendation()
-	*	=================
-	*
-	*	This function displays a drop-down menu with already saved foods based on the user's input.
-	*	This function is supposed to be called when the contents of an element are modified
-	*
-	*	@param 	-	element 	-	the html element being modified
-	*/
-	function getRecommendation( element )
-	{
-		var queryString =	{ 
-								user_input: element.value
-							};
 
-		//use AJAX to get the saved foods that correspond to the names
-		$.getJSON( 	
-			'/inc/food_recommendation.php?' + jQuery.param(queryString),
-			function( matches )
-			{
-				console.log( matches );
-			} 
-		); 
+	<script>
 
-	}
+	//note: this is copied from a tutorial from http://net.tutsplus.com/tutorials/javascript-ajax/how-to-use-the-jquery-ui-autocomplete-widget/ , using it as a guide to implement own code
+	$(function(){
 
+		//attach the autocomplete
+		$(".recommendation").autocomplete({
+
+			//define callback to format results
+			source: 
+				function(req, add){
+					//pass request to the server
+					$.getJSON("friends.php?callback=?", req, function(data){
+
+							//create array for response objects
+							var suggestions = [];
+
+							//process the response from the php file
+							$.each(data, function(i, val){
+								suggestions.push(val.name);
+							});
+
+							//pass the suggestions array back to the callback
+							add(suggestions);
+					} );
+				},
+
+			//define select handler
+			select:
+				function(e, ui) {
+					//create formatted friend
+					var 	friend = ui.item.value,
+							span = $("<span>").text(friend),
+							a = $("<a>").addClass("remove").attr({
+								href: "javascript:",
+								title: "Remove " + friend
+							}).text("x").appendTo(span);
+
+							//add friend to friend div
+							span.insertBefore(".recommendation");
+				},
+
+			//define select handler
+			change:
+				function(){
+					//prevent 'recommendation' field from being updated. Also, correct the position
+					$(".recommendation").val("").css("top", 2);
+				}
+		});
+	});
+	//END copied code
+
+
+	// /**
+	// *	getRecommendation()
+	// *	=================
+	// *
+	// *	This function displays a drop-down menu with already saved foods based on the user's input.
+	// *	This function is supposed to be called when the contents of an element are modified
+	// *
+	// *	@param 	-	element 	-	the html element being modified
+	// */
+	// function getRecommendation( element )
+	// {
+	// 	var queryString =	{ 
+	// 							user_input: element.value
+	// 						};
+
+	// 	//use AJAX to get the saved foods that correspond to the names
+	// 	$.getJSON( 	
+	// 		'/inc/food_recommendation.php?' + jQuery.param(queryString),
+	// 		function( matches )
+	// 		{
+	// 			console.log( matches );
+	// 		} 
+	// 	); 
+
+	// }
 	</script>
 
 	<?php
