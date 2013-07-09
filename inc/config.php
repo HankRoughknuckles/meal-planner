@@ -39,11 +39,11 @@ define("STYLE_PATH", 	BASE_URL . "css/style.css");
 
 
 //path to the jQuery UI source code
-define("JQUERY_UI_PATH", 	BASE_URL . "js/jquery-ui.custom.min.js");
+define("JQUERY_UI_PATH", 	BASE_URL . "js/jquery-ui-1.10.3.custom.min.js");
 
 
 //path to the jQuery UI style sheet
-define("JQUERY_UI_STYLE_PATH", 	BASE_URL . "css/smoothness/jquery-ui.custom.css");
+define("JQUERY_UI_STYLE_PATH", 	BASE_URL . "css/smoothness/jquery-ui-1.10.3.custom.css");
 
 
 

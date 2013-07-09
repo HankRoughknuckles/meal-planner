@@ -154,6 +154,12 @@ else
 	<script>
 
 	//note: this is copied from a tutorial from http://net.tutsplus.com/tutorials/javascript-ajax/how-to-use-the-jquery-ui-autocomplete-widget/ , using it as a guide to implement own code
+
+	// /**
+	// *
+	// *	Autocomplete  - Gives suggestions of what food should be in the recipe based on previously saved foods
+	// *
+	// */
 	$(function(){
 
 		//attach the autocomplete
@@ -163,18 +169,18 @@ else
 			source: 
 				function(req, add){
 					//pass request to the server
-					$.getJSON("friends.php?callback=?", req, function(data){
+						$.getJSON("<?php echo BASE_URL; ?>food_recommendation.php?user_input=?", req, function(data){
 
-							//create array for response objects
-							var suggestions = [];
+						//create array for response objects
+						var suggestions = [];
 
-							//process the response from the php file
-							$.each(data, function(i, val){
-								suggestions.push(val.name);
-							});
+						//process the response from the php file
+						$.each(data, function(i, val){
+							suggestions.push(val.name);
+						});
 
-							//pass the suggestions array back to the callback
-							add(suggestions);
+						//pass the suggestions array back to the callback
+						add(suggestions);
 					} );
 				},
 
@@ -191,6 +197,10 @@ else
 
 							//add friend to friend div
 							span.insertBefore(".recommendation");
+
+
+
+
 				},
 
 			//define select handler
