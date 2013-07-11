@@ -16,7 +16,6 @@ if( $_GET['user_input'] and strlen( $_GET['user_input'] ) >= 2 )
 	$user_input = $_GET['user_input'];
 	$saved_foods = $_SESSION['saved_foods'];
 
-
 	$matched_results = array(); //the saved foods that match the name typed by the user
 
 
@@ -27,6 +26,6 @@ if( $_GET['user_input'] and strlen( $_GET['user_input'] ) >= 2 )
 			$matched_results[] = $saved_food['user_def_food_name'];
 		}
 	}
-	echo json_encode( $matched_results );
+	echo $_GET['callback'] . '(' . json_encode( $matched_results ) . ')';
 }
 

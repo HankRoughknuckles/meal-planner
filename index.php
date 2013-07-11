@@ -1,7 +1,7 @@
 <?php
 require_once("/inc/config.php");
 
-$pageTitle = "Meal Calculator - Index";
+$pageTitle = "Meal Planner - Index";
 include( HEADER_PATH );
 
 session_start();

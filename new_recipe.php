@@ -84,7 +84,6 @@ else
 	{
 		$body_html .= '<tr id="ingredient_row_' . $i . '">';
 		$body_html .= '<td><input type="text" class="recommendation" name="ing_' . $i . '_name" id="ing_' . $i . '_name"></td>';
-		// $body_html = $body_html . '<div class=recommendation id=' . $i . '><ul><li>hi</li><li>hello</li></ul></div>'; //make suggestions box
 		$body_html .= '<td><input type="text" name="ing_' . $i . '_amt" id="ing_' . $i . '_amt"></td>';
 		$body_html .= '<td><input type="text" name="ing_' . $i . '_unit" id="ing_' . $i . '_unit"></td>';
 		$body_html .= '</tr>';
@@ -153,7 +152,6 @@ else
 
 	<script>
 
-	//note: this is copied from a tutorial from http://net.tutsplus.com/tutorials/javascript-ajax/how-to-use-the-jquery-ui-autocomplete-widget/ , using it as a guide to implement own code
 
 	// /**
 	// *
@@ -161,15 +159,22 @@ else
 	// *
 	// */
 	$(function(){
-
+		//note: this is copied from a tutorial from http://net.tutsplus.com/tutorials/javascript-ajax/how-to-use-the-jquery-ui-autocomplete-widget/ , using it as a guide to implement own code
 		//attach the autocomplete
 		$(".recommendation").autocomplete({
 
 			//define callback to format results
 			source: 
 				function(req, add){
+					console.log("activated! calling <?php echo INCLUDE_PATH; ?>food_recommendation.php?callback=?"); //DEBUG
 					//pass request to the server
-						$.getJSON("<?php echo BASE_URL; ?>food_recommendation.php?user_input=?", req, function(data){
+					var params= {
+						user_input: req.term,
+						callback: req
+					};
+
+					//TODO: this block is returning nothing.  fix this
+					$.getJSON("<?php echo INCLUDE_PATH; ?>food_recommendation.php?", req, function(data){
 
 						//create array for response objects
 						var suggestions = [];
@@ -177,8 +182,8 @@ else
 						//process the response from the php file
 						$.each(data, function(i, val){
 							suggestions.push(val.name);
+							console.log(val.name); //DEBUG
 						});
-
 						//pass the suggestions array back to the callback
 						add(suggestions);
 					} );
@@ -211,27 +216,27 @@ else
 				}
 		});
 	});
-	//END copied code
+//END copied code
 
 
-	// /**
-	// *	getRecommendation()
-	// *	=================
-	// *
-	// *	This function displays a drop-down menu with already saved foods based on the user's input.
-	// *	This function is supposed to be called when the contents of an element are modified
-	// *
-	// *	@param 	-	element 	-	the html element being modified
-	// */
-	// function getRecommendation( element )
-	// {
-	// 	var queryString =	{ 
-	// 							user_input: element.value
-	// 						};
+// /**
+// *	getRecommendation()
+// *	=================
+// *
+// *	This function displays a drop-down menu with already saved foods based on the user's input.
+// *	This function is supposed to be called when the contents of an element are modified
+// *
+// *	@param 	-	element 	-	the html element being modified
+// */
+// function getRecommendation( element )
+// {
+// 	var queryString =	{ 
+// 							user_input: element.value
+// 						};
 
-	// 	//use AJAX to get the saved foods that correspond to the names
-	// 	$.getJSON( 	
-	// 		'/inc/food_recommendation.php?' + jQuery.param(queryString),
+// 	//use AJAX to get the saved foods that correspond to the names
+// 	$.getJSON( 	
+// 		'/inc/food_recommendation.php?' + jQuery.param(queryString),
 	// 		function( matches )
 	// 		{
 	// 			console.log( matches );

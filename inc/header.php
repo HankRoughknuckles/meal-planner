@@ -11,7 +11,7 @@
 	}
 	?>
 
-	<title>Calorie Calculator - "<?php echo $pageTitle; ?>"</title>
+	<title>Meal Planner - "<?php echo $pageTitle; ?>"</title>
 
 	<link rel="stylesheet" href="<?php echo JQUERY_UI_STYLE_PATH; ?>" />
 	<link rel="stylesheet" type="text/css" href="<?php echo STYLE_PATH; ?>" />
@@ -20,4 +20,5 @@
 	<script src="<?php echo JQUERY_UI_PATH; ?>"></script>
 </head>
 <body>
-	<h1><?php echo $pageTitle ?></h1>
+	<h1><a href="<?php echo BASE_URL; ?>">Meal Planner</a></h1>
+	<h2><?php echo $pageTitle ?></h2>
