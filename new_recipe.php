@@ -164,56 +164,45 @@ else
 		$(".recommendation").autocomplete({
 
 			//define callback to format results
-			source: 
-				function(req, add){
-					console.log("activated! calling <?php echo INCLUDE_PATH; ?>food_recommendation.php?callback=?"); //DEBUG
-					//pass request to the server
-					var params= {
-						user_input: req.term,
-						callback: req
-					};
+			source: function(request, response){
+				console.log("request = %o", request);
 
-					//TODO: this block is returning nothing.  fix this
-					$.getJSON("<?php echo INCLUDE_PATH; ?>food_recommendation.php?", req, function(data){
+				$.ajax({
+					url: "<?php echo INCLUDE_PATH_BASE; ?>food_recommendation.php",
+					method: "GET",
+					dataType: "json",
+					data: {
+						user_input: request.term
+					},
+					success: function( data ){
+						response( data );
+					}
+				});
+				
+			}
+				
+			////define select handler
+			//		
+			//select:
+			//	function(e, ui) {
+			//		//create formatted friend
+			//		var 	friend = ui.item.value,
+			//				span = $("<span>").text(friend),
+			//				a = $("<a>").addClass("remove").attr({
+			//					href: "javascript:",
+			//					title: "Remove " + friend
+			//				}).text("x").appendTo(span);
 
-						//create array for response objects
-						var suggestions = [];
+			//				//add friend to friend div
+			//				span.insertBefore(".recommendation");
+			//	},
 
-						//process the response from the php file
-						$.each(data, function(i, val){
-							suggestions.push(val.name);
-							console.log(val.name); //DEBUG
-						});
-						//pass the suggestions array back to the callback
-						add(suggestions);
-					} );
-				},
-
-			//define select handler
-			select:
-				function(e, ui) {
-					//create formatted friend
-					var 	friend = ui.item.value,
-							span = $("<span>").text(friend),
-							a = $("<a>").addClass("remove").attr({
-								href: "javascript:",
-								title: "Remove " + friend
-							}).text("x").appendTo(span);
-
-							//add friend to friend div
-							span.insertBefore(".recommendation");
-
-
-
-
-				},
-
-			//define select handler
-			change:
-				function(){
-					//prevent 'recommendation' field from being updated. Also, correct the position
-					$(".recommendation").val("").css("top", 2);
-				}
+			////define select handler
+			//change:
+			//	function(){
+			//		//prevent 'recommendation' field from being updated. Also, correct the position
+			//		$(".recommendation").val("").css("top", 2);
+			//	}
 		});
 	});
 //END copied code

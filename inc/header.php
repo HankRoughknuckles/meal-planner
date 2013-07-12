@@ -20,5 +20,6 @@
 	<script src="<?php echo JQUERY_UI_PATH; ?>"></script>
 </head>
 <body>
+
 	<h1><a href="<?php echo BASE_URL; ?>">Meal Planner</a></h1>
 	<h2><?php echo $pageTitle ?></h2>

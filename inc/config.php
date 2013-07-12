@@ -11,7 +11,8 @@ define("ROOT_PATH",		$_SERVER["DOCUMENT_ROOT"] . "/");
 
 
 //the path of the folder that contains all the include files
-define("INCLUDE_PATH", 	BASE_URL . "inc/");
+define("INCLUDE_PATH", 	ROOT_PATH . "inc/");
+define("INCLUDE_PATH_BASE", 	BASE_URL . "inc/");
 
 
 //the path to the file that contains the header that goes at the top of every file
