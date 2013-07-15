@@ -17,3 +17,5 @@ restricted/*
 WAMP_Default_Backup/*
 
 jquery-ui-1.10.3.custom/*
+
+*.swp

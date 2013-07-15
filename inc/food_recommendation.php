@@ -13,7 +13,7 @@ require_once LOGIN_PATH;
 //echo json_encode( array('message' => $_GET['user_input'] . 'from php' ) ); //DEBUG
 
 //return a result if >=2 characters have been entered
-if( $_GET['user_input'] and strlen( $_GET['user_input'] ) >= 2 )
+if( $_GET['user_input'] )
 {
 	$user_input = $_GET['user_input'];
 	$saved_foods = $_SESSION['saved_foods'];
@@ -25,7 +25,7 @@ if( $_GET['user_input'] and strlen( $_GET['user_input'] ) >= 2 )
 	{
 		if( stristr( $saved_food['user_def_food_name'], $user_input ) )
 		{
-			$matched_results[] = $saved_food['user_def_food_name'];
+			$matched_results[] = array( 'label' => $saved_food['user_def_food_name'], 'category' => 'Your Saved Foods:' );
 		}
 	}
 	echo json_encode( $matched_results );

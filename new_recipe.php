@@ -12,9 +12,9 @@ define( 'DEFAULT_FIELD_AMOUNT', 	10 ); //the number of ingredient fields to be d
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//%									%
-//%				POST handling				%
-//%									%
+//%																		%
+//%								POST handling							%
+//%																		%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if( $_SERVER["REQUEST_METHOD"] == "POST")
 {
@@ -22,9 +22,9 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//%									%
-//%				non-POST handling			%
-//%									%
+//%																		%
+//%							non-POST handling							%
+//%																		%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 else
 {
@@ -151,61 +151,68 @@ else
 
 
 	<script>
-
-
-	// /**
-	// *
-	// *	Autocomplete  - Gives suggestions of what food should be in the recipe based on previously saved foods
-	// *
-	// */
-	$(function(){
-		//note: this is copied from a tutorial from http://net.tutsplus.com/tutorials/javascript-ajax/how-to-use-the-jquery-ui-autocomplete-widget/ , using it as a guide to implement own code
-		//attach the autocomplete
-		$(".recommendation").autocomplete({
-
-			//define callback to format results
-			source: function(request, response){
-				console.log("request = %o", request);
-
-				$.ajax({
-					url: "<?php echo INCLUDE_PATH_BASE; ?>food_recommendation.php",
-					method: "GET",
-					dataType: "json",
-					data: {
-						user_input: request.term
-					},
-					success: function( data ){
-						response( data );
-					}
-				});
-				
-			}
-				
-			////define select handler
-			//		
-			//select:
-			//	function(e, ui) {
-			//		//create formatted friend
-			//		var 	friend = ui.item.value,
-			//				span = $("<span>").text(friend),
-			//				a = $("<a>").addClass("remove").attr({
-			//					href: "javascript:",
-			//					title: "Remove " + friend
-			//				}).text("x").appendTo(span);
-
-			//				//add friend to friend div
-			//				span.insertBefore(".recommendation");
-			//	},
-
-			////define select handler
-			//change:
-			//	function(){
-			//		//prevent 'recommendation' field from being updated. Also, correct the position
-			//		$(".recommendation").val("").css("top", 2);
-			//	}
-		});
+	
+	//set up the category autocomplete widget
+	$.widget( "custom.catcomplete", $.ui.autocomplete, {
+		_renderMenu: function( ul, items ) {
+			var that = this,
+			currentCategory = "";
+			$.each( items, function( index, item ) {
+				if ( item.category != currentCategory ) {
+					ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
+					currentCategory = item.category;
+				}
+				that._renderItemData( ul, item );
+			});
+		}
 	});
-//END copied code
+	
+	//attach the autocomplete to items that have class "recommendation"
+	//TODO: make the autocomplete show  the matched characters in bold or underline
+	$(".recommendation").catcomplete({
+		
+		//define callback to format results
+		source: function(request, response){
+			console.log("request = %o", request);
+
+			$.ajax({
+				url: "<?php echo INCLUDE_PATH_BASE; ?>food_recommendation.php",
+				method: "GET",
+				dataType: "json",
+				data: {
+					user_input: request.term
+				},
+				success: function( data ){
+					response( data );
+				}
+			});
+			
+		}/*,
+		
+		//define select handler
+		select:
+			function(e, ui) {
+				//create formatted friend
+				var 	friend = ui.item.value,
+						span = $("<span>").text(friend),
+						a = $("<a>").addClass("remove").attr({
+							href: "javascript:",
+							title: "Remove " + friend
+						}).text("x").appendTo(span);
+
+						//add friend to friend div
+						span.insertBefore(".recommendation");
+			},
+
+
+		//define select handler
+		change:
+			function(){
+				//prevent 'recommendation' field from being updated. Also, correct the position
+				$(".recommendation").val("").css("top", 2);
+			}
+			 */
+	});
 
 
 // /**
