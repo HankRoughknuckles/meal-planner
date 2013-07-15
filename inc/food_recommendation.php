@@ -10,10 +10,9 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . "/inc/config.php";
 require_once LOGIN_PATH;
 
-echo json_encode( array('message' => $_GET['user_input'] . 'from php' ) ); //DEBUG
+//echo json_encode( array('message' => $_GET['user_input'] . 'from php' ) ); //DEBUG
 
 //return a result if >=2 characters have been entered
-/*
 if( $_GET['user_input'] and strlen( $_GET['user_input'] ) >= 2 )
 {
 	$user_input = $_GET['user_input'];
@@ -24,12 +23,11 @@ if( $_GET['user_input'] and strlen( $_GET['user_input'] ) >= 2 )
 
 	foreach( $saved_foods as $saved_food )
 	{
-		if( strstr( strtolower($saved_food['user_def_food_name']), strtolower($user_input) ) )
+		if( stristr( $saved_food['user_def_food_name'], $user_input ) )
 		{
 			$matched_results[] = $saved_food['user_def_food_name'];
 		}
 	}
-	echo $_GET['callback'] . '(' . json_encode( $matched_results ) . ')'; 
+	echo json_encode( $matched_results );
 }
-*/
 ?>
