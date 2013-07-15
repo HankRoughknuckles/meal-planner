@@ -189,21 +189,22 @@ else
 			
 		}/*,
 		
+		
+		//TODO: eventually make this have the functionality to display a box around the text in the ingredient field if it was selected.  clicking that box will delete the food in the entry
 		//define select handler
 		select:
 			function(e, ui) {
 				//create formatted friend
-				var 	friend = ui.item.value,
-						span = $("<span>").text(friend),
-						a = $("<a>").addClass("remove").attr({
+				var 	food = ui.item.value;
+				var		span = $("<span>").text(food);
+				var 	a = $("<a>").addClass("remove").attr({
 							href: "javascript:",
-							title: "Remove " + friend
+							title: "Remove " + food
 						}).text("x").appendTo(span);
 
 						//add friend to friend div
-						span.insertBefore(".recommendation");
+						span.insertBefore(this);
 			},
-
 
 		//define select handler
 		change:

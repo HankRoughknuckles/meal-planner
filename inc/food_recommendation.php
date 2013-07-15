@@ -25,7 +25,11 @@ if( $_GET['user_input'] )
 	{
 		if( stristr( $saved_food['user_def_food_name'], $user_input ) )
 		{
-			$matched_results[] = array( 'label' => $saved_food['user_def_food_name'], 'category' => 'Your Saved Foods:' );
+			$matched_results[] = array( 
+					'food_name' => $saved_food['user_def_food_name'], 
+					'units' => /*TODO: Add units */
+					'category' => 'Your Saved Foods:',
+			);
 		}
 	}
 	echo json_encode( $matched_results );
