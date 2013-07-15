@@ -151,6 +151,11 @@ else
 
 
 	<script>
+	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	//%																		%
+	//%								Autocomplete							%
+	//%																		%
+	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
 	//set up the category autocomplete widget
 	$.widget( "custom.catcomplete", $.ui.autocomplete, {
