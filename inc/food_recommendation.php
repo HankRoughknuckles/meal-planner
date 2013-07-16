@@ -5,6 +5,8 @@
 *	user's pantry, and returning those results.
 */
 
+//TODO: make this always query the SQL database for matched foods
+
 session_start();
 
 require_once $_SERVER['DOCUMENT_ROOT'] . "/inc/config.php";
@@ -23,15 +25,16 @@ if( $_GET['user_input'] )
 
 	foreach( $saved_foods as $saved_food )
 	{
-		if( stristr( $saved_food['user_def_food_name'], $user_input ) )
+		if( 1 == 1 ) //stristr( $saved_food['user_def_food_name'], $user_input ) )
 		{
 			$matched_results[] = array( 
-					'food_name' => $saved_food['user_def_food_name'], 
-					'units' => /*TODO: Add units */
 					'category' => 'Your Saved Foods:',
+					'food_name' => $saved_food['user_def_food_name']
+					//'units' => /*TODO: Add units based on what food it is*/
 			);
 		}
 	}
+
 	echo json_encode( $matched_results );
 }
 ?>

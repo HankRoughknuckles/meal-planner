@@ -19,27 +19,31 @@ $code_to_unit_table = json_decode( $code_to_unit_table, true );
 $new = array();
 $unit_to_code_table = array();
 
+//Take each element from the array and make an associative array
 foreach( $code_to_unit_table as $unit )
 {
 	$temp = array(
 		$unit['id'] => $unit['description']
 	);
-	$temp2 = array( //used to make the unit_to_code_table variable
-		$unit['description'] => $unit['id'];
+				
+	//used to make the unit_to_code_table variable
+	$temp2 = array( 
+		$unit['description'] => $unit['id']
 	);
 	$new = array_merge( $new, $temp );
-
+	$unit_to_code_table = array_merge( $unit_to_code_table, $temp2 );
 }
 
 $code_to_unit_table = $new;
 $new = NULL;
 
 
-// common_units an associative array of commonly used units.  each element has the form:
-// 		<unit_name>		=>		<ESHA_code>
+
+// common_units is a 1-dimensional array containing the nams of commonly used units
 $common_units = array(
-	'mL'	=>	'milliliters',
-	'c'		=>	'cups',
-	'tsp'	=>	'teaspoons',
-	'g'		=>	'grams'
+	'milliliters',
+	'cups',
+	'teaspoons',
+	'tablespoons',
+	'grams'
 );
