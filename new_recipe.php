@@ -54,6 +54,7 @@ else
 	$_SESSION['saved_foods'] = $query->fetchAll( PDO::FETCH_ASSOC ); //this will be used in food_recommendation.php to reduce the number of SQL queries
 	$conn = null; //close the connection by setting it to null
 
+        //var_dump( $_SESSION['saved_foods'] ); //DEBUG
 
 	$body_html = '<h2><label for="recipe_name">Recipe Name</h2>';
 	$body_html .= '<form name="input" action="' . BASE_URL . 'new_recipe.php' . '" method="post">'; //concatenate this to $body_html
@@ -107,7 +108,6 @@ else
 	$body_html .= '</form>';
 
 	echo $body_html;
-
 	?>
 
 	<script>
@@ -159,17 +159,17 @@ else
 	
 	//set up the category autocomplete widget
 	$.widget( "custom.catcomplete", $.ui.autocomplete, {
-		_renderMenu: function( ul, items ) {
-			var that = this,
-			currentCategory = "";
-			$.each( items, function( index, item ) {
-				if ( item.category != currentCategory ) {
-					ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
-					currentCategory = item.category;
-				}
-				that._renderItemData( ul, item );
-			});
-		}
+	    _renderMenu: function( ul, items ) {
+		var that = this,
+		currentCategory = "";
+		$.each( items, function( index, item ) {
+			if ( item.category != currentCategory ) {
+				ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
+				currentCategory = item.category;
+			}
+			that._renderItemData( ul, item );
+		});
+	    }
 	});
 	
 	//attach the autocomplete to items that have class "recommendation"
@@ -188,7 +188,8 @@ else
 					user_input: request.term
 				},
 				success: function( data ){
-					response( data );
+                                    console.log("Response = %o", data); //DEBUG
+				    response( data );
 				}
 			});
 			
