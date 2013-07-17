@@ -327,38 +327,51 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 		// Set up and insert data into the database if there are no errors
 		if( count( $error_array ) == 0 ){
 
+		    $params = array(
+			'user_def_food_name'    => $user_def_food_name,
+			'serving_size'          => $serving_size,
+			'serving_units_esha'    => $serving_units_esha,
+			'cost'                  => $cost,
+			'currency'              => $currency,
+			'json_esha'             => $json_esha,
+			'esha_food_id'          => $esha_food_id,
+			'user_id'               => $user_id
+		    );
+
+                    insert_row( 't_foods', $params ); //TODO: START THE TESTING OF insert_row() here
+
 			//using PDO prepared statements...
-			$conn = new PDO( 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, SQL_USERNM, SQL_PSWD );
-
-			$sql = 'INSERT INTO t_foods (user_def_food_name, serving_size, serving_units_esha, cost, currency, json_esha, esha_food_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-
-			//the params to go into the ?'s in the $sql variable
-			$params = array(
-				$user_def_food_name,
-				$serving_size,
-				$serving_units_esha,
-				$cost,
-				$currency,
-				$json_esha,
-				$esha_food_id,
-				$user_id
-			);
-
-			//prepare the sql statement
-			$query = $conn->prepare( $sql ); 
-			if( !$query )
-			{
-				echo 'Query preparation failed! - (' . $query->errno . ') ' . $query->error;
-			}
-
-			//crank the parameters into the statement and execute
-			$query = $query->execute( $params ); 
-			if( !$query )
-			{
-				echo 'Query execution failed! - (' . $query->errno . ') ' . $query->error;
-			}
-
-			$conn = null; //close the connection by setting it to null
+			//$conn = new PDO( 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, SQL_USERNM, SQL_PSWD );
+//
+			//$sql = 'INSERT INTO t_foods (user_def_food_name, serving_size, serving_units_esha, cost, currency, json_esha, esha_food_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+//
+			////the params to go into the ?'s in the $sql variable
+			//$params = array(
+				//$user_def_food_name,
+				//$serving_size,
+				//$serving_units_esha,
+				//$cost,
+				//$currency,
+				//$json_esha,
+				//$esha_food_id,
+				//$user_id
+			//);
+//
+			////prepare the sql statement
+			//$query = $conn->prepare( $sql ); 
+			//if( !$query )
+			//{
+				//echo 'Query preparation failed! - (' . $query->errno . ') ' . $query->error;
+			//}
+//
+			////crank the parameters into the statement and execute
+			//$query = $query->execute( $params ); 
+			//if( !$query )
+			//{
+				//echo 'Query execution failed! - (' . $query->errno . ') ' . $query->error;
+			//}
+//
+			//$conn = null; //close the connection by setting it to null
 		}
 		echo '<p>Food Saved!</p>';
 	}
