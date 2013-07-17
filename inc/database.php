@@ -41,36 +41,63 @@ function open_connection(){
  *
  * 			- EXEC_FAIL -	If the command execution failed
  */
-//TODO: fix this up.  look at the PDO documentation about how to crank in arguments formatted as arrays
 function insert_row( $table, $params )
 {
-	$sql = 'INSERT INTO $table (user_def_food_name, serving_size, serving_units_esha, cost, currency, json_esha, esha_food_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-	
-	//the params to go into the ?'s in the $sql variable
-	$params = array(
-		$user_def_food_name,
-		$serving_size,
-		$serving_units_esha,
-		$cost,
-		$currency,
-		$json_esha,
-		$esha_food_id,
-		$user_id
-	);
-	
-	//prepare the sql statement
-	$query = $conn->prepare( $sql ); 
-	if( !$query )
-	{
-		echo 'Query preparation failed! - (' . $query->errno . ') ' . $query->error;
-	}
-	
-	//crank the parameters into the statement and execute
-	$query = $query->execute( $params ); 
-	if( !$query )
-	{
-		echo 'Query execution failed! - (' . $query->errno . ') ' . $query->error;
-	}
+    //TODO: TEST THIS!
+    $sql = 'INSERT INTO ' . $table . ' (';
+
+    foreach( $params as $col => $row) //build the query based off the contents of $params
+    {
+        $sql .= $col . ', ';
+    }
+    
+    substr( $sql, 0, -1 ); //remove last comma
+    $sql .= ') VALUES (';
+
+    foreach( $params as $col => $row)
+    {
+        $sql .= ':' . $row . ', ';
+    }
+
+    substr( $sql, 0, -1 ); //remove last comma
+    $sql .= ')';
+    echo $sql; //DEBUG
+
+
+    //$sql = "INSERT INTO $table (user_def_food_name, serving_size, serving_units_esha, cost, currency, json_esha, esha_food_id, user_id) VALUES (:user_def_food_name, :serving_size, :serving_units_esha, :cost, :currency, :json_esha, :esha_food_id, :user_id)";
+    
+    //TODO: TEST THIS!
+    $formatted_params = array(); //same format as $params, but the keys (or column names) start with a colon (:)
+    //the params to go into the ?'s in the $sql variable
+    foreach( $params as $col => $row )
+    {
+        $formatted_params[ ':' . $col ] = $row;
+    }
+
+    $params = array(
+	    $user_def_food_name,
+	    $serving_size,
+	    $serving_units_esha,
+	    $cost,
+	    $currency,
+	    $json_esha,
+	    $esha_food_id,
+	    $user_id
+    );
+    
+    //prepare the sql statement
+    $query = $conn->prepare( $sql ); 
+    if( !$query )
+    {
+	    echo 'Query preparation failed! - (' . $query->errno . ') ' . $query->error;
+    }
+    
+    //crank the parameters into the statement and execute
+    $query = $query->execute( $params ); 
+    if( !$query )
+    {
+	    echo 'Query execution failed! - (' . $query->errno . ') ' . $query->error;
+    }
 }
 
 
