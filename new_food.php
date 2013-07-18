@@ -46,12 +46,10 @@ function display_page_header( $inTitle )
 *	arguments passed
 *
 *	@param 	$units 	-	A one dimensional array containing the units that 
-*						will be in the dropdown menu
+*			        will be in the dropdown menu
+*			        Ex: $units = array("Cup", "Milliliter", "Pound")
 *
-*						Ex: $units = array("Cup", "Milliliter", "Pound")
-*
-*
-*	@return NULL
+*	@return $html_text -    The html string for making the dropdown
 *
 */
 function create_serving_units_dropdown( $units )
@@ -60,16 +58,18 @@ function create_serving_units_dropdown( $units )
 
 	require_once( UNITS_TABLE_PATH );
 
+        $html_text = '<select name="serving_units">';
 	//the serving units (i.e. cups, pieces, lbs, etc.) input
-	echo '<select name="serving_units">';
 
 	//output each unit to the dropdown list
 	foreach( $units as $unit )
 	{
-		echo '<option value="' . $unit . '">' . $unit . '(s)</option>';
+		$html_text .= '<option value="' . $unit . '">' . $unit . '(s)</option>';
 	}
 
-	echo '</select>';
+	$html_text .= '</select>';
+
+        return $html_text;
 }
 
 
@@ -95,73 +95,73 @@ function create_serving_units_dropdown( $units )
 function create_pantry_save_form( $default_food_name, $unit_list )
 {
     //TODO: make this return a string that contains all the html code instead of directly outputting it through echo.
-    echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
-    echo 	'<table>';
-    echo 		'<tr>';
-    echo 			'<th><label for="user_def_food_name">Name:</label></th>';
-    echo 			'<td><input type="text" name="user_def_food_name" id="user_def_food_name" value="' . $default_food_name . '" size="' . (strlen($default_food_name) + 5) . '"></td>';
-    echo 		'</tr>';
-    echo 	'</table>';
-    echo 	'<p>How much is it?</p>';
-    echo 	'<table>';
-    echo 		'<tr>';
-    echo 			'<th>Amount</th>';
-    echo 			'<th>Units</th>';
-    echo 		'</tr>';
-    echo 		'<tr>';
-    echo 			'<td>';
-    echo 				'<input type="text" name="serving_size" id="serving_size" value="1">';
-    echo 			'</td>'; //TODO: do form validation for this text input to make sure all the inputs are in number fomat
-    echo 			'<td>';
-    create_serving_units_dropdown( $unit_list );
-    echo 			'</td>';
-    echo 		'</tr>';
-    echo 	'</table>';
+    $html_text = '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
+    $html_text .= 	'<table>';
+    $html_text .= 		'<tr>';
+    $html_text .= 			'<th><label for="user_def_food_name">Name:</label></th>';
+    $html_text .= 			'<td><input type="text" name="user_def_food_name" id="user_def_food_name" value="' . $default_food_name . '" size="' . (strlen($default_food_name) + 5) . '"></td>';
+    $html_text .= 		'</tr>';
+    $html_text .= 	'</table>';
+    $html_text .= 	'<p>How much is it?</p>';
+    $html_text .= 	'<table>';
+    $html_text .= 		'<tr>';
+    $html_text .= 			'<th>Amount</th>';
+    $html_text .= 			'<th>Units</th>';
+    $html_text .= 		'</tr>';
+    $html_text .= 		'<tr>';
+    $html_text .= 			'<td>';
+    $html_text .= 				'<input type="text" name="serving_size" id="serving_size" value="1">';
+    $html_text .= 			'</td>'; //TODO: do form validation for this text input to make sure all the inputs are in number fomat
+    $html_text .= 			'<td>';
+    $html_text .=                       create_serving_units_dropdown( $unit_list );
+    $html_text .= 			'</td>';
+    $html_text .= 		'</tr>';
+    $html_text .= 	'</table>';
 
-    echo 	'<p>Costs</p>';
+    $html_text .= 	'<p>Costs</p>';
 
-    echo 	'<table>';
-    echo 		'<tr>';
-    echo 			'<td>';
-    echo 				'<input type="text" name="cost" value="">';
-    echo 			'</td>';
-    echo 			'<td>';
-    create_currency_dropdown();
-    echo 			'</td>';
-    echo 			'<td>';
-    echo 				'<input type="hidden" name="status" value="save_food">'; //tells the site to save the food in the database if this is selected
-    echo 				'<input type="submit" value="Save that food!">';
-    echo 			'</td>';
-    echo 		'</tr>';
-    echo 	'</table>';
-    echo '</form>';
+    $html_text .= 	'<table>';
+    $html_text .= 		'<tr>';
+    $html_text .= 			'<td>';
+    $html_text .= 				'<input type="text" name="cost" value="">';
+    $html_text .= 			'</td>';
+    $html_text .= 			'<td>';
+    $html_text .=                       create_currency_dropdown();
+    $html_text .= 			'</td>';
+    $html_text .= 			'<td>';
+    $html_text .= 				'<input type="hidden" name="status" value="save_food">'; //tells the site to save the food in the database if this is selected
+    $html_text .= 				'<input type="submit" value="Save that food!">';
+    $html_text .= 			'</td>';
+    $html_text .= 		'</tr>';
+    $html_text .= 	'</table>';
+    $html_text .= '</form>';
+
+    echo $html_text;
 }
 
 
 
 /**
-*	create_currency_dropdown()
-*	==========================
-*
-*	creates a dropdown menu for currencies based on the passed arguments.
-*	If the $default_currency argument is not an element in the 
-*	$currencies array, then there will be no default element in the 
-*	dropdown menu and the function will return false.
-*
-*	@param 	$currencies	-	A one dimensional array containing the currencies
-*							that will be in the dropdown menu
-*
-*							Ex: $units = array("USD", "EUR", "JPY");
-*
-*	@param 	$default_currency	-	a string containing the currency that 
-*									will be selected as the default for the
-*									dropdown menu
-*
-*
-*	@return $isPresent			-	true if $default_currency is present
-*										in the $currencies array
-*									false if $default_currency is not 
-*										present in the array
+*    create_currency_dropdown()
+*    ==========================
+*    
+*    creates and returns an html string for a dropdown menu for 
+*    currencies based on the passed arguments. If the 
+*    $default_currency argument is not an element in the 
+*    $currencies array, then there will be no default element in the 
+*    dropdown menu and the function will return false.
+*    
+*    @param $currencies	-	A one dimensional array containing 
+*                               the currencies that will be in the dropdown 
+*                               menu
+*                               Ex: $units = array("USD", "EUR", "JPY");
+*    
+*    @param $default_currency -	a string containing the currency that 
+*                               will be selected as the default for the
+*                               dropdown menu
+*    
+*    
+*    @return $output -	        the corresponding html string for the dropdown menu
 */
 function create_currency_dropdown( $currencies = NULL, $default_currency = "USD" )
 {
@@ -178,24 +178,22 @@ function create_currency_dropdown( $currencies = NULL, $default_currency = "USD"
 	}
 
 	//build the dropdown menu
-	$isPresent = false;
-	echo '<select name="currency">';
+        $output = '<select name="currency">';
 	foreach( $currencies as $currency )
 	{
 		if( $currency == $default_currency )
 		{
-			echo '<option value="' . $currency . '" selected>' . $currency . '</option>';
-			$isPresent = true;
+			$output .= '<option value="' . $currency . '" selected>' . $currency . '</option>';
 		}
 		else
 		{
-			echo '<option value="' . $currency . '">' . $currency . '</option>';
+			$output .= '<option value="' . $currency . '">' . $currency . '</option>';
 		}
 	}
-	echo '</select>';
+	$output .= '</select>';
 
 
-	return $isPresent;
+	return $output;
 }
 
 
