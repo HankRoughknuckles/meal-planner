@@ -83,7 +83,6 @@ class Database_handler
 
         $command = substr( $command, 0, -2 ); //remove last comma
         $command .= ')';
-        echo $command; //DEBUG
 
 
         //$command = "INSERT INTO $table (user_def_food_name, serving_size, serving_units_esha, cost, currency, json_esha, esha_food_id, user_id) VALUES (:user_def_food_name, :serving_size, :serving_units_esha, :cost, :currency, :json_esha, :esha_food_id, :user_id)";
@@ -114,11 +113,10 @@ class Database_handler
 
 
     /**
-     *	open_connection()
+     *	close_connection()
      *	================
      *
-     *	this function opens the connection using the database host, 
-     *	name, and sql username and password specified in LOGIN_PATH
+     *	this function closes the database connection 
      */
     function close_connection(){
 	    $conn = null; //close the connection by setting it to null

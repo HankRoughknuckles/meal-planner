@@ -1,4 +1,5 @@
 <?php
+session_start();
 /*
 *	This page is responsible for taking in a get request containing a 
 *	food name, searching for any matching foods that are saved in the
@@ -22,6 +23,7 @@
 	    }
 	}
 
-	echo json_encode( $matched_results );
+	//echo json_encode( $matched_results );
+	echo json_encode( $saved_foods ); //DEBUG
 }
 ?>

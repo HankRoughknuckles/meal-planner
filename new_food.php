@@ -340,6 +340,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
                     $db = new Database_handler;
                     $db->open_connection();
                     $db->insert_row( 't_foods', $params ); 
+                    $db->
 
 			//using PDO prepared statements...
 			//$conn = new PDO( 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, SQL_USERNM, SQL_PSWD );
