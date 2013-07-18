@@ -6,6 +6,7 @@
 require_once "/inc/config.php";
 require_once LOGIN_PATH;
 require_once INCLUDE_PATH . "esha.php";
+require_once INCLUDE_PATH . "database.php";
 
 session_start();
 
@@ -73,67 +74,67 @@ function create_serving_units_dropdown( $units )
 
 
 /**
-*	create_pantry_save_form()
-*	=========================
-*
-*	Creates a form in HTML that has the layout for saving a food in the user's
-*	pantry. This form has information for the user to input like food name,
-*	serving size, serving units, Cost per serving size, and the currency that
-*	cost is denominated in.
-*
-*	@param 	-	$default_food_name	-	The name of the food that will show up
-*										in the "food name" field when the page
-*										first loads up.
-*
-*	@param 	-	$unit_list			-	an array containing the desired serving
-*										units to be displayed
-*
-*	@return -	NULL
+*   create_pantry_save_form()
+*   =========================
+*   
+*   Creates a form in HTML that has the layout for saving a food in the user's
+*   pantry. This form has information for the user to input like food name,
+*   serving size, serving units, Cost per serving size, and the currency that
+*   cost is denominated in.
+*   
+*   @param 	-	$default_food_name	-	The name of the food that will show up
+*   									in the "food name" field when the page
+*   									first loads up.
+*   
+*   @param 	-	$unit_list			-	an array containing the desired serving
+*   									units to be displayed
+*   
+*   @return -	NULL
 *
 */
 function create_pantry_save_form( $default_food_name, $unit_list )
 {
-	//TODO: make this return a string that contains all the html code instead of directly outputting it through echo.
-	echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
-	echo 	'<table>';
-	echo 		'<tr>';
-	echo 			'<th><label for="user_def_food_name">Name:</label></th>';
-	echo 			'<td><input type="text" name="user_def_food_name" id="user_def_food_name" value="' . $default_food_name . '" size="' . (strlen($default_food_name) + 5) . '"></td>';
-	echo 		'</tr>';
-	echo 	'</table>';
-	echo 	'<p>How much is it?</p>';
-	echo 	'<table>';
-	echo 		'<tr>';
-	echo 			'<th>Amount</th>';
-	echo 			'<th>Units</th>';
-	echo 		'</tr>';
-	echo 		'<tr>';
-	echo 			'<td>';
-	echo 				'<input type="text" name="serving_size" id="serving_size" value="1">';
-	echo 			'</td>'; //TODO: do form validation for this text input to make sure all the inputs are in number fomat
-	echo 			'<td>';
-	create_serving_units_dropdown( $unit_list );
-	echo 			'</td>';
-	echo 		'</tr>';
-	echo 	'</table>';
+    //TODO: make this return a string that contains all the html code instead of directly outputting it through echo.
+    echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
+    echo 	'<table>';
+    echo 		'<tr>';
+    echo 			'<th><label for="user_def_food_name">Name:</label></th>';
+    echo 			'<td><input type="text" name="user_def_food_name" id="user_def_food_name" value="' . $default_food_name . '" size="' . (strlen($default_food_name) + 5) . '"></td>';
+    echo 		'</tr>';
+    echo 	'</table>';
+    echo 	'<p>How much is it?</p>';
+    echo 	'<table>';
+    echo 		'<tr>';
+    echo 			'<th>Amount</th>';
+    echo 			'<th>Units</th>';
+    echo 		'</tr>';
+    echo 		'<tr>';
+    echo 			'<td>';
+    echo 				'<input type="text" name="serving_size" id="serving_size" value="1">';
+    echo 			'</td>'; //TODO: do form validation for this text input to make sure all the inputs are in number fomat
+    echo 			'<td>';
+    create_serving_units_dropdown( $unit_list );
+    echo 			'</td>';
+    echo 		'</tr>';
+    echo 	'</table>';
 
-	echo 	'<p>Costs</p>';
+    echo 	'<p>Costs</p>';
 
-	echo 	'<table>';
-	echo 		'<tr>';
-	echo 			'<td>';
-	echo 				'<input type="text" name="cost" value="">';
-	echo 			'</td>';
-	echo 			'<td>';
-	create_currency_dropdown();
-	echo 			'</td>';
-	echo 			'<td>';
-	echo 				'<input type="hidden" name="status" value="save_food">'; //tells the site to save the food in the database if this is selected
-	echo 				'<input type="submit" value="Save that food!">';
-	echo 			'</td>';
-	echo 		'</tr>';
-	echo 	'</table>';
-	echo '</form>';
+    echo 	'<table>';
+    echo 		'<tr>';
+    echo 			'<td>';
+    echo 				'<input type="text" name="cost" value="">';
+    echo 			'</td>';
+    echo 			'<td>';
+    create_currency_dropdown();
+    echo 			'</td>';
+    echo 			'<td>';
+    echo 				'<input type="hidden" name="status" value="save_food">'; //tells the site to save the food in the database if this is selected
+    echo 				'<input type="submit" value="Save that food!">';
+    echo 			'</td>';
+    echo 		'</tr>';
+    echo 	'</table>';
+    echo '</form>';
 }
 
 
@@ -338,7 +339,9 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 			'user_id'               => $user_id
 		    );
 
-                    insert_row( 't_foods', $params ); //TODO: START THE TESTING OF insert_row() here
+                    $db = new Database_handler;
+                    $db->open_connection();
+                    $db->insert_row( 't_foods', $params ); 
 
 			//using PDO prepared statements...
 			//$conn = new PDO( 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, SQL_USERNM, SQL_PSWD );
