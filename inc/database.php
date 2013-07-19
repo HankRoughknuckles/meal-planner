@@ -38,7 +38,7 @@ class Database_handler
      *	this function opens the connection using the database host, 
      *	name, and sql username and password specified in LOGIN_PATH
      */
-    function open_connection(){
+    protected function open_connection(){
 	    $this->conn = new PDO( 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, SQL_USERNM, SQL_PSWD );
     }
 
@@ -65,7 +65,7 @@ class Database_handler
      */
     function insert_row( $table, $params )
     {
-        this->open_connection();
+        $this->open_connection();
 
         //TODO: TEST THIS!
         $command = 'INSERT INTO ' . $table . ' (';
@@ -111,7 +111,7 @@ class Database_handler
 	        echo 'Query execution failed! - (' . $query->errno . ') ' . $query->error;
         }
 
-        this->close_connection();
+        $this->close_connection();
     }
 
 
@@ -122,7 +122,7 @@ class Database_handler
      *
      *	this function closes the database connection 
      */
-    function close_connection(){
+    protected function close_connection(){
 	    $conn = null; //close the connection by setting it to null
     }
 }
