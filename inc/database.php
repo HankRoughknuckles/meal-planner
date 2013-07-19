@@ -65,6 +65,8 @@ class Database_handler
      */
     function insert_row( $table, $params )
     {
+        this->open_connection();
+
         //TODO: TEST THIS!
         $command = 'INSERT INTO ' . $table . ' (';
 
@@ -108,6 +110,8 @@ class Database_handler
         {
 	        echo 'Query execution failed! - (' . $query->errno . ') ' . $query->error;
         }
+
+        this->close_connection();
     }
 
 
