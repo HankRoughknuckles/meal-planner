@@ -82,14 +82,14 @@ function create_serving_units_dropdown( $units )
 *   serving size, serving units, Cost per serving size, and the currency that
 *   cost is denominated in.
 *   
-*   @param 	-	$default_food_name	-	The name of the food that will show up
-*   									in the "food name" field when the page
-*   									first loads up.
+*   @param  -   $default_food_name  -   The name of the food that will show up
+*   					in the "food name" field when the page
+*   					first loads up.
 *   
-*   @param 	-	$unit_list			-	an array containing the desired serving
-*   									units to be displayed
+*   @param  -   $unit_list  -   an array containing the desired serving
+*   			        units to be displayed
 *   
-*   @return -	NULL
+*   @return -   $html_text  -   The html string that will build the save form
 *
 */
 function create_pantry_save_form( $default_food_name, $unit_list )
@@ -136,7 +136,7 @@ function create_pantry_save_form( $default_food_name, $unit_list )
     $html_text .= 	'</table>';
     $html_text .= '</form>';
 
-    echo $html_text;
+    return $html_text;
 }
 
 
@@ -416,54 +416,48 @@ else if( isset($_GET['status']) AND $_GET['status'] == "find" )
 // ------------------------------------------------------------------
 else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 {
-	//TODO: use AJAX (eventually) to show nutrition facts as the user changes the serving size on this page
+    //TODO: use AJAX (eventually) to show nutrition facts as the user changes the serving size on this page
 
-	//retrieve the selected food from the matched_foods array dependent on what idx is in the GET variable
-	$_SESSION['selected_food'] = $_SESSION['matched_foods'][ $_GET['idx'] ];
-	$selected_food = $_SESSION['selected_food'];
+    //retrieve the selected food from the matched_foods array dependent on what idx is in the GET variable
+    $_SESSION['selected_food'] = $_SESSION['matched_foods'][ $_GET['idx'] ];
+    $selected_food = $_SESSION['selected_food'];
 
-	//for readability
-	$food_name = $selected_food->description;
+    //for readability
+    $food_name = $selected_food->description;
 
-	//display the page title
-	display_page_header( $_SESSION['page_title'] . ' - ' . $food_name );
+    //display the page title
+    display_page_header( $_SESSION['page_title'] . ' - ' . $food_name );
 
-	$units = create_units_array( $_SESSION['selected_food'] );
-	?>
+    $units = create_units_array( $_SESSION['selected_food'] );
 
-	<!-- //TODO: Hopefully this will look prettier with some CSS -->
-	<!-- //give the user the option to search for the food's nutrition facts... -->
-	<hr>
-	<h3>Search for Nutrition Facts</h3>
-	<form name="input" action="<?php echo BASE_URL . 'new_food.php'; ?>" method="post">
-		<table>
-			<tr>
-				<th>Amount</th>
-				<th>Units</th>
-			</tr>
+    //TODO: Hopefully this will look prettier with some CSS 
+    //give the user the option to search for the food's nutrition facts... 
+    $html_text = '<hr>';
+    $html_text .= '<h3>Search for Nutrition Facts</h3>';
 
-			<tr>
-				<td><input type = "text" name="serving_size" value=""></td> <!-- //TODO: do form validation for this text input to make sure that it all numbers input the serving size input -->
-				<td>
-					<?php create_serving_units_dropdown( $units ); ?>
-				</td>
-				<td>
-					<input type="hidden" name="status" value="nutrition_facts"><!--//tells the site to view the nutrition facts if this is selected -->
-					<input type="submit" value="See Nutrition Facts">
-				</td>
-			</tr>
-		</table>
-	</form>
+    $html_text .= '<form name="input" action="' . BASE_URL . 'new_food.php" method="post">';
+    $html_text .=       '<table>';
+    $html_text .=           '<tr>';
+    $html_text .=               '<th>Amount</th>';
+    $html_text .=               '<th>Units</th>';
+    $html_text .=           '</tr>';
+    $html_text .=           '<tr>';
+    $html_text .=               '<td><input type = "text" name="serving_size" value=""></td>'; //TODO: do form validation for this text input to make sure that it all numbers input the serving size input
+    $html_text .=               '<td>' . create_serving_units_dropdown( $units ) . '</td>';
+    $html_text .=               '<td>';
+    $html_text .=                   '<input type="hidden" name="status" value="nutrition_facts"><!--//tells the site to view the nutrition facts if this is selected -->';
+    $html_text .=                   '<input type="submit" value="See Nutrition Facts">';
+    $html_text .=               '</td>';
+    $html_text .=           '</tr>';
+    $html_text .=       '</table>';
+    $html_text .= '</form>';
+    $html_text .= '<h2>OR</h2>';
 
+    //...or give them the option to save the food in the database
+    $html_text .= '<h3>Save the food in your pantry</h3>';
+    $html_text .= create_pantry_save_form( $selected_food->description, $units );	
 
-	<h2>OR</h2>
-
-
-	<!-- ...or give them the option to save the food in the database -->
-	<h3>Save the food in your pantry</h3>
-
-	<?php
-	create_pantry_save_form( $selected_food->description, $units );	
+    echo $html_text;
 }
 
 
