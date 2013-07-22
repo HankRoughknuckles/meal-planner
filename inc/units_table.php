@@ -56,7 +56,11 @@ $common_units = array(
 *	creates a "select" input (aka dropdown menu) for a form based on the 
 *	arguments passed
 *
-*	@param  $name   -       The name of the select
+*	@param  $attr   -       An associative array with the following format
+*	                        attr = {    class   => class_name,
+*	                                    id      => id_name,
+*	                                    name    => var_name
+*	                        }
 *
 *	@param 	$units 	-	A one dimensional array containing the units that 
 *			        will be in the dropdown menu
@@ -66,21 +70,26 @@ $common_units = array(
 */
 if( !function_exists( 'create_serving_units_dropdown' ) )
 {
-    function create_serving_units_dropdown( $name, $units )
+    function create_serving_units_dropdown( $attr, $units )
     {
 	    //TODO: modify this so that if the serving size is > 1, the units will have an 's' at the end. This will probably require some javascript
 
-            $html_text = '<select name="' . $name . '">';
-	    //the serving units (i.e. cups, pieces, lbs, etc.) input
+        $html_text = '<select ';
+        foreach( $attr as $idx => $val )
+        {
+            $html_text .= $idx . '="' . $val . '" ';
+        }
+        $html_text = substr( $html_text, 0, -1 ); //remove the last space
+	$html_text .= '>';
 
-	    //output each unit to the dropdown list
-	    foreach( $units as $unit )
-	    {
-		    $html_text .= '<option value="' . $unit . '">' . $unit . '(s)</option>';
-	    }
+	//output each unit to the dropdown list
+	foreach( $units as $unit )
+	{
+		$html_text .= '<option value="' . $unit . '">' . $unit . '(s)</option>';
+	}
 
-	    $html_text .= '</select>';
+	$html_text .= '</select>';
 
-            return $html_text;
+        return $html_text;
     }
 }

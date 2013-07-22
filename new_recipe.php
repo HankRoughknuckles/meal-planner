@@ -4,27 +4,28 @@ require_once( LOGIN_PATH );
 
 session_start();
 
+//Display the header
 $pageTitle = "New Recipe";
 include( HEADER_PATH );
 
+// Define constants
 define( 'DEFAULT_FIELD_AMOUNT', 	10 ); //the number of ingredient fields to be displayed by default on page load-up.
 
-
-
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//%																		%
-//%								POST handling							%
-//%																		%
+//%							        	%
+//% 			   POST handling				%
+//%									%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if( $_SERVER["REQUEST_METHOD"] == "POST")
 {
-	var_dump( $_POST );
+    //After the user has submitted the information for the recipe
+    //TODO: parse the post variables and save them to the db
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//%																		%
-//%							non-POST handling							%
-//%																		%
+//%							        	%
+//% 			   non-POST handling				%
+//%									%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 else
 {
@@ -56,7 +57,6 @@ else
     $_SESSION['saved_foods'] = $query->fetchAll( PDO::FETCH_ASSOC ); //this will be used in food_recommendation.php to reduce the number of SQL queries
     $conn = null; //close the connection by setting it to null
 
-    //var_dump( $_SESSION['saved_foods'] ); //DEBUG
 
     $body_html = '<h2><label for="recipe_name">Recipe Name</h2>';
     $body_html .= '<form name="input" action="' . BASE_URL . 'new_recipe.php' . '" method="post">'; //concatenate this to $body_html
@@ -73,7 +73,10 @@ else
     $body_html .= '<th>Unit</th>';
     $body_html .= '</tr>';
 
-    if( !isset( $field_offset ) ){ $field_offset = 0; }
+    if( !isset( $field_offset ) )
+    { 
+        $field_offset = 0; //determines how many ingredient rows should be displayed
+    }
     ?>
 
     <!-- Save the current number of ingredient fields present on the screen in case we need to add more in the javascript later -->
@@ -82,14 +85,17 @@ else
     </script>
 
     <?php
-    //TODO: use AJAX to suggest saved foods based on what the user types
     for( $i = 0; $i < DEFAULT_FIELD_AMOUNT + $field_offset; $i++ )
     {
 	    $body_html .= '<tr id="ingredient_row_' . $i . '">';
-	    $body_html .= '<td><input type="text" class="recommendation" name="ing_' . $i . '_name" id="ing_' . $i . '_name"></td>';
-	    $body_html .= '<td><input type="text" name="ing_' . $i . '_amt" id="ing_' . $i . '_amt"></td>';
+	    $body_html .= '<td><input type="text" class="recommendation jsonify" name="ing_' . $i . '_name" id="ing_' . $i . '_name"></td>';
+	    $body_html .= '<td><input type="text" class="jsonify" name="ing_' . $i . '_amt" id="ing_' . $i . '_amt"></td>';
 	    $body_html .= '<td>';
-            $body_html .=       create_serving_units_dropdown( "ing_" . $i . "_unit", $common_units );
+            $dropdown_attr = array(
+                'class'     => 'jsonify',
+                'name'      => 'ing_' . $i . '_unit'
+            );
+            $body_html .=       create_serving_units_dropdown( $dropdown_attr, $common_units );
             $body_html .= '</td>';
 	    $body_html .= '</tr>';
     }
@@ -98,6 +104,7 @@ else
 
 
     //Button to display more ingredients for the user to enter
+
     $body_html .= '<a href=# onclick="moreIngredients()">Add more ingredients</a>';
     // $body_html .= '<input type="submit" name="more_ingredients_button" value="Add more ingredients">';
 
@@ -135,7 +142,6 @@ else
 		ingredientRows = "";
 		var rowNum;
                 var unitList = <?php echo json_encode( $common_units ); ?>;
-                console.log("unitList =  %o", unitList); //DEBUG
 		for( var i = 0; i < extraRowAmount; i++ )
 		{
 			rowNum = numIngredients + i;
@@ -147,7 +153,6 @@ else
 
                         $.each( unitList, function( index, value ){
                             //TODO build units dropdown here
-                            console.log("unitList: %o => %o", index, value); //DEBUG
                             ingredientRows = ingredientRows +  '<option value="' + value + '">' + value + '(s)</option>';
                         });
                         
@@ -165,11 +170,11 @@ else
 
 
     <script>
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    //%																		%
-    //%								Autocomplete							%
-    //%																		%
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    //%								        	%
+    //% 			   Autocomplete					%
+    //%										%
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    
     //set up the category autocomplete widget
     $.widget( "custom.catcomplete", $.ui.autocomplete, {
@@ -260,6 +265,13 @@ else
     // 	); 
 
     // }
+    </script>
+
+
+    <script>
+    //SUBMIT button
+    
+
     </script>
 
     <?php

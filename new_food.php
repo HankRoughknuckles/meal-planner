@@ -79,7 +79,8 @@ function create_pantry_save_form( $default_food_name, $unit_list )
     $html_text .= 				'<input type="text" name="serving_size" id="serving_size" value="1">';
     $html_text .= 			'</td>'; //TODO: do form validation for this text input to make sure all the inputs are in number fomat
     $html_text .= 			'<td>';
-    $html_text .=                       create_serving_units_dropdown( 'serving_units', $unit_list );
+
+    $html_text .=                       create_serving_units_dropdown( array('name' => 'serving_units') , $unit_list );
     $html_text .= 			'</td>';
     $html_text .= 		'</tr>';
     $html_text .= 	'</table>';
@@ -409,7 +410,7 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
     $html_text .=           '</tr>';
     $html_text .=           '<tr>';
     $html_text .=               '<td><input type = "text" name="serving_size" value=""></td>'; //TODO: do form validation for this text input to make sure that it all numbers input the serving size input
-    $html_text .=               '<td>' . create_serving_units_dropdown( 'serving_units', $units ) . '</td>';
+    $html_text .=               '<td>' . create_serving_units_dropdown( array('name' => 'serving_units'), $units ) . '</td>';
     $html_text .=               '<td>';
     $html_text .=                   '<input type="hidden" name="status" value="nutrition_facts"><!--//tells the site to view the nutrition facts if this is selected -->';
     $html_text .=                   '<input type="submit" value="See Nutrition Facts">';
