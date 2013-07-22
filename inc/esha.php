@@ -5,7 +5,7 @@
 
 require_once "/inc/config.php";
 require_once LOGIN_PATH;
-require_once INCLUDE_PATH . "units_table.php";
+require_once UNITS_TABLE_PATH;
 
 /**
 *	fetch_food_details()
@@ -87,22 +87,20 @@ function fetch_food_details( $food_id, $qty, $unit, $api_key)
 *	@param $food 	-	an object returned from an ESHA query
 *
 *	@return $units 	-	a non-associative array containing 
-*						the human readable forms of the ESHA 
-*						units that $food can be measured in
-*
+*			        the human readable forms of the ESHA 
+*		        	units that $food can be measured in
 */
 function create_units_array ( $food )
 {
-	require( UNITS_TABLE_PATH );
+    include UNITS_TABLE_PATH;
 
-	$units = array();
-	foreach( $food->units as $unit_code )
-	{
-		$units[] = $code_to_unit_table[ $unit_code ];
-	}
+    $units = array();
+    foreach( $food->units as $unit_code )
+    {
+	$units[] = $code_to_unit_table[ $unit_code ];
+    }
 
-
-	return $units;
+    return $units;
 }
 
 

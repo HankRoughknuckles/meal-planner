@@ -7,6 +7,7 @@ require_once "/inc/config.php";
 require_once LOGIN_PATH;
 require_once INCLUDE_PATH . "esha.php";
 require_once INCLUDE_PATH . "database.php";
+require_once UNITS_TABLE_PATH;
 
 session_start();
 
@@ -35,41 +36,6 @@ function display_page_header( $inTitle )
 {
 	$pageTitle = $inTitle;
 	include HEADER_PATH;
-}
-
-
-/**
-*	create_serving_units_dropdown()
-*	===============================
-*
-*	creates a "select" input (aka dropdown menu) for a form based on the 
-*	arguments passed
-*
-*	@param 	$units 	-	A one dimensional array containing the units that 
-*			        will be in the dropdown menu
-*			        Ex: $units = array("Cup", "Milliliter", "Pound")
-*
-*	@return $html_text -    The html string for making the dropdown
-*
-*/
-function create_serving_units_dropdown( $units )
-{
-	//TODO: modify this so that if the serving size is > 1, the units will have an 's' at the end. This will probably require some javascript
-
-	require_once( UNITS_TABLE_PATH );
-
-        $html_text = '<select name="serving_units">';
-	//the serving units (i.e. cups, pieces, lbs, etc.) input
-
-	//output each unit to the dropdown list
-	foreach( $units as $unit )
-	{
-		$html_text .= '<option value="' . $unit . '">' . $unit . '(s)</option>';
-	}
-
-	$html_text .= '</select>';
-
-        return $html_text;
 }
 
 
@@ -113,7 +79,7 @@ function create_pantry_save_form( $default_food_name, $unit_list )
     $html_text .= 				'<input type="text" name="serving_size" id="serving_size" value="1">';
     $html_text .= 			'</td>'; //TODO: do form validation for this text input to make sure all the inputs are in number fomat
     $html_text .= 			'<td>';
-    $html_text .=                       create_serving_units_dropdown( $unit_list );
+    $html_text .=                       create_serving_units_dropdown( 'serving_units', $unit_list );
     $html_text .= 			'</td>';
     $html_text .= 		'</tr>';
     $html_text .= 	'</table>';
@@ -262,7 +228,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 	// ------------------------------------------------------------------
 	else if( $_POST['status'] == 'nutrition_facts' )
 	{
-		require_once( UNITS_TABLE_PATH );
+		//require_once( UNITS_TABLE_PATH );
 
 		//these two variables are to be used in searching for nutrition facts, they are not necessarily the units that will be used to store the food in the user's pantry (db).  I decided to use _SESSION instead of using GET to keep things more secure
 		$_SESSION['lookup_serving_size'] = $_POST['serving_size'];
@@ -443,7 +409,7 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
     $html_text .=           '</tr>';
     $html_text .=           '<tr>';
     $html_text .=               '<td><input type = "text" name="serving_size" value=""></td>'; //TODO: do form validation for this text input to make sure that it all numbers input the serving size input
-    $html_text .=               '<td>' . create_serving_units_dropdown( $units ) . '</td>';
+    $html_text .=               '<td>' . create_serving_units_dropdown( 'serving_units', $units ) . '</td>';
     $html_text .=               '<td>';
     $html_text .=                   '<input type="hidden" name="status" value="nutrition_facts"><!--//tells the site to view the nutrition facts if this is selected -->';
     $html_text .=                   '<input type="submit" value="See Nutrition Facts">';
@@ -468,7 +434,7 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 // ------------------------------------------------------------------
 else if( isset($_GET['status']) AND $_GET['status'] == 'nutrition_facts' )
 {
-	require( UNITS_TABLE_PATH );
+	//require( UNITS_TABLE_PATH );
 	require_once( NUTRIENTS_TABLE_PATH );
 
 	display_page_header( "Nutrition Facts - " . $_SESSION['selected_food']->description );

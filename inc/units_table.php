@@ -47,3 +47,40 @@ $common_units = array(
 	'tablespoons',
 	'grams'
 );
+
+
+/**
+*	create_serving_units_dropdown()
+*	===============================
+*
+*	creates a "select" input (aka dropdown menu) for a form based on the 
+*	arguments passed
+*
+*	@param  $name   -       The name of the select
+*
+*	@param 	$units 	-	A one dimensional array containing the units that 
+*			        will be in the dropdown menu
+*			        Ex: $units = array("Cup", "Milliliter", "Pound")
+*
+*	@return $html_text -    The html string for making the dropdown
+*/
+if( !function_exists( 'create_serving_units_dropdown' ) )
+{
+    function create_serving_units_dropdown( $name, $units )
+    {
+	    //TODO: modify this so that if the serving size is > 1, the units will have an 's' at the end. This will probably require some javascript
+
+            $html_text = '<select name="' . $name . '">';
+	    //the serving units (i.e. cups, pieces, lbs, etc.) input
+
+	    //output each unit to the dropdown list
+	    foreach( $units as $unit )
+	    {
+		    $html_text .= '<option value="' . $unit . '">' . $unit . '(s)</option>';
+	    }
+
+	    $html_text .= '</select>';
+
+            return $html_text;
+    }
+}

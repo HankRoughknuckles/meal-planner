@@ -28,6 +28,8 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 else
 {
+    require_once( UNITS_TABLE_PATH );
+
     //TODO: put this query method into another file as a function to keep the code DRY
     //using PDO prepared statements for SQL query
     $conn = new PDO( 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, SQL_USERNM, SQL_PSWD );
@@ -74,7 +76,7 @@ else
     if( !isset( $field_offset ) ){ $field_offset = 0; }
     ?>
 
-    <!-- Save the current number of ingredient fields present on the screen in case we need to add more -->
+    <!-- Save the current number of ingredient fields present on the screen in case we need to add more in the javascript later -->
     <script>
     var numIngredients =  <?php echo json_encode( DEFAULT_FIELD_AMOUNT + $field_offset ) ?>;
     </script>
@@ -86,7 +88,9 @@ else
 	    $body_html .= '<tr id="ingredient_row_' . $i . '">';
 	    $body_html .= '<td><input type="text" class="recommendation" name="ing_' . $i . '_name" id="ing_' . $i . '_name"></td>';
 	    $body_html .= '<td><input type="text" name="ing_' . $i . '_amt" id="ing_' . $i . '_amt"></td>';
-	    $body_html .= '<td><input type="text" name="ing_' . $i . '_unit" id="ing_' . $i . '_unit"></td>';
+	    $body_html .= '<td>';
+            $body_html .=       create_serving_units_dropdown( "ing_" . $i . "_unit", $common_units );
+            $body_html .= '</td>';
 	    $body_html .= '</tr>';
     }
     $body_html .= '</table>';
@@ -130,6 +134,8 @@ else
 	lastRow.after( function() {
 		ingredientRows = "";
 		var rowNum;
+                var unitList = <?php echo json_encode( $common_units ); ?>;
+                console.log("unitList =  %o", unitList); //DEBUG
 		for( var i = 0; i < extraRowAmount; i++ )
 		{
 			rowNum = numIngredients + i;
@@ -137,7 +143,15 @@ else
 			ingredientRows = ingredientRows + '<td><input type="text" name="ing_' + rowNum + '_name" id="ing_' + rowNum + '_name" onkeyup="getRecommendation(this)"></td>';
 			ingredientRows = ingredientRows + '<div class=recommendation id=' + rowNum + '><ul><li>hi</li><li>hello</li></ul></div>';
 			ingredientRows = ingredientRows + '<td><input type="text" name="ing_' + rowNum + '_amt" id="ing_' + rowNum + '_amt"></td>';
-			ingredientRows = ingredientRows + '<td><input type="text" name="ing_' + rowNum + '_unit" id="ing_' + rowNum + '_unit"></td>';
+			ingredientRows = ingredientRows + '<td><select name="ing_' + rowNum + '_unit" id="ing_' + rowNum + '_unit">';
+
+                        $.each( unitList, function( index, value ){
+                            //TODO build units dropdown here
+                            console.log("unitList: %o => %o", index, value); //DEBUG
+                            ingredientRows = ingredientRows +  '<option value="' + value + '">' + value + '(s)</option>';
+                        });
+                        
+                        ingredientRows = ingredientRows + '</td>';
 			ingredientRows = ingredientRows + '</tr>';
 		}
 
