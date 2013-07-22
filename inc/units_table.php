@@ -41,11 +41,12 @@ $new = NULL;
 
 // common_units is a 1-dimensional array containing the nams of commonly used units
 $common_units = array(
-	'milliliters',
-	'cups',
-	'teaspoons',
-	'tablespoons',
-	'grams'
+    '',
+    'milliliters',
+    'cups',
+    'teaspoons',
+    'tablespoons',
+    'grams'
 );
 
 
@@ -85,7 +86,14 @@ if( !function_exists( 'create_serving_units_dropdown' ) )
 	//output each unit to the dropdown list
 	foreach( $units as $unit )
 	{
+            if( $unit )
+            {
 		$html_text .= '<option value="' . $unit . '">' . $unit . '(s)</option>';
+            }
+            else
+            {
+		$html_text .= '<option value="' . $unit . '">' . $unit . '</option>';
+            }
 	}
 
 	$html_text .= '</select>';

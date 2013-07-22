@@ -20,6 +20,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 {
     //After the user has submitted the information for the recipe
     //TODO: parse the post variables and save them to the db
+    var_dump($_POST);
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -66,6 +67,7 @@ else
     $body_html .= '<div id="output">OUTPUT!</div>';
 
     // $body_html .= '<div class="ingredient_list">';
+    $body_html .= '<input type="hidden" id="ingredient_list" name="ingredient_list" value="">';
     $body_html .= '<table id="ingredient_list">';
     $body_html .= '<tr>	';
     $body_html .= '<th>Ingredient Name</th>';
@@ -88,12 +90,12 @@ else
     for( $i = 0; $i < DEFAULT_FIELD_AMOUNT + $field_offset; $i++ )
     {
 	    $body_html .= '<tr id="ingredient_row_' . $i . '">';
-	    $body_html .= '<td><input type="text" class="recommendation jsonify" name="ing_' . $i . '_name" id="ing_' . $i . '_name"></td>';
-	    $body_html .= '<td><input type="text" class="jsonify" name="ing_' . $i . '_amt" id="ing_' . $i . '_amt"></td>';
+	    $body_html .= '<td><input type="text" class="recommendation jsonify" name="' . $i . '_ing_name" id="ing_' . $i . '_name"></td>';
+	    $body_html .= '<td><input type="text" class="jsonify" name="' . $i . '_ing_amt" id="ing_' . $i . '_amt"></td>';
 	    $body_html .= '<td>';
             $dropdown_attr = array(
                 'class'     => 'jsonify',
-                'name'      => 'ing_' . $i . '_unit'
+                'name'      => $i . '_ing_unit'
             );
             $body_html .=       create_serving_units_dropdown( $dropdown_attr, $common_units );
             $body_html .= '</td>';
@@ -134,7 +136,6 @@ else
     function moreIngredients()
     {
 	var extraRowAmount = 10; //The number of rows to increase the ingredients table by
-	var ingPrefix = "#ing_" + (numIngredients) + "_";
 	var lastRow = $( "#ingredient_row_" + (numIngredients - 1) ); //select the last row in the ingredient list
 
 	//insert {extraRowAmount} of rows after the last row in the table
@@ -146,10 +147,9 @@ else
 		{
 			rowNum = numIngredients + i;
 			ingredientRows = ingredientRows + '<tr id="ingredient_row_' + rowNum + '">';
-			ingredientRows = ingredientRows + '<td><input type="text" name="ing_' + rowNum + '_name" id="ing_' + rowNum + '_name" onkeyup="getRecommendation(this)"></td>';
-			ingredientRows = ingredientRows + '<div class=recommendation id=' + rowNum + '><ul><li>hi</li><li>hello</li></ul></div>';
-			ingredientRows = ingredientRows + '<td><input type="text" name="ing_' + rowNum + '_amt" id="ing_' + rowNum + '_amt"></td>';
-			ingredientRows = ingredientRows + '<td><select name="ing_' + rowNum + '_unit" id="ing_' + rowNum + '_unit">';
+			ingredientRows = ingredientRows + '<td><input class="jsonify" type="text" name="' + rowNum + '_ing_name" id="ing_' + rowNum + '_name"></td>';
+			ingredientRows = ingredientRows + '<td><input class="jsonify" type="text" name="' + rowNum + '_ing_amt" id="ing_' + rowNum + '_amt"></td>';
+			ingredientRows = ingredientRows + '<td><select class="jsonify" name="' + rowNum + '_ing_unit" id="ing_' + rowNum + '_unit">';
 
                         $.each( unitList, function( index, value ){
                             //TODO build units dropdown here
@@ -207,7 +207,7 @@ else
 			    user_input: request.term
 		    },
 		    success: function( data ){
-                        console.log("Response = %o", data); //DEBUG
+                        // console.log("Response = %o", data); //DEBUG
 			response( data );
 		    }
 	    });
@@ -269,8 +269,40 @@ else
 
 
     <script>
-    //SUBMIT button
+    var ingredients = new Array();
     
+    // JSONify the ingredient list
+    $(".jsonify").blur(function(){
+        var input = $(this).attr('name'); //this will have the format [num]_ing_[name, amt, unit]
+        var num = input.substr(0, input.indexOf("_"));    //which number is assigned to the ingredient field
+        // console.log("num = " + num ); //DEBUG
+
+        input = input.substr( input.indexOf("_") + 1); //get rid of everything before the first underscore (the number)
+        var type = input.substr( input.indexOf("_") + 1); //get rid of everything before the next underscore (a string containing "ing"). type tells you whether it's an ingredient name, unit, or amount
+        
+        // console.log("type  = " + type ); //DEBUG
+
+        if( !ingredients[num] )
+        {
+            ingredients[num] = {
+                'name'      : null,
+                'amt'       : null,
+                'unit'      : null
+            }
+        }
+
+        //put the value of the field into the ingredients variable
+        if( $(this).val() === "" )
+        {
+            ingredients[num][type] = null; //put as null if it was left blank
+        }
+        else
+        {
+            ingredients[num][type] = $(this).val();
+        }
+
+        $("#ingredient_list").val( JSON.stringify(ingredients) );
+    });
 
     </script>
 
