@@ -19,7 +19,16 @@ define( 'DEFAULT_FIELD_AMOUNT', 	10 ); //the number of ingredient fields to be d
 if( $_SERVER["REQUEST_METHOD"] == "POST")
 {
     //After the user has submitted the information for the recipe
-    //TODO: parse the post variables and save them to the db
+    if( $_POST['save_unregistered_foods'] == 'on' AND $_POST['new_foods_present'] == 'true' )
+    {
+        echo "saving unregistered foods";
+        //TODO: display menu for saving unregistered foods
+    }
+
+    else //if all the foods in the recipe are already registered
+    {
+        echo "posting food calorie and cost information";
+    }
     var_dump($_POST);
 }
 
@@ -66,6 +75,7 @@ else
     $body_html .= '<h2>Ingredients</h2>';
     
     $body_html .= '<input type="hidden" id="ingredient_list" name="ingredient_list" value="">'; //the JSON array to be submitted to the server via POST
+    $body_html .= '<input type="hidden" id="new_foods_present" name="new_foods_present" value="false">'; //the JSON array to be submitted to the server via POST
     $body_html .= '<table id="ingredient_list">';
     $body_html .= '<tr>	';
     $body_html .= '<th>Ingredient Name</th>';
@@ -114,7 +124,8 @@ else
     $body_html .= '<textarea rows="9" cols="65" name="instructions" id="instructions"></textarea>'; 
     $body_html .= '<br />';
 
-    $body_html .= '<input type="submit" value="Save Recipe">';
+    $body_html .= '<p>Recipe yields <input type="text" name="meal_yield"> portions.</p>';
+    $body_html .= '<input type="submit" id="submit_btn" value="Save Recipe">';
     $body_html .= '<input type="checkbox" name="save_unregistered_foods" checked>Store all new ingredients in My Pantry'; //TODO: if this is unchecked and there are new ingredients entered, make an alert message pop up asking them if they're sure they want to proceed without saving the foods.
     $body_html .= '</form>';
 
@@ -318,6 +329,19 @@ else
 
     refreshJQuery();
     </script>
+
+    <script>
+    $("#submit_btn").click( function(){
+        
+        $.each( ingredients, function( ingredientIndex, ingredient ){
+            if( ingredient['food_id'] == null )
+            {
+                $("#new_foods_present").val("true");
+            }
+        });
+    });
+    </script>
+
 
     <?php
 }

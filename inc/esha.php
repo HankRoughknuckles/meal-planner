@@ -15,61 +15,60 @@ require_once UNITS_TABLE_PATH;
 *	the nutrient information about the food selected.
 *
 *	@param 	-	$food_id 	-	the ESHA food ID code. (This value can 
-								usually be retrieved by a GET request to 
-								http://api.esha.com/foods?apikey=[YOUR API KEY]&query=[FOOD TO BE SEARCHED FOR]
-								)
+*								usually be retrieved by a GET request to 
+*								http://api.esha.com/foods?apikey=[YOUR API KEY]&query=[FOOD TO BE SEARCHED FOR]
+*								)
 *
 *	@param 	-	$qty 		-	the serving size to be searched for.
 *
 *	@param 	-	$unit 		-	the ESHA id code for the units that $qty will be denominated 
-	`							in (e.g. urn:uuid:dfad1d25-17ff-4201-bba0-0711e8b88c65 = cups).
-
+*								in (e.g. urn:uuid:dfad1d25-17ff-4201-bba0-0711e8b88c65 = cups).
+*
 *
 *	@param 	-	$api_key 	-	your ESHA api key
 */
 function fetch_food_details( $food_id, $qty, $unit, $api_key)
 {
-	// use cURL to fetch from ESHA
-	$header = array(
-		"Accept: application/json",
-		"Content-Type: application/json"
-		);
+    // use cURL to fetch from ESHA
+    $header = array(
+	    "Accept: application/json",
+	    "Content-Type: application/json"
+	    );
 
-	$data = json_encode(
-		array(
-			'items' => array(
-				'id' => $food_id,  
-				'quantity' => $qty, 
-				'unit' => $unit 
-			)
-		)
-	);
+    $data = json_encode(
+	    array(
+		    'items' => array(
+			    'id' => $food_id,  
+			    'quantity' => $qty, 
+			    'unit' => $unit 
+		    )
+	    )
+    );
 
+    $ch = curl_init( "http://api.esha.com/analysis?apikey=" . $api_key ); 	//initialize cURL with the ESHA URL
+    curl_setopt($ch, CURLOPT_POST,				1); 		//specify that it will be a POST request
+    curl_setopt($ch, CURLOPT_HTTPHEADER,		$header);	//insert the proper header defined above	
+    curl_setopt($ch, CURLOPT_POSTFIELDS,		$data); 	//the data to be sent
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION,	0); 		//do not go to any LOCATION: header that the server sends back
+    curl_setopt($ch, CURLOPT_HEADER,			1);  		// make the response return http headers
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER,	1);  		// make the response return the contents of the call
+    curl_setopt($ch, CURLOPT_VERBOSE,	1);  				// make the response verbose.  FOR DEBUGGING PURPOSES
 
-	$ch = curl_init( "http://api.esha.com/analysis?apikey=" . $api_key ); 	//initialize cURL with the ESHA URL
-	curl_setopt($ch, CURLOPT_POST,				1); 		//specify that it will be a POST request
-	curl_setopt($ch, CURLOPT_HTTPHEADER,		$header);	//insert the proper header defined above	
-	curl_setopt($ch, CURLOPT_POSTFIELDS,		$data); 	//the data to be sent
-	curl_setopt($ch, CURLOPT_FOLLOWLOCATION,	0); 		//do not go to any LOCATION: header that the server sends back
-	curl_setopt($ch, CURLOPT_HEADER,			1);  		// make the response return http headers
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER,	1);  		// make the response return the contents of the call
-	curl_setopt($ch, CURLOPT_VERBOSE,	1);  				// make the response verbose.  FOR DEBUGGING PURPOSES
+    $response = curl_exec( $ch );
 
-	$response = curl_exec( $ch );
+    //if the database didn't return anything properly, give a fatal error
+    //the conditional has the strpos() > 25 to prevent the response body from containing "200 OK" and potentially allowing the program to continue
+    if ( strpos( $response, "200 OK" ) == false 	OR 		strpos( $response, "200 OK" ) > 25 )
+    {
+	echo 'Query response = ';
+	die("Query Error: Food not found."); //TODO: handle this more gracefully.  have some kind of error handling
+    }
 
-	//if the database didn't return anything properly, give a fatal error
-	//the conditional has the strpos() > 25 to prevent the response body from containing "200 OK" and potentially allowing the program to continue
-	if ( strpos( $response, "200 OK" ) == false 	OR 		strpos( $response, "200 OK" ) > 25 )
-	{
-		echo 'Query response = ';
-		die("Query Error: Food not found."); //TODO: handle this more gracefully.  have some kind of error handling
-	}
+    //knock off the html headers and start at the beginning of the actual query results (note: they're in JSON so we have to decode them)
+    $foods = substr( $response, strpos($response, '{"items":') );
+    $foods = json_decode( $foods );
 
-	//knock off the html headers and start at the beginning of the actual query results (note: they're in JSON so we have to decode them)
-	$foods = substr( $response, strpos($response, '{"items":') );
-	$foods = json_decode( $foods );
-
-	return $foods->results;
+    return $foods->results;
 }
 
 
