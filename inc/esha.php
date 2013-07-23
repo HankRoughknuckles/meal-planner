@@ -14,18 +14,21 @@ require_once UNITS_TABLE_PATH;
 *	sends an HTTP POST request to the ESHA servers to retrieve 
 *	the nutrient information about the food selected.
 *
-*	@param 	-	$food_id 	-	the ESHA food ID code. (This value can 
-*								usually be retrieved by a GET request to 
-*								http://api.esha.com/foods?apikey=[YOUR API KEY]&query=[FOOD TO BE SEARCHED FOR]
-*								)
+*	@param 	-	$food_id 	-   the ESHA food ID code. (This value can 
+*					    usually be retrieved by a GET request to 
+*				            http://api.esha.com/foods?apikey=[YOUR API KEY]&query=[FOOD TO BE SEARCHED FOR]
+*				            )
 *
-*	@param 	-	$qty 		-	the serving size to be searched for.
+*	@param 	-	$qty 		-   the serving size to be searched for.
 *
-*	@param 	-	$unit 		-	the ESHA id code for the units that $qty will be denominated 
-*								in (e.g. urn:uuid:dfad1d25-17ff-4201-bba0-0711e8b88c65 = cups).
+*	@param 	-	$unit 		-   the ESHA id code for the units that $qty will be denominated 
+*				            in (e.g. urn:uuid:dfad1d25-17ff-4201-bba0-0711e8b88c65 = cups).
+*
+*	@param 	-	$api_key 	-   your ESHA api key
 *
 *
-*	@param 	-	$api_key 	-	your ESHA api key
+*
+*	@return -       $results        -   the raw results straight from the ESHA server
 */
 function fetch_food_details( $food_id, $qty, $unit, $api_key)
 {
@@ -46,13 +49,13 @@ function fetch_food_details( $food_id, $qty, $unit, $api_key)
     );
 
     $ch = curl_init( "http://api.esha.com/analysis?apikey=" . $api_key ); 	//initialize cURL with the ESHA URL
-    curl_setopt($ch, CURLOPT_POST,				1); 		//specify that it will be a POST request
-    curl_setopt($ch, CURLOPT_HTTPHEADER,		$header);	//insert the proper header defined above	
-    curl_setopt($ch, CURLOPT_POSTFIELDS,		$data); 	//the data to be sent
+    curl_setopt($ch, CURLOPT_POST,		1); 		//specify that it will be a POST request
+    curl_setopt($ch, CURLOPT_HTTPHEADER,	$header);	//insert the proper header defined above	
+    curl_setopt($ch, CURLOPT_POSTFIELDS,	$data); 	//the data to be sent
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION,	0); 		//do not go to any LOCATION: header that the server sends back
-    curl_setopt($ch, CURLOPT_HEADER,			1);  		// make the response return http headers
+    curl_setopt($ch, CURLOPT_HEADER,		1);  		// make the response return http headers
     curl_setopt($ch, CURLOPT_RETURNTRANSFER,	1);  		// make the response return the contents of the call
-    curl_setopt($ch, CURLOPT_VERBOSE,	1);  				// make the response verbose.  FOR DEBUGGING PURPOSES
+    curl_setopt($ch, CURLOPT_VERBOSE,	        1);  		// make the response verbose.  FOR DEBUGGING PURPOSES
 
     $response = curl_exec( $ch );
 
@@ -60,8 +63,10 @@ function fetch_food_details( $food_id, $qty, $unit, $api_key)
     //the conditional has the strpos() > 25 to prevent the response body from containing "200 OK" and potentially allowing the program to continue
     if ( strpos( $response, "200 OK" ) == false 	OR 		strpos( $response, "200 OK" ) > 25 )
     {
-	echo 'Query response = ';
-	die("Query Error: Food not found."); //TODO: handle this more gracefully.  have some kind of error handling
+        echo 'Query Error: Food not found. Printing stack backtrace';
+        var_dump( debug_backtrace() );
+	die(); //TODO: handle this more gracefully.  have some kind of error handling
+
     }
 
     //knock off the html headers and start at the beginning of the actual query results (note: they're in JSON so we have to decode them)

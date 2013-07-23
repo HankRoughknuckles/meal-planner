@@ -1,4 +1,5 @@
 <?php
+//TODO: implement form checking on ingredients to make sure they are not blank and also have the right format
 require_once("/inc/config.php");
 require_once( LOGIN_PATH );
 
@@ -18,6 +19,8 @@ define( 'DEFAULT_FIELD_AMOUNT', 	10 ); //the number of ingredient fields to be d
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if( $_SERVER["REQUEST_METHOD"] == "POST")
 {
+    require_once INCLUDE_PATH . 'esha.php';
+
     //After the user has submitted the information for the recipe
     if( $_POST['save_unregistered_foods'] == 'on' AND $_POST['new_foods_present'] == 'true' )
     {
@@ -27,20 +30,40 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 
     else //if all the foods in the recipe are already registered
     {
-        echo "posting food calorie and cost information";
+        var_dump( $_SESSION['saved_foods'] ); //DEBUG
+        $ingredient_list = json_decode($_POST['ingredient_list']);
 
-        $body_html = '<table>';
+        $body_html = '<table id="recipe_tabulation">';
         $body_html .=   '<tr>';
         $body_html .=       '<th>Amount</th>';
         $body_html .=       '<th>Food</th>';
         $body_html .=       '<th>Calories</th>';
         $body_html .=       '<th>Cost</th>';
         $body_html .=   '</tr>';
-        $body_html = '</table>';
+        $body_html .= '</table>';
+
+
+        $ingredient_list = json_decode( $_POST['ingredient_list'] );
+        //get nutrition information about each ingredient
+        foreach( $ingredient_list as $ingredient ){
+
+            var_dump( $ingredient ); //DEBUG
+
+            $nutrition_info = fetch_food_details( 
+                $_SESSION['saved_foods'][$ingredient->food_id]['esha_food_id'],
+                $ingredient->amt,
+                $unit_to_code_table[ $ingredient->unit ],
+                ESHA_API_KEY
+            );
+
+        }
 
         echo $body_html;
+        var_dump( $_POST ); //DEBUG
+        var_dump( $nutrition_info ); //DEBUG
+        var_dump( $nutrition_info ); //DEBUG
     }
-    var_dump($_POST);
+
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,7 +98,17 @@ else
 	    echo 'Query execution failed! - (' . $result->errno . ') ' . $result->error;
     }
 
-    $_SESSION['saved_foods'] = $query->fetchAll( PDO::FETCH_ASSOC ); //this will be used in food_recommendation.php to reduce the number of SQL queries
+    $queried_foods = $query->fetchAll( PDO::FETCH_ASSOC ); //this will be used in food_recommendation.php to reduce the number of SQL queries
+
+    //make the $saved_foods associative array where the key is the SQL food id and the value is the information for the food.  Store it in a session variable
+    $saved_foods = array();
+    foreach( $queried_foods as $food )
+    {
+        $food_id = $food['id'];
+        $saved_foods[$food_id] = $food;
+    }
+    $_SESSION['saved_foods'] = $saved_foods;
+
     // var_dump($_SESSION['saved_foods']); //DEBUG
     $conn = null; //close the connection by setting it to null
 

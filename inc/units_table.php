@@ -40,14 +40,16 @@ $new = NULL;
 
 
 // common_units is a 1-dimensional array containing the nams of commonly used units
+//NOTE: then editing this, make sure that the values are 
+//  exactly the same as they appear in code_to_unit_table
 $common_units = array(
     '',
-    'pieces',
-    'milliliters',
-    'cups',
-    'teaspoons',
-    'tablespoons',
-    'grams'
+    'Piece',
+    'Milliliter',
+    'Cup',
+    'Teaspoon',
+    'Tablespoon',
+    'Gram'
 );
 
 
