@@ -19,8 +19,9 @@ if( $_GET['user_input'] )
 	    if (stristr( $saved_food['user_def_food_name'], $user_input ) )
 	    {
 		$matched_results[] = array( 
-		    'category' => 'Your Saved Foods:',
-		    'label' => $saved_food['user_def_food_name']
+		    'category'  => 'Your Saved Foods:',
+		    'label'     => $saved_food['user_def_food_name'],
+		    'food_id'   => $saved_food['id']
 		    //'units' => /*TODO: Add units based on what food it is*/
 		);
 	    }
