@@ -42,6 +42,7 @@ $new = NULL;
 // common_units is a 1-dimensional array containing the nams of commonly used units
 $common_units = array(
     '',
+    'pieces',
     'milliliters',
     'cups',
     'teaspoons',

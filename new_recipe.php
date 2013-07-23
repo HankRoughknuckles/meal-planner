@@ -22,12 +22,23 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
     if( $_POST['save_unregistered_foods'] == 'on' AND $_POST['new_foods_present'] == 'true' )
     {
         echo "saving unregistered foods";
-        //TODO: display menu for saving unregistered foods
+        //TODO: display menu for saving unregistered foods -- do the autocomplete for new_foods.php before doing this
     }
 
     else //if all the foods in the recipe are already registered
     {
         echo "posting food calorie and cost information";
+
+        $body_html = '<table>';
+        $body_html .=   '<tr>';
+        $body_html .=       '<th>Amount</th>';
+        $body_html .=       '<th>Food</th>';
+        $body_html .=       '<th>Calories</th>';
+        $body_html .=       '<th>Cost</th>';
+        $body_html .=   '</tr>';
+        $body_html = '</table>';
+
+        echo $body_html;
     }
     var_dump($_POST);
 }
@@ -314,11 +325,11 @@ else
 
             // TODO: this may be a little inefficient. find a faster way of doing this
             //look through all the foods in $_SESSION['saved_foods'] to find which name matches the one created
-            $.each( <?php echo json_encode($_SESSION['saved_foods']); ?>, function( i, saved_food ){
+            $.each( <?php echo json_encode($_SESSION['saved_foods']); ?>, function( i, savedFood ){
                 //if the currently checked element in saved_foods matches the one that was just selected by the user
-                if( saved_food['user_def_food_name'] == ingredients[num]['name'] )
+                if( savedFood['user_def_food_name'] == ingredients[num]['name'] )
                 {
-                    ingredients[num]['food_id'] = saved_food['id']; //save the food's id number
+                    ingredients[num]['food_id'] = savedFood['id']; //save the food's id number
                 }
             });
 
