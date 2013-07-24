@@ -14,14 +14,14 @@ require_once UNITS_TABLE_PATH;
 *	sends an HTTP POST request to the ESHA servers to retrieve 
 *	the nutrient information about the food selected.
 *
-*	@param 	-	$food_id 	-   the ESHA food ID code. (This value can 
+*	@param 	-	$esha_food_id 	-   the ESHA food ID code. (This value can 
 *					    usually be retrieved by a GET request to 
 *				            http://api.esha.com/foods?apikey=[YOUR API KEY]&query=[FOOD TO BE SEARCHED FOR]
 *				            )
 *
 *	@param 	-	$qty 		-   the serving size to be searched for.
 *
-*	@param 	-	$unit 		-   the ESHA id code for the units that $qty will be denominated 
+*	@param 	-	$esha_unit 	-   the ESHA id code for the units that $qty will be denominated 
 *				            in (e.g. urn:uuid:dfad1d25-17ff-4201-bba0-0711e8b88c65 = cups).
 *
 *	@param 	-	$api_key 	-   your ESHA api key
@@ -30,28 +30,28 @@ require_once UNITS_TABLE_PATH;
 *
 *	@return -       $results        -   the raw results straight from the ESHA server
 */
-function fetch_food_details( $food_id, $qty, $unit, $api_key)
+function fetch_food_details( $esha_food_id, $qty, $esha_unit, $api_key)
 {
     // use cURL to fetch from ESHA
     $header = array(
-	    "Accept: application/json",
-	    "Content-Type: application/json"
-	    );
+	"Accept: application/json",
+	"Content-Type: application/json"
+	);
 
     $data = json_encode(
-	    array(
-		    'items' => array(
-			    'id' => $food_id,  
-			    'quantity' => $qty, 
-			    'unit' => $unit 
-		    )
+	array(
+	    'items' => array(
+		'id' => $esha_food_id,  
+		'quantity' => $qty, 
+		'unit' => $esha_unit 
 	    )
+	)
     );
 
     $ch = curl_init( "http://api.esha.com/analysis?apikey=" . $api_key ); 	//initialize cURL with the ESHA URL
     curl_setopt($ch, CURLOPT_POST,		1); 		//specify that it will be a POST request
     curl_setopt($ch, CURLOPT_HTTPHEADER,	$header);	//insert the proper header defined above	
-    curl_setopt($ch, CURLOPT_POSTFIELDS,	$data); 	//the data to be sent
+    curl_setopt($ch, CURLOPT_POSTFIELDS,	$data); 	//the data to be sent in JSON format
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION,	0); 		//do not go to any LOCATION: header that the server sends back
     curl_setopt($ch, CURLOPT_HEADER,		1);  		// make the response return http headers
     curl_setopt($ch, CURLOPT_RETURNTRANSFER,	1);  		// make the response return the contents of the call

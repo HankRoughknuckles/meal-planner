@@ -228,21 +228,21 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 	// ------------------------------------------------------------------
 	else if( $_POST['status'] == 'nutrition_facts' )
 	{
-		//require_once( UNITS_TABLE_PATH );
+	    //require_once( UNITS_TABLE_PATH );
 
-		//these two variables are to be used in searching for nutrition facts, they are not necessarily the units that will be used to store the food in the user's pantry (db).  I decided to use _SESSION instead of using GET to keep things more secure
-		$_SESSION['lookup_serving_size'] = $_POST['serving_size'];
+	    //these two variables are to be used in searching for nutrition facts, they are not necessarily the units that will be used to store the food in the user's pantry (db).  I decided to use _SESSION instead of using GET to keep things more secure
+	    $_SESSION['lookup_serving_size'] = $_POST['serving_size'];
 
-		//since $units_lookup_table is structured as $id => $unit_name, search through the table to find which id matches the POSTed unit
-		foreach( $units_lookup_table as $id => $table_unit )
+	    //since $code_to_unit_table is structured as $id => $unit_name, search through the table to find which id matches the POSTed unit
+	    foreach( $code_to_unit_table as $id => $table_unit )
+	    {
+		if( $table_unit == $_POST['serving_units'] )
 		{
-			if( $table_unit == $_POST['serving_units'] )
-			{
-				$_SESSION['lookup_serving_units_id'] = $id;
-			}
+		    $_SESSION['lookup_serving_units_id'] = $id;
 		}
+	    }
 
-		header( "Location: " . BASE_URL . "new_food.php?status=nutrition_facts" );
+	    header( "Location: " . BASE_URL . "new_food.php?status=nutrition_facts" );
 	}
 
 
@@ -254,59 +254,64 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 	// ------------------------------------------------------------------
 	else if( $_POST["status"] == "save_food" )
 	{
-		//import the variables from _POST and _SESSION
-		$user_id				= trim( $_SESSION['user_id'] ); //the id of the user currently logged in
-		$user_def_food_name 	= trim( $_POST['user_def_food_name'] ); //the name the user saved the food as
-		$serving_size 			= $_POST['serving_size'];
-		$serving_units_esha		= trim( $_POST['serving_units'] );
-		$cost 					= $_POST['cost']; //this is the cost per serving size specified in $serving_size
-		$currency 				= trim( $_POST['currency'] );
-		$json_esha				= json_encode( $_SESSION['selected_food'] ); //the json encoded esha information about the food
-		$esha_food_id			= trim( $_SESSION['selected_food']->id ); //the food id as found in the esha database
+	    require_once LOGIN_PATH;
+
+	    //import the variables from _POST and _SESSION
+	    $user_id			= trim( $_SESSION['user_id'] ); //the id of the user currently logged in
+	    $user_def_food_name 	= trim( $_POST['user_def_food_name'] ); //the name the user saved the food as
+	    $serving_size 		= $_POST['serving_size'];
+	    $serving_units_esha		= $unit_to_code_table[ trim( $_POST['serving_units'] ) ];
+	    $cost 			= $_POST['cost']; //this is the cost per serving size specified in $serving_size
+	    $currency 			= trim( $_POST['currency'] );
+	    $json_esha			= json_encode( $_SESSION['selected_food'] ); //the json encoded esha information about the food
+	    $esha_food_id		= trim( $_SESSION['selected_food']->id ); //the food id as found in the esha database
+
+            $nutrition_info = fetch_food_details( $esha_food_id, $serving_size, $serving_units_esha, ESHA_API_KEY );
+            $calories = $nutrition_info[0]->value;
+
+	    // replace any blank fields with NULL instead
+	    if( $user_def_food_name == "" ){
+		$user_def_food_name = NULL;
+	    }
+	    if( $serving_size == "" ){
+		$serving_size = NULL;
+	    }
+	    if( $serving_units_esha == "" ){
+		$serving_units_esha = NULL;
+	    }
+	    if( $cost == "" ){
+		$cost = NULL;
+	    }
+	    if( $currency == "" ){
+		$currency = NULL;
+	    }
+
+	    //TODO: do any error checking / form validation here
+	    $error_array = array();
+
+	    //escape all double quotation marks in json_esha
+	    $json_esha = addslashes( $json_esha );
 
 
-		// replace any blank fields with NULL instead
-		if( $user_def_food_name == "" ){
-			$user_def_food_name = NULL;
-		}
-		if( $serving_size == "" ){
-			$serving_size = NULL;
-		}
-		if( $serving_units_esha == "" ){
-			$serving_units_esha = NULL;
-		}
-		if( $cost == "" ){
-			$cost = NULL;
-		}
-		if( $currency == "" ){
-			$currency = NULL;
-		}
+	    // Set up and insert data into the database if there are no errors
+	    if( count( $error_array ) == 0 ){
 
-		//TODO: do any error checking / form validation here
-		$error_array = array();
+		$params = array(
+		    'user_def_food_name'    => $user_def_food_name,
+		    'serving_size'          => $serving_size,
+		    'serving_units_esha'    => $serving_units_esha,
+		    'cost'                  => $cost,
+		    'currency'              => $currency,
+		    'json_esha'             => $json_esha,
+		    'esha_food_id'          => $esha_food_id,
+		    'user_id'               => $user_id,
+                    'calories'              => $calories
+		);
 
-		//escape all double quotation marks in json_esha
-		$json_esha = addslashes( $json_esha );
-
-
-		// Set up and insert data into the database if there are no errors
-		if( count( $error_array ) == 0 ){
-
-		    $params = array(
-			'user_def_food_name'    => $user_def_food_name,
-			'serving_size'          => $serving_size,
-			'serving_units_esha'    => $serving_units_esha,
-			'cost'                  => $cost,
-			'currency'              => $currency,
-			'json_esha'             => $json_esha,
-			'esha_food_id'          => $esha_food_id,
-			'user_id'               => $user_id
-		    );
-
-                    $db = new Database_handler;
-                    $db->insert_row( 't_foods', $params ); 
-		}
-		echo '<p>Food Saved!</p>';
+                $db = new Database_handler;
+                $db->insert_row( 't_foods', $params ); 
+	    }
+	    echo '<p>Food Saved!</p>';
 	}
 } //end if request method == POST
 
@@ -434,54 +439,54 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 // ------------------------------------------------------------------
 else if( isset($_GET['status']) AND $_GET['status'] == 'nutrition_facts' )
 {
-	//require( UNITS_TABLE_PATH );
-	require_once( NUTRIENTS_TABLE_PATH );
+    //require( units_table_path );
+    require_once( nutrients_table_path );
 
-	display_page_header( "Nutrition Facts - " . $_SESSION['selected_food']->description );
-	$nutrition_facts = fetch_food_details( 
-		$_SESSION['selected_food']->id, 
-		$_SESSION['lookup_serving_size'], 
-		$_SESSION['lookup_serving_units_id'],  
-		ESHA_API_KEY
-	);
+    display_page_header( "nutrition facts - " . $_session['selected_food']->description );
+    $nutrition_facts = fetch_food_details( 
+	$_session['selected_food']->id, 
+	$_session['lookup_serving_size'], 
+	$_session['lookup_serving_units_id'],  
+	esha_api_key
+    );
 
-	//show the serving size and units
-	echo '<table>';
-	echo 	'<tr>';
-	echo 		'<th>Serving Size:</th>';
+    //show the serving size and units
+    echo '<table>';
+    echo 	'<tr>';
+    echo 		'<th>serving size:</th>';
 
-	//put the units in plural if the serving is != 1
-	//TODO: implement inch'es' instead of 'inchs'.  Make the units correctly either have 's' or 'es' at the end, depending on the word
-	if(	$_SESSION['lookup_serving_size'] == 1 )
-	{
-		echo 	'<td>' . $_SESSION['lookup_serving_size'] . ' ' . $units_lookup_table[ $_SESSION['lookup_serving_units_id'] ];
-	}
-	else
-	{
-		echo 	'<td>' . $_SESSION['lookup_serving_size'] . ' ' . $units_lookup_table[ $_SESSION['lookup_serving_units_id'] ] . 's';
-	}
-	echo 	'</tr>';
+    //put the units in plural if the serving is != 1
+    //todo: implement inch'es' instead of 'inchs'.  make the units correctly either have 's' or 'es' at the end, depending on the word
+    if(	$_session['lookup_serving_size'] == 1 )
+    {
+	echo 	'<td>' . $_session['lookup_serving_size'] . ' ' . $code_to_unit_table[ $_session['lookup_serving_units_id'] ];
+    }
+    else
+    {
+	echo 	'<td>' . $_session['lookup_serving_size'] . ' ' . $code_to_unit_table[ $_session['lookup_serving_units_id'] ] . 's';
+    }
+    echo 	'</tr>';
 
-	//show each of the nutrients in it
-	foreach ($nutrition_facts as $fact) 
-	{
-		echo '<tr>';
+    //show each of the nutrients in it
+    foreach ($nutrition_facts as $fact) 
+    {
+	echo '<tr>';
 
-		$nutrient = $nutrients_lookup_table[ $fact->nutrient ]['description'];
-		$nutrient_unit = $nutrients_lookup_table[ $fact->nutrient ]['unit']; 
+	$nutrient = $nutrients_lookup_table[ $fact->nutrient ]['description'];
+	$nutrient_unit = $nutrients_lookup_table[ $fact->nutrient ]['unit']; 
 
-		echo '<th>' . $nutrient . ':</th>';
-		echo '<td>' . $fact->value . ' ' . $nutrient_unit . '</td>';
+	echo '<th>' . $nutrient . ':</th>';
+	echo '<td>' . $fact->value . ' ' . $nutrient_unit . '</td>';
 
-		echo '</tr>';
-	}
-	echo '</table>';
+	echo '</tr>';
+    }
+    echo '</table>';
 
-	echo '<hr>';
-	echo '<p>' . htmlspecialchars('If you want to save this food in your pantry, please specify how much it costs:') . '</p>';
+    echo '<hr>';
+    echo '<p>' . htmlspecialchars('if you want to save this food in your pantry, please specify how much it costs:') . '</p>';
 
-	$units = create_units_array( $_SESSION['selected_food'] );
-	create_pantry_save_form( $_SESSION['selected_food']->description, $units );
+    $units = create_units_array( $_session['selected_food'] );
+    create_pantry_save_form( $_session['selected_food']->description, $units );
 }
 
 
