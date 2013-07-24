@@ -32,6 +32,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
     {
         //var_dump( $_SESSION['saved_foods'] ); //DEBUG
         $ingredient_list = json_decode($_POST['ingredient_list']);
+        $saved_foods = $_SESSION['saved_foods'];
 
         $body_html = '<table id="recipe_tabulation">';
         $body_html .=   '<tr>';
@@ -44,17 +45,30 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
         //get nutrition information about each ingredient
         foreach( $ingredient_list as $ingredient ){
             var_dump( $ingredient ); //DEBUG
+            var_dump( $_SESSION['saved_foods'] ); //DEBUG
             
+            $matching_saved_food = $saved_foods[$ingredient->food_id];
+
             // TODO: ESHA gets pissy when you try to use units of "Pieces", check out why
             // TODO: check with all the other units too
-            $nutrition_info = fetch_food_details(
-                $_SESSION['saved_foods'][$ingredient->food_id]['esha_food_id'],
+            //Get calories of the entered ingredient
+            $ingredient_calories = fetch_food_details(
+                $matching_saved_food['esha_food_id'],
                 $ingredient->amt,
                 $unit_to_code_table[ $ingredient->unit ],
                 ESHA_API_KEY
             );
-            echo 'esha successfully polled';
+            $ingredient_calories = $ingredient_calories[0]->value;
+            echo 'esha successfully polled, calories are ' . $ingredient_calories;
 
+            // Find calorie ratio between saved food amount and entered 
+            // ingredient amount. Use this ratio to determine cost of using 
+            // the ingredient.
+            echo floatval($matching_saved_food['calories']);
+            $ratio = floatval($matching_saved_food['calories']) / $ingredient_calories;
+            echo $ratio;
+            
+            // $ingredient_cost = 
             
             $body_html .=       '<tr>';
             $body_html .=       '<td>';
@@ -74,8 +88,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 
 
         echo $body_html;
-        var_dump( $_POST ); //DEBUG
-        var_dump( $nutrition_info ); //DEBUG
+        // var_dump( $_POST ); //DEBUG
         var_dump( $nutrition_info ); //DEBUG
     }
 
@@ -124,7 +137,7 @@ else
     }
     $_SESSION['saved_foods'] = $saved_foods;
 
-    // var_dump($_SESSION['saved_foods']); //DEBUG
+    var_dump($_SESSION['saved_foods']); //DEBUG
     $conn = null; //close the connection by setting it to null
 
 
@@ -219,14 +232,14 @@ else
 		ingredientRows = ingredientRows + '<td><input class="jsonify" type="text" name="' + rowNum + '_ing_amt" id="ing_' + rowNum + '_amt"></td>';
 		ingredientRows = ingredientRows + '<td><select class="jsonify" name="' + rowNum + '_ing_unit" id="ing_' + rowNum + '_unit">';
 
-                $.each( unitList, function( index, value ){
-                    if( value ) 
+                $.each( unitList, function( index, unit ){
+                    if( unit ) 
                     {
-                        ingredientRows = ingredientRows +  '<option value="' + value + '">' + value + '(s)</option>';
+                        ingredientRows = ingredientRows +  '<option value="' + unit + '">' + unit + '(s)</option>';
                     }
                     else
                     {
-                        ingredientRows = ingredientRows +  '<option value="' + value + '">' + value + '</option>'; //dont display the (s) if the field is blank
+                        ingredientRows = ingredientRows +  '<option value="' + unit + '">' + unit + '</option>'; //dont display the (s) if the field is blank
                     }
                 });
                 
@@ -341,8 +354,15 @@ else
         * =============
         */
         
-        // JSONify the ingredient list
+        //TODO: make all of this happen when the submit button is pressed instead of when blurred
+        //TODO: implement form validation.  If any field is blank while others in its row are not, make an error
+        // JSONify the ingredient list when one of the ingredient fields loses focus
         $(".jsonify").blur(function(){
+            if( $(this).val() === "" )
+            {
+                return;
+            }
+
             var input = $(this).attr('name'); //this will have the format [num]_ing_[name, amt, unit]
             var num = input.substr(0, input.indexOf("_"));    //which number is assigned to the ingredient field
             // console.log("num = " + num ); //DEBUG
@@ -362,14 +382,7 @@ else
             }
 
             //put the value of the field into the ingredients variable
-            if( $(this).val() === "" )
-            {
-                ingredients[num][type] = null; //put as null if it was left blank
-            }
-            else
-            {
-                ingredients[num][type] = $(this).val();
-            }
+            ingredients[num][type] = $(this).val();
 
             // TODO: this may be a little inefficient. find a faster way of doing this
             //look through all the foods in $_SESSION['saved_foods'] to find which name matches the one created
@@ -382,7 +395,7 @@ else
             });
 
             $("#ingredient_list").val( JSON.stringify(ingredients) );
-            // console.log( ingredients );
+            console.log( ingredients );
         });
     }
 
@@ -398,6 +411,8 @@ else
                 $("#new_foods_present").val("true");
             }
         });
+
+        console.log( ingredients );
     });
     </script>
 
