@@ -63,7 +63,7 @@ function fetch_food_details( $food_id, $qty, $unit, $api_key)
     //the conditional has the strpos() > 25 to prevent the response body from containing "200 OK" and potentially allowing the program to continue
     if ( strpos( $response, "200 OK" ) == false 	OR 		strpos( $response, "200 OK" ) > 25 )
     {
-        echo 'Query Error: Food not found. Printing stack backtrace';
+        echo 'Query Error: Response code: ' . $response . '.  Printing stack backtrace';
         var_dump( debug_backtrace() );
 	die(); //TODO: handle this more gracefully.  have some kind of error handling
 

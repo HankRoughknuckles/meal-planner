@@ -30,7 +30,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 
     else //if all the foods in the recipe are already registered
     {
-        var_dump( $_SESSION['saved_foods'] ); //DEBUG
+        //var_dump( $_SESSION['saved_foods'] ); //DEBUG
         $ingredient_list = json_decode($_POST['ingredient_list']);
 
         $body_html = '<table id="recipe_tabulation">';
@@ -40,23 +40,38 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
         $body_html .=       '<th>Calories</th>';
         $body_html .=       '<th>Cost</th>';
         $body_html .=   '</tr>';
-        $body_html .= '</table>';
 
-
-        $ingredient_list = json_decode( $_POST['ingredient_list'] );
         //get nutrition information about each ingredient
         foreach( $ingredient_list as $ingredient ){
-
             var_dump( $ingredient ); //DEBUG
-
-            $nutrition_info = fetch_food_details( 
+            
+            // TODO: ESHA gets pissy when you try to use units of "Pieces", check out why
+            // TODO: check with all the other units too
+            $nutrition_info = fetch_food_details(
                 $_SESSION['saved_foods'][$ingredient->food_id]['esha_food_id'],
                 $ingredient->amt,
                 $unit_to_code_table[ $ingredient->unit ],
                 ESHA_API_KEY
             );
+            echo 'esha successfully polled';
 
+            
+            $body_html .=       '<tr>';
+            $body_html .=       '<td>';
+            if( $ingredient->unit == 1 )
+            {
+                $body_html .=           $ingredient->name . ':  ' . $ingredient->amt . ' ' . strtolower($ingredient->unit);
+            }
+            else
+            {
+                $body_html .=           $ingredient->name . ':  ' . $ingredient->amt . ' ' . strtolower($ingredient->unit) . 's';
+            }
+            $body_html .=       '</td>';
+            $body_html .=       '</tr>';
         }
+        $body_html .= '</table>';
+
+
 
         echo $body_html;
         var_dump( $_POST ); //DEBUG
