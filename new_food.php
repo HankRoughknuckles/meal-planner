@@ -1,8 +1,15 @@
 <?php
-//TODO: make individual folders for URLs. (i.e. - instead of having /new_food.php, have /newFood/, or something)
-//TODO: make the program inform the user if there is already a food saved of the same type as what they are entering
-//TODO: parse the esha query results into a class that you can standardize and work with
-//TODO: implement error handling in case the user inputs a letter where only numbers should be.
+//TODO: make individual folders for URLs. (i.e. - instead of having 
+// /new_food.php, have /newFood/, or something)
+
+//TODO: make the program inform the user if there is already a food saved of 
+//the same type as what they are entering
+
+//TODO: parse the esha query results into a class that you can standardize and 
+//work with
+
+//TODO: implement error handling in case the user inputs a letter where only 
+//numbers should be.
 require_once "/inc/config.php";
 require_once LOGIN_PATH;
 require_once INCLUDE_PATH . "esha.php";
@@ -12,7 +19,11 @@ require_once UNITS_TABLE_PATH;
 session_start();
 
 $_SESSION['page_title'] = "New Food";
-$_SESSION['user_id'] = "-1"; //TODO: implement user accounts since THIS IS JUST FOR TESTING UNTIL WE IMPLEMENT USER ACCOUNTS
+
+
+//TODO: implement user accounts since THIS -1 VALUE IS JUST FOR TESTING UNTIL 
+//WE IMPLEMENT USER ACCOUNTS
+$_SESSION['user_id'] = "-1"; 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%								        	%
@@ -59,52 +70,67 @@ function display_page_header( $inTitle )
 */
 function create_pantry_save_form( $default_food_name, $unit_list )
 {
-    //TODO: make this return a string that contains all the html code instead of directly outputting it through echo.
-    $html_text = '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
-    $html_text .= 	'<table>';
-    $html_text .= 		'<tr>';
-    $html_text .= 			'<th><label for="user_def_food_name">Name:</label></th>';
-    $html_text .= 			'<td><input type="text" name="user_def_food_name" id="user_def_food_name" value="' . $default_food_name . '" size="' . (strlen($default_food_name) + 5) . '"></td>';
-    $html_text .= 		'</tr>';
-    $html_text .= 	'</table>';
-    $html_text .= 	'<p>How much is it?</p>';
-    $html_text .= 	'<table>';
-    $html_text .= 		'<tr>';
-    $html_text .= 			'<th>Amount</th>';
-    $html_text .= 			'<th>Units</th>';
-    $html_text .= 		'</tr>';
-    $html_text .= 		'<tr>';
-    $html_text .= 			'<td>';
-    $html_text .= 				'<input type="text" name="serving_size" id="serving_size" value="1">';
-    $html_text .= 			'</td>'; //TODO: do form validation for this text input to make sure all the inputs are in number fomat
-    $html_text .= 			'<td>';
+    //TODO: make this return a string that contains all the html code instead 
+    //of directly outputting it through echo.
+    
+    //TODO: do form validation for this text input to make sure all the inputs 
+    //are in number fomat
+    $html_text = '<form name="input" action="' . 
+        BASE_URL . 'new_food.php' . '" method="post">';
+    $html_text .= '<table>';
+    $html_text .= '<tr>';
+    $html_text .= '<th><label for="user_def_food_name">Name:</label></th>';
+    $html_text .= 	    
+        '<td>' . 
+            '<input type="text" '.
+            'name="user_def_food_name" ' . 
+            'id="user_def_food_name" ' . 
+            'value="' .  $default_food_name .  '" ' . 
+            'size="' . (strlen($default_food_name) + 5) .  '">' . 
+        '</td>';
+    $html_text .= '</tr>';
+    $html_text .= '</table>';
+    $html_text .= '<p>How much is it?</p>';
+    $html_text .= '<table>';
+    $html_text .= '<tr>';
+    $html_text .= '<th>Amount</th>';
+    $html_text .= '<th>Units</th>';
+    $html_text .= '</tr>';
+    $html_text .= '<tr>';
+    $html_text .= '<td>';
+    $html_text .= 
+        '<input type="text" name="serving_size" id="serving_size" value="1">';
+    $html_text .= '</td>'; 
+    $html_text .= '<td>';
 
-    $html_text .=                       create_serving_units_dropdown( array('name' => 'serving_units') , $unit_list );
-    $html_text .= 			'</td>';
-    $html_text .= 		'</tr>';
-    $html_text .= 	'</table>';
+    $html_text .=
+        create_serving_units_dropdown( 
+            array('name' => 'serving_units') , $unit_list 
+        );
+    $html_text .= '</td>';
+    $html_text .= '</tr>';
+    $html_text .= '</table>';
 
-    $html_text .= 	'<p>Costs</p>';
+    $html_text .= '<p>Costs</p>';
 
-    $html_text .= 	'<table>';
-    $html_text .= 		'<tr>';
-    $html_text .= 			'<td>';
-    $html_text .= 				'<input type="text" name="cost" value="">';
-    $html_text .= 			'</td>';
-    $html_text .= 			'<td>';
-    $html_text .=                       create_currency_dropdown();
-    $html_text .= 			'</td>';
-    $html_text .= 			'<td>';
-    $html_text .= 				'<input type="hidden" name="status" value="save_food">'; //tells the site to save the food in the database if this is selected
-    $html_text .= 				'<input type="submit" value="Save that food!">';
-    $html_text .= 			'</td>';
-    $html_text .= 		'</tr>';
-    $html_text .= 	'</table>';
+    $html_text .= '<table>';
+    $html_text .= '<tr>';
+    $html_text .= '<td>';
+    $html_text .= '<input type="text" name="cost" value="">';
+    $html_text .= '</td>';
+    $html_text .= '<td>';
+    $html_text .= create_currency_dropdown();
+    $html_text .=' </td>';
+    $html_text .=' <td>';
+    $html_text .= '<input type="hidden" name="status" value="save_food">'; 
+    $html_text .= '<input type="submit" value="Save that food!">';
+    $html_text .= '</td>';
+    $html_text .= '</tr>';
+    $html_text .= '</table>';
     $html_text .= '</form>';
 
     return $html_text;
 }
-
 
 
 /**
@@ -126,42 +152,45 @@ function create_pantry_save_form( $default_food_name, $unit_list )
 *                               will be selected as the default for the
 *                               dropdown menu
 *    
-*    
+*  
 *    @return $output -	        the corresponding html string for the dropdown menu
 */
 function create_currency_dropdown( $currencies = NULL, $default_currency = "USD" )
 {
-	//initialize the currencies array if nothing is passed as an argument
-	if( $currencies == NULL )
+    //initialize the currencies array if nothing is passed as an argument
+    if( $currencies == NULL )
+    {
+	$currencies = array(
+	    "USD",
+	    "KRW",
+	    "EUR",
+	    "GBP",
+	    "RON"
+	);
+    }
+
+    //build the dropdown menu
+    $output = '<select name="currency">';
+    foreach( $currencies as $currency )
+    {
+	    if( $currency == $default_currency )
+	    {
+		$output .= 
+                    '<option value="' . $currency . '" selected>' . 
+                    $currency . '</option>';
+	    }
+	else
 	{
-		$currencies = array(
-			"USD",
-			"KRW",
-			"EUR",
-			"GBP",
-			"RON"
-			);
-	}
-
-	//build the dropdown menu
-        $output = '<select name="currency">';
-	foreach( $currencies as $currency )
-	{
-		if( $currency == $default_currency )
-		{
-			$output .= '<option value="' . $currency . '" selected>' . $currency . '</option>';
-		}
-		else
-		{
-			$output .= '<option value="' . $currency . '">' . $currency . '</option>';
-		}
-	}
-	$output .= '</select>';
+		$output .= 
+                    '<option value="' . $currency . '">' . 
+                    $currency . '</option>';
+	    }
+    }
+    $output .= '</select>';
 
 
-	return $output;
+    return $output;
 }
-
 
 
 /**
@@ -171,12 +200,14 @@ function create_currency_dropdown( $currencies = NULL, $default_currency = "USD"
 *	displays the name of the variable to be displayed in var_dump() 
 *	and then calls var_dump() after
 *
-*	@param 	-	 $var_name 	-	 the name to be displayed before var_dump
+*	@param 	-	 $var_name 	-   the name to be displayed 
+*	                                    before var_dump
 *
-*	@param 	-	 $variable 	-	the variable to be fed into var_dump
+*	@param 	-	 $variable 	-   the variable to be fed into 
+*                                           var_dump
 *
 *
-*	@return -	NULL
+*	@return -	null
 */
 function my_var_dump( $var_name, $variable )
 {
@@ -187,6 +218,196 @@ function my_var_dump( $var_name, $variable )
 }
 
 
+/**
+ * prepare_nutrition_lookup_data()
+ * ===============================
+ *
+ * This function prepares the data necessary to let the user view the nutrition 
+ * info for the food he/she wants to store.  
+ * In particular, this function:
+ *      -finds the ESHA code for the user-specified serving units
+ *      -stores the user-specified serving size in $_SESSION
+ *
+ *  @param  -   null
+ *  @retun  -   null
+ */
+function prepare_nutrition_lookup_data()
+{
+    $_SESSION['lookup_serving_size'] = $_POST['serving_size'];
+
+    //since $code_to_unit_table is structured as $id => $unit_name, search 
+    //through the table to find which id matches the POSTed unit
+    foreach( $code_to_unit_table as $id => $table_unit )
+    {
+	if( $table_unit == $_POST['serving_units'] )
+	{
+	    $_SESSION['lookup_serving_units_id'] = $id;
+	}
+    }
+}
+
+
+/*
+ * handle_save_food()
+ * ==================
+ *
+ * This function is called when the user has specified all the data necessary 
+ * to save the new food in their pantry. This function performs form 
+ * validation, and then saves the food in the SQL database
+ *
+ * @param   -   null
+ * @return  -   null
+ */
+function handle_save_food()
+{
+    include UNITS_TABLE_PATH;
+
+    $save_food_vars = import_save_food_vars();
+
+    $save_food_vars['error_array'] = save_food_form_validation( $save_food_vars );
+
+    save_food( $save_food_vars );
+
+}
+
+/**
+ * import_save_food_vars()
+ * =======================
+ *
+ * imports from _POST and _SESSION the variables needed to store the selected 
+ * food in the sql database
+ * 
+ * user_id               = id of the user currently logged in
+ * user_def_food_name    = name the user saved the food as
+ * serving_size          = cost per serving size specified in $serving_size
+ * serving_units_esha    = esha code for the serving units (i.e. cups, etc.)
+ * cost                  = money cost per serving
+ * currency              = currency the cost is denominated in
+ * json_esha             = the json encoded esha information about the food
+ * esha_food_id          = the food id as found in the esha database
+*/
+function import_save_food_vars()
+{
+    include UNITS_TABLE_PATH;
+
+    $vars = array();
+
+    $vars['user_id'] =
+        trim( $_SESSION['user_id'] ); 
+
+    $vars['user_def_food_name'] = 
+        trim( $_POST['user_def_food_name'] ); 
+
+    $vars['serving_size'] = 
+        $_POST['serving_size'];
+
+    $vars['serving_units_esha'] = 
+        $unit_to_code_table[ trim( $_POST['serving_units'] ) ];
+
+    $vars['cost'] = 
+        $_POST['cost']; 
+
+    $vars['currency'] = 
+        trim( $_POST['currency'] );
+
+    $vars['json_esha'] = 
+        addslashes( json_encode( $_SESSION['selected_food'] ) ); 
+
+    $vars['esha_food_id'] = 
+        trim( $_SESSION['selected_food']->id ); 
+
+    $vars['calories'] = 
+        fetch_food_details( 
+            $vars['esha_food_id'],
+            $vars['serving_size'],
+            $vars['serving_units_esha'],
+            ESHA_API_KEY 
+        )[0]->value;
+
+
+    // replace any blank fields with NULL instead
+    if( $vars['user_def_food_name'] == "" ){
+	$vars['user_def_food_name'] = NULL;
+    }
+    if( $vars['serving_size'] == "" ){
+	$vars['serving_size'] = NULL;
+    }
+    if( $vars['serving_units_esha'] == "" ){
+	$vars['serving_units_esha'] = NULL;
+    }
+    if( $vars['cost'] == "" ){
+	$vars['cost'] = NULL;
+    }
+    if( $vars['currency'] == "" ){
+	$vars['currency'] = NULL;
+    }
+
+
+    return $vars;
+}
+
+
+
+/*
+ * save_food_form_validation()
+ * ===========================
+ *
+ * This function checks the POST inputs from the forms when a user sends food 
+ * data to be saved.  If there are any errors or blank entries, this will mark 
+ * them in $error_array
+ *
+ * @param   -   $save_food_vars     -   the POST entries to be checked
+ *
+ * @return  -   $error_array        -   an array containing the errors in the 
+ *                                      forms
+ */
+function save_food_form_validation( $save_food_vars )
+{
+    extract( $save_food_vars );
+
+    //TODO: do any error checking / form validation here
+    $error_array = array();
+    return $error_array;
+}
+
+
+
+/*
+ * save_food()
+ * ===========
+ *
+ * Takes in the POST variables and saves the food described in them to the SQL 
+ * database
+ *
+ * @param   -   $save_food_vars     -   the POST entries for the food
+ *
+ *
+ * @return  -   null
+ */
+function save_food( $save_food_vars )
+{
+    extract( $save_food_vars );
+
+    // Set up and insert data into the database if there are no errors
+    if( count( $error_array ) == 0 ){
+
+	$params = array(
+	    'user_def_food_name'    => $user_def_food_name,
+	    'serving_size'          => $serving_size,
+	    'serving_units_esha'    => $serving_units_esha,
+	    'cost'                  => $cost,
+	    'currency'              => $currency,
+	    'json_esha'             => $json_esha,
+	    'esha_food_id'          => $esha_food_id,
+	    'user_id'               => $user_id,
+            'calories'              => $calories
+	);
+
+        $db = new Database_handler;
+        $db->insert_row( 't_foods', $params ); 
+    }
+    echo '<p>Food Saved!</p>';
+}
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%								        	%
 //%     			   POST handling				%
@@ -194,125 +415,44 @@ function my_var_dump( $var_name, $variable )
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if( $_SERVER["REQUEST_METHOD"] == "POST")
 {
-	$error_array = array();
+    $error_array = array();
 
-	// ==================================================================
-	//
-	// 1st step - After the user has searched for a food name
-	//
-	// ------------------------------------------------------------------
-	if( $_POST["status"] == "name_selected" )
-	{
-		//Check if the food name is blank
-		if( !isset($_POST["name"]) OR trim($_POST["name"]) == "" )
-		{
-			//if no food name was searched, mark it in the error array and go back to the initial page
-			$error_array["name"] = true;
-			// header( "Location: " . BASE_URL . "new_food.php" );
-		}
-		else
-		{
-			//store entered name as session variable
-			$_SESSION['food_name_query'] = htmlspecialchars( $_POST['name'] );
-
-			// if no errors, proceed to the next step, setting $_GET['status']='find'
-			header( "Location: " . BASE_URL . "new_food.php?status=find" );
-		}
-	}
-
-
-	// ==================================================================
-	//
-	//	Searching for nutrition facts
-	//
-	// ------------------------------------------------------------------
-	else if( $_POST['status'] == 'nutrition_facts' )
-	{
-	    //require_once( UNITS_TABLE_PATH );
-
-	    //these two variables are to be used in searching for nutrition facts, they are not necessarily the units that will be used to store the food in the user's pantry (db).  I decided to use _SESSION instead of using GET to keep things more secure
-	    $_SESSION['lookup_serving_size'] = $_POST['serving_size'];
-
-	    //since $code_to_unit_table is structured as $id => $unit_name, search through the table to find which id matches the POSTed unit
-	    foreach( $code_to_unit_table as $id => $table_unit )
-	    {
-		if( $table_unit == $_POST['serving_units'] )
-		{
-		    $_SESSION['lookup_serving_units_id'] = $id;
-		}
-	    }
-
-	    header( "Location: " . BASE_URL . "new_food.php?status=nutrition_facts" );
-	}
-
-
-	// ==================================================================
-	//
-	//	The last step - saving the user's choices to the database
-	//	(Note: the steps in between are below - in the non-POST section)
-	//
-	// ------------------------------------------------------------------
-	else if( $_POST["status"] == "save_food" )
-	{
-	    require_once LOGIN_PATH;
-
-	    //import the variables from _POST and _SESSION
-	    $user_id			= trim( $_SESSION['user_id'] ); //the id of the user currently logged in
-	    $user_def_food_name 	= trim( $_POST['user_def_food_name'] ); //the name the user saved the food as
-	    $serving_size 		= $_POST['serving_size'];
-	    $serving_units_esha		= $unit_to_code_table[ trim( $_POST['serving_units'] ) ];
-	    $cost 			= $_POST['cost']; //this is the cost per serving size specified in $serving_size
-	    $currency 			= trim( $_POST['currency'] );
-	    $json_esha			= json_encode( $_SESSION['selected_food'] ); //the json encoded esha information about the food
-	    $esha_food_id		= trim( $_SESSION['selected_food']->id ); //the food id as found in the esha database
-
-            $nutrition_info = fetch_food_details( $esha_food_id, $serving_size, $serving_units_esha, ESHA_API_KEY );
-            $calories = $nutrition_info[0]->value;
-
-	    // replace any blank fields with NULL instead
-	    if( $user_def_food_name == "" ){
-		$user_def_food_name = NULL;
-	    }
-	    if( $serving_size == "" ){
-		$serving_size = NULL;
-	    }
-	    if( $serving_units_esha == "" ){
-		$serving_units_esha = NULL;
-	    }
-	    if( $cost == "" ){
-		$cost = NULL;
-	    }
-	    if( $currency == "" ){
-		$currency = NULL;
-	    }
-
-	    //TODO: do any error checking / form validation here
-	    $error_array = array();
-
-	    //escape all double quotation marks in json_esha
-	    $json_esha = addslashes( $json_esha );
-
-
-	    // Set up and insert data into the database if there are no errors
-	    if( count( $error_array ) == 0 ){
-
-		$params = array(
-		    'user_def_food_name'    => $user_def_food_name,
-		    'serving_size'          => $serving_size,
-		    'serving_units_esha'    => $serving_units_esha,
-		    'cost'                  => $cost,
-		    'currency'              => $currency,
-		    'json_esha'             => $json_esha,
-		    'esha_food_id'          => $esha_food_id,
-		    'user_id'               => $user_id,
-                    'calories'              => $calories
-		);
-
-                $db = new Database_handler;
-                $db->insert_row( 't_foods', $params ); 
-	    }
-	    echo '<p>Food Saved!</p>';
-	}
+    // ------------------------------------------------------------------
+    // 1st step - After the user has searched for a food name
+    // ------------------------------------------------------------------
+    if( $_POST["status"] == "name_selected" )
+    {
+        //store the food name in session variable and go to the page 
+        //displaying the search results
+        if( isset($_POST['name']) )
+        {
+	    $_SESSION['food_name_query'] = htmlspecialchars( $_POST['name'] );
+	    header( "location: " . BASE_URL . "new_food.php?status=find" );
+        }
+        else
+        {
+	    $error_array["name"] = true;
+	    // header( "location: " . BASE_URL . "new_food.php" );
+        }
+    }
+    
+    // ------------------------------------------------------------------
+    //	Searching for nutrition facts
+    // ------------------------------------------------------------------
+    else if( $_POST['status'] == 'nutrition_facts' )
+    {
+        prepare_nutrition_lookup_data();
+        header( "Location: " . BASE_URL . "new_food.php?status=nutrition_facts" );
+    }
+    
+    // ------------------------------------------------------------------
+    //	The last step - saving the user's choices to the database
+    //	(Note: the steps in between are below - in the non-POST section)
+    // ------------------------------------------------------------------
+    else if( $_POST["status"] == "save_food" )
+    {
+        handle_save_food();
+    }
 } //end if request method == POST
 
 
@@ -440,7 +580,7 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 else if( isset($_GET['status']) AND $_GET['status'] == 'nutrition_facts' )
 {
     //require( units_table_path );
-    require_once( nutrients_table_path );
+    require_once( NUTRIENTS_TABLE_PATH );
 
     display_page_header( "nutrition facts - " . $_session['selected_food']->description );
     $nutrition_facts = fetch_food_details( 
