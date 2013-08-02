@@ -1,5 +1,7 @@
 <?php
-//TODO: implement form checking on ingredients to make sure they are not blank and also have the right format
+//TODO: implement form checking on ingredients to make sure they are not blank 
+//and also have the right format
+
 require_once("/inc/config.php");
 require_once( LOGIN_PATH );
 
@@ -12,6 +14,80 @@ include( HEADER_PATH );
 // Define constants
 define( 'DEFAULT_FIELD_AMOUNT', 	10 ); //the number of ingredient fields to be displayed by default on page load-up.
 
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%							        	%
+//% 			        FUNCTIONS                               %
+//%									%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/**
+ * TODO: make doc
+ * @return $table_html  -   the string containing the html code for the table
+ */
+function make_cost_table()
+{
+    require_once UNITS_TABLE_PATH;
+    global $unit_to_code_table;
+
+    $ingredient_list = json_decode($_POST['ingredient_list']);
+    $saved_foods = $_SESSION['saved_foods'];
+
+    $table_html = '<table id="recipe_tabulation">';
+    $table_html .=   '<tr>';
+    $table_html .=       '<th>Amount</th>';
+    $table_html .=       '<th>Food</th>';
+    $table_html .=       '<th>Calories</th>';
+    $table_html .=       '<th>Cost</th>';
+    $table_html .=   '</tr>';
+
+    //get nutrition information about each ingredient
+    foreach( $ingredient_list as $ingredient ){
+        var_dump( $ingredient ); //DEBUG
+        var_dump( $_SESSION['saved_foods'] ); //DEBUG
+        
+        $matching_saved_food = $saved_foods[$ingredient->food_id];
+
+        // TODO: ESHA gets pissy when you try to use units of "Pieces", 
+        // check out why
+        
+        // TODO: check with all the other units too
+        //Get calories of the entered ingredient
+        $ingredient_calories = fetch_food_details(
+            $matching_saved_food['esha_food_id'],
+            $ingredient->amt,
+            $unit_to_code_table[ $ingredient->unit ],
+            ESHA_API_KEY
+        );
+        $ingredient_calories = $ingredient_calories[0]->value;
+        echo 'esha successfully polled, calories are ' . $ingredient_calories;
+
+        // Find calorie ratio between saved food amount and entered 
+        // ingredient amount. Use this ratio to determine cost of using 
+        // the ingredient.
+        echo floatval($matching_saved_food['calories']);
+        $ratio = floatval($matching_saved_food['calories']) / $ingredient_calories;
+        echo $ratio;
+        
+        // $ingredient_cost = 
+        
+        $table_html .=       '<tr>';
+        $table_html .=       '<td>';
+        if( $ingredient->unit == 1 )
+        {
+            $table_html .=           $ingredient->name . ':  ' . $ingredient->amt . ' ' . strtolower($ingredient->unit);
+        }
+        else
+        {
+            $table_html .=           $ingredient->name . ':  ' . $ingredient->amt . ' ' . strtolower($ingredient->unit) . 's';
+        }
+        $table_html .=       '</td>';
+        $table_html .=       '</tr>';
+    }
+    $table_html .= '</table>';
+
+    return $table_html;
+}
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%							        	%
 //% 			   POST handling				%
@@ -22,72 +98,23 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
     require_once INCLUDE_PATH . 'esha.php';
 
     //After the user has submitted the information for the recipe
-    if( $_POST['save_unregistered_foods'] == 'on' AND $_POST['new_foods_present'] == 'true' )
+    if( $_POST['save_unregistered_foods'] == 'on' AND 
+        $_POST['new_foods_present'] == 'true' )
     {
         echo "saving unregistered foods";
-        //TODO: display menu for saving unregistered foods -- do the autocomplete for new_foods.php before doing this
+        //TODO: display menu for saving unregistered foods -- do the 
+        //autocomplete for new_foods.php before doing this
     }
 
     else //if all the foods in the recipe are already registered
     {
         //var_dump( $_SESSION['saved_foods'] ); //DEBUG
-        $ingredient_list = json_decode($_POST['ingredient_list']);
-        $saved_foods = $_SESSION['saved_foods'];
+        // $ingredient_list = json_decode($_POST['ingredient_list']);
+        // $saved_foods = $_SESSION['saved_foods'];
+        
+        $table_html = make_cost_table();
+        echo $table_html;
 
-        $body_html = '<table id="recipe_tabulation">';
-        $body_html .=   '<tr>';
-        $body_html .=       '<th>Amount</th>';
-        $body_html .=       '<th>Food</th>';
-        $body_html .=       '<th>Calories</th>';
-        $body_html .=       '<th>Cost</th>';
-        $body_html .=   '</tr>';
-
-        //get nutrition information about each ingredient
-        foreach( $ingredient_list as $ingredient ){
-            var_dump( $ingredient ); //DEBUG
-            var_dump( $_SESSION['saved_foods'] ); //DEBUG
-            
-            $matching_saved_food = $saved_foods[$ingredient->food_id];
-
-            // TODO: ESHA gets pissy when you try to use units of "Pieces", check out why
-            // TODO: check with all the other units too
-            //Get calories of the entered ingredient
-            $ingredient_calories = fetch_food_details(
-                $matching_saved_food['esha_food_id'],
-                $ingredient->amt,
-                $unit_to_code_table[ $ingredient->unit ],
-                ESHA_API_KEY
-            );
-            $ingredient_calories = $ingredient_calories[0]->value;
-            echo 'esha successfully polled, calories are ' . $ingredient_calories;
-
-            // Find calorie ratio between saved food amount and entered 
-            // ingredient amount. Use this ratio to determine cost of using 
-            // the ingredient.
-            echo floatval($matching_saved_food['calories']);
-            $ratio = floatval($matching_saved_food['calories']) / $ingredient_calories;
-            echo $ratio;
-            
-            // $ingredient_cost = 
-            
-            $body_html .=       '<tr>';
-            $body_html .=       '<td>';
-            if( $ingredient->unit == 1 )
-            {
-                $body_html .=           $ingredient->name . ':  ' . $ingredient->amt . ' ' . strtolower($ingredient->unit);
-            }
-            else
-            {
-                $body_html .=           $ingredient->name . ':  ' . $ingredient->amt . ' ' . strtolower($ingredient->unit) . 's';
-            }
-            $body_html .=       '</td>';
-            $body_html .=       '</tr>';
-        }
-        $body_html .= '</table>';
-
-
-
-        echo $body_html;
         // var_dump( $_POST ); //DEBUG
         var_dump( $nutrition_info ); //DEBUG
     }

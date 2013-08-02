@@ -48,14 +48,27 @@ function fetch_food_details( $esha_food_id, $qty, $esha_unit, $api_key)
 	)
     );
 
-    $ch = curl_init( "http://api.esha.com/analysis?apikey=" . $api_key ); 	//initialize cURL with the ESHA URL
-    curl_setopt($ch, CURLOPT_POST,		1); 		//specify that it will be a POST request
-    curl_setopt($ch, CURLOPT_HTTPHEADER,	$header);	//insert the proper header defined above	
-    curl_setopt($ch, CURLOPT_POSTFIELDS,	$data); 	//the data to be sent in JSON format
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION,	0); 		//do not go to any LOCATION: header that the server sends back
-    curl_setopt($ch, CURLOPT_HEADER,		1);  		// make the response return http headers
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER,	1);  		// make the response return the contents of the call
-    curl_setopt($ch, CURLOPT_VERBOSE,	        1);  		// make the response verbose.  FOR DEBUGGING PURPOSES
+    //initialize cURL with the ESHA URL 
+
+    $ch = curl_init( "http://api.esha.com/analysis?apikey=" . $api_key ); 	   
+    
+    // CURLOPT_POST = 1             -- specify that it will be a POST request
+    // CURLOPT_HTTPHEADER = $header -- insert the proper header defined above	
+    // CURLOPT_POSTFIELDS = $data   -- the data to be sent in JSON format
+    // CURLOPT_FOLLOWLOCATION = 0   -- do not go to any LOCATION: header that 
+    //                                  the server sends back
+    // CURLOPT_HEADER = 1           -- make the response return http headers
+    // CURLOPT_RETURNTRANSFER = 1   -- make the response return the contents of 
+    //                                  the call
+    // CURLOPT_VERBOSE = 1          -- make the response verbose.  
+    //                                  FOR DEBUGGING PURPOSES
+    curl_setopt($ch, CURLOPT_POST,		1); 		    
+    curl_setopt($ch, CURLOPT_HTTPHEADER,	$header);	
+    curl_setopt($ch, CURLOPT_POSTFIELDS,	$data); 	
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION,	0); 		
+    curl_setopt($ch, CURLOPT_HEADER,		1);  	
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER,	1);  		
+    curl_setopt($ch, CURLOPT_VERBOSE,	        1);  		
 
     $response = curl_exec( $ch );
 
@@ -63,7 +76,7 @@ function fetch_food_details( $esha_food_id, $qty, $esha_unit, $api_key)
     //the conditional has the strpos() > 25 to prevent the response body from containing "200 OK" and potentially allowing the program to continue
     if ( strpos( $response, "200 OK" ) == false 	OR 		strpos( $response, "200 OK" ) > 25 )
     {
-        echo 'Query Error: Response code: ' . $response . '.  Printing stack backtrace';
+        echo 'ESHA Query Error: Response code: ' . $response . '.  Printing stack backtrace';
         var_dump( debug_backtrace() );
 	die(); //TODO: handle this more gracefully.  have some kind of error handling
 
