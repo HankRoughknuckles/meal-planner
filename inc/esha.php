@@ -8,27 +8,31 @@ require_once LOGIN_PATH;
 require_once UNITS_TABLE_PATH;
 
 /**
-*	fetch_food_details()
-*	=====================
-*
-*	sends an HTTP POST request to the ESHA servers to retrieve 
-*	the nutrient information about the food selected.
-*
-*	@param 	-	$esha_food_id 	-   the ESHA food ID code. (This value can 
-*					    usually be retrieved by a GET request to 
-*				            http://api.esha.com/foods?apikey=[YOUR API KEY]&query=[FOOD TO BE SEARCHED FOR]
-*				            )
-*
-*	@param 	-	$qty 		-   the serving size to be searched for.
-*
-*	@param 	-	$esha_unit 	-   the ESHA id code for the units that $qty will be denominated 
-*				            in (e.g. urn:uuid:dfad1d25-17ff-4201-bba0-0711e8b88c65 = cups).
-*
-*	@param 	-	$api_key 	-   your ESHA api key
-*
-*
-*
-*	@return -       $results        -   the raw results straight from the ESHA server
+* fetch_food_details()
+* =====================
+* 
+* sends an HTTP POST request to the ESHA servers to retrieve 
+* the nutrient information about the food selected.
+* 
+* @param    -	$esha_food_id 	-   the ESHA food ID code. (This value can 
+* 				    usually be retrieved by a GET request to 
+* 				    http://api.esha.com/foods?apikey=[YOUR API 
+* 				    KEY]&query=[FOOD TO BE SEARCHED FOR]
+* 				    )
+* 
+* @param    -	$qty            -   the serving size to be searched for.
+* 
+* @param    -	$esha_unit 	-   the ESHA id code for the units that $qty 
+*                                   will be denominated 
+* 				    in (e.g. 
+* 				    urn:uuid:dfad1d25-17ff-4201-bba0-0711e8b88c65 
+* 				    = cups).
+* 
+* @param    -	$api_key 	-   your ESHA api key
+* 
+* 
+* @return   -   $results        -   the raw results straight from the ESHA 
+*                                   server
 */
 function fetch_food_details( $esha_food_id, $qty, $esha_unit, $api_key)
 {

@@ -47,6 +47,10 @@ define("JQUERY_UI_PATH", 	BASE_URL . "js/jquery-ui-1.10.3.custom.min.js");
 define("JQUERY_UI_STYLE_PATH", 	BASE_URL . "css/smoothness/jquery-ui-1.10.3.custom.css");
 
 
+//path to Recipe stuff
+define("RECIPE_PATH", 	BASE_URL );
+
+
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%																			%

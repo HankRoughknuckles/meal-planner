@@ -1,4 +1,5 @@
 <?php
+//TODO: URGENT! make the first screen have drop down menus that only display the units that are stored for each food in ESHA (ie if cheese can only be measured in cups in ESHA, only display cups
 //TODO: implement form checking on ingredients to make sure they are not blank 
 //and also have the right format
 
@@ -27,6 +28,7 @@ define( 'DEFAULT_FIELD_AMOUNT', 	10 ); //the number of ingredient fields to be d
  */
 function make_cost_table()
 {
+    //TODO: finish this
     require_once UNITS_TABLE_PATH;
     global $unit_to_code_table;
 
@@ -44,15 +46,15 @@ function make_cost_table()
     //get nutrition information about each ingredient
     foreach( $ingredient_list as $ingredient ){
         var_dump( $ingredient ); //DEBUG
-        var_dump( $_SESSION['saved_foods'] ); //DEBUG
+        // var_dump( $_SESSION['saved_foods'] ); //DEBUG
         
         $matching_saved_food = $saved_foods[$ingredient->food_id];
 
-        // TODO: ESHA gets pissy when you try to use units of "Pieces", 
-        // check out why
-        
-        // TODO: check with all the other units too
+        // TODO: ESHA gets pissy when you try to use units of "Pieces" and "Cups", 
+        // check out why. Check with all the other units too
         //Get calories of the entered ingredient
+        var_dump( $unit_to_code_table[ $ingredient->unit ] ); // DEBUG
+
         $ingredient_calories = fetch_food_details(
             $matching_saved_food['esha_food_id'],
             $ingredient->amt,
@@ -88,6 +90,238 @@ function make_cost_table()
 
     return $table_html;
 }
+
+
+/*
+ * This function will handle saving unregistered foods that were entered in the 
+ * recipe
+ */
+function save_unregistered_foods()
+{
+    return null;
+}
+
+
+/*
+ * get_user_pantry_foods()
+ * =======================
+ *
+ * takes the foods that were saved in the user's pantry and returns them in an 
+ * array of the form:
+ *      array(
+ *          'esha_food_id_code' => {food object}
+ *          ...
+ *      )
+ *
+ * @param   - null
+ * @return  - saved_foods   - the associative array containing all the food 
+ *                              objects stored in the user's pantry
+ */
+function get_user_pantry_foods()
+{
+    $saved_foods = array();
+    $queried_foods = db_fetch_saved_foods();
+
+
+    foreach( $queried_foods as $food )
+    {
+        $food_id = $food['id'];
+        $saved_foods[$food_id] = $food;
+    }
+
+    // var_dump($saved_foods); //DEBUG
+
+    return $saved_foods;
+}
+
+
+/*
+ * Queries the SQL database to find the foods saved in the user's pantry
+ * Returns the saved foods from the db if they exist.  
+ *
+ * @param   - null
+ *
+ * @return  - $queried foods    - the user's foods stored in the format of the 
+ *                                  database
+ * @return  - false             - if an error occurred while polling the database
+ * @return  - null              - if the user has no stored foods
+ */
+function db_fetch_saved_foods()
+{
+    //TODO: put this query method into another file as a function to keep 
+    //the code DRY
+    
+    $conn = new PDO( 
+        'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, 
+        SQL_USERNM, 
+        SQL_PSWD );
+
+    $sql = 'SELECT * FROM t_foods WHERE user_id = ?';
+    $query = $conn->prepare( $sql ); 
+    $query_error = query_has_error( $query );
+
+    if( $query_error ) 
+    {
+        return false;
+    }
+
+    $params = array( $_SESSION[ 'user_id' ] );
+
+    $result = $query->execute( $params ); 
+    $query_error = query_has_error( $result );
+
+    if( $query_error ) 
+    {
+        return false;
+    }
+    
+    //close the connection by setting it to null
+    $conn = null; 
+
+    return $queried_foods = $query->fetchAll( PDO::FETCH_ASSOC ); 
+}
+
+/*
+ * query_has_error()
+ * ===================
+ *
+ * sees if there is an error with the statement returned after querying the SQL 
+ * db
+ */
+function query_has_error( $statement )
+{
+    if( !$statement )
+    {
+	echo 'Query preparation failed! - (' . $statement->errno . ') ' . 
+            $statement->error;
+        return true;
+    }
+
+    return false;
+}
+
+
+/**
+ * create_recipe_input()
+ * =====================
+ * 
+ * Makes the html code for the entire input form for the recipe page
+ *
+ * @return  - $form_html    - the html for the input form
+ */
+function create_recipe_input()
+{
+    //it should be noted that for all these inputs, the one that will 
+    //ultimately be most important is the input "ingredient_list".  It will 
+    //contain the JSON for all the information submitted to the server
+
+    //Recipe name
+    $form_html = '<h2><label for="recipe_name">Recipe Name</h2>';
+    $form_html .= '<form name="input" action="' . BASE_URL . 'new_recipe.php' . 
+        '" method="post">'; 
+    $form_html .= '<input type="text" name="recipe_name" id="recipe_name" 
+        size="70">';
+
+    //The ingredients list
+    $form_html .= '<h2>Ingredients</h2>';
+    $form_html .= '<input type="hidden" id="ingredient_list" 
+        name="ingredient_list" value="">';     
+    $form_html .= '<input type="hidden" id="new_foods_present" 
+        name="new_foods_present" value="false">'; 
+    $form_html .= create_ingredients_table();
+
+    //Button to display more ingredients for the user to enter
+    $form_html .= '<a href=# onclick="moreIngredients()">Add more 
+        ingredients</a>';
+
+    //Recipe instructions
+    $form_html .= '<h2><label for="instructions">Recipe Instructions</h2>';
+    $form_html .= '<textarea rows="9" cols="65" name="instructions" 
+        id="instructions"></textarea>'; 
+    $form_html .= '<br />';
+
+    //Recipe yield
+    $form_html .= '<p>Recipe yields <input type="text" name="meal_yield"> 
+        portions.</p>';
+
+    //Form submission
+    $form_html .= '<input type="submit" id="submit_btn" value="Save Recipe">';
+    $form_html .= '<input type="checkbox" name="save_unregistered_foods" 
+        checked>Store all new ingredients in My Pantry'; //TODO: if this is 
+        // unchecked and there are new ingredients entered, make an alert 
+        // message pop up asking them if they're sure they want to proceed 
+        // without saving the foods.
+
+    $form_html .= '</form>';
+
+    return $form_html; 
+}
+
+
+/*
+ * create_ingredients_table()
+ * ==========================
+ *
+ * Makes the html for displaying the table containing all the ingredient 
+ * entries
+ *
+ * @param   - null
+ * @return  - $table_html   - the html code for the ingredients table
+ */
+function create_ingredients_table()
+{
+    global $common_units;
+    $table_html = '<table id="ingredient_list">';
+
+    //the table headers
+    $table_html .= '<tr>';
+    $table_html .= '<th>Ingredient Name</th>';
+    $table_html .= '<th>Amount</th>';
+    $table_html .= '<th>Unit</th>';
+    $table_html .= '</tr>';
+
+?>
+
+
+    <?php
+    for( $i = 0; $i < DEFAULT_FIELD_AMOUNT; $i++ )
+    {
+	$table_html .= '<tr id="ingredient_row_' . $i . '">';
+	$table_html .= '<td><input type="text" class="recommendation jsonify" 
+            name="' . $i . '_ing_name" id="ing_' . $i . '_name"></td>';
+	$table_html .= '<td><input type="text" class="jsonify" name="' . $i . 
+            '_ing_amt" id="ing_' . $i . '_amt"></td>';
+	$table_html .= '<td>';
+        $dropdown_attr = array(
+            'class'     => 'jsonify',
+            'name'      => $i . '_ing_unit'
+        );
+        $table_html .=       create_serving_units_dropdown( $dropdown_attr, 
+            $common_units );
+        $table_html .= '</td>';
+	$table_html .= '</tr>';
+    }
+    $table_html .= '</table>';
+
+    return $table_html;
+}
+
+
+/**
+ * create_ingredient_js()
+ * ================
+ *
+ * puts the javascript for the ingredient form on screen
+ */
+function create_ingredient_js()
+{
+    $js = 'var numIngredients =  json_encode( DEFAULT_FIELD_AMOUNT )';
+    $js .= '<script src=' . RECIPE_PATH . 'recipe.js></script>';
+
+    return $js;
+}
+
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%							        	%
 //% 			   POST handling				%
@@ -101,6 +335,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
     if( $_POST['save_unregistered_foods'] == 'on' AND 
         $_POST['new_foods_present'] == 'true' )
     {
+        save_unregistered_foods();
         echo "saving unregistered foods";
         //TODO: display menu for saving unregistered foods -- do the 
         //autocomplete for new_foods.php before doing this
@@ -130,321 +365,14 @@ else
 {
     require_once( UNITS_TABLE_PATH );
 
-    //TODO: put this query method into another file as a function to keep the code DRY
-    //using PDO prepared statements for SQL query
-    $conn = new PDO( 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, SQL_USERNM, SQL_PSWD );
-
-    $sql = 'SELECT * FROM t_foods WHERE user_id = ?';
-
-    //the param to go into the ? in the $sql variable
-    $params = array( $_SESSION[ 'user_id' ] );
-
-    //prepare the sql statement
-    $query = $conn->prepare( $sql ); 
-    if( !$query )
-    {
-	    echo 'Query preparation failed! - (' . $query->errno . ') ' . $query->error;
-    }
-
-    //crank the parameters into the statement and execute
-    $result = $query->execute( $params ); 
-    if( !$result )
-    {
-	    echo 'Query execution failed! - (' . $result->errno . ') ' . $result->error;
-    }
-
-    $queried_foods = $query->fetchAll( PDO::FETCH_ASSOC ); //this will be used in food_recommendation.php to reduce the number of SQL queries
-
-    //make the $saved_foods associative array where the key is the SQL food id and the value is the information for the food.  Store it in a session variable
-    $saved_foods = array();
-    foreach( $queried_foods as $food )
-    {
-        $food_id = $food['id'];
-        $saved_foods[$food_id] = $food;
-    }
+    $saved_foods = get_user_pantry_foods();
     $_SESSION['saved_foods'] = $saved_foods;
 
-    var_dump($_SESSION['saved_foods']); //DEBUG
-    $conn = null; //close the connection by setting it to null
-
-
-    $body_html = '<h2><label for="recipe_name">Recipe Name</h2>';
-    $body_html .= '<form name="input" action="' . BASE_URL . 'new_recipe.php' . '" method="post">'; //concatenate this to $body_html
-    $body_html .= '<input type="text" name="recipe_name" id="recipe_name" size="70">';
-    $body_html .= '<h2>Ingredients</h2>';
-    
-    $body_html .= '<input type="hidden" id="ingredient_list" name="ingredient_list" value="">'; //the JSON array to be submitted to the server via POST
-    $body_html .= '<input type="hidden" id="new_foods_present" name="new_foods_present" value="false">'; //the JSON array to be submitted to the server via POST
-    $body_html .= '<table id="ingredient_list">';
-    $body_html .= '<tr>	';
-    $body_html .= '<th>Ingredient Name</th>';
-    $body_html .= '<th>Amount</th>';
-    $body_html .= '<th>Unit</th>';
-    $body_html .= '</tr>';
-
-    if( !isset( $field_offset ) )
-    { 
-        $field_offset = 0; //determines how many ingredient rows should be displayed
-    }
-    ?>
-
-    <script>
-    // Save the current number of ingredient fields present on the screen in case we need to add more in the javascript later
-    var numIngredients =  <?php echo json_encode( DEFAULT_FIELD_AMOUNT + $field_offset ) ?>;
-    </script>
-
-    <?php
-    for( $i = 0; $i < DEFAULT_FIELD_AMOUNT + $field_offset; $i++ )
-    {
-	    $body_html .= '<tr id="ingredient_row_' . $i . '">';
-	    $body_html .= '<td><input type="text" class="recommendation jsonify" name="' . $i . '_ing_name" id="ing_' . $i . '_name"></td>';
-	    $body_html .= '<td><input type="text" class="jsonify" name="' . $i . '_ing_amt" id="ing_' . $i . '_amt"></td>';
-	    $body_html .= '<td>';
-            $dropdown_attr = array(
-                'class'     => 'jsonify',
-                'name'      => $i . '_ing_unit'
-            );
-            $body_html .=       create_serving_units_dropdown( $dropdown_attr, $common_units );
-            $body_html .= '</td>';
-	    $body_html .= '</tr>';
-    }
-    $body_html .= '</table>';
-    // $body_html .= '</div>'; //END ingredient_list div
-
-
-    //Button to display more ingredients for the user to enter
-
-    $body_html .= '<a href=# onclick="moreIngredients()">Add more ingredients</a>';
-    // $body_html .= '<input type="submit" name="more_ingredients_button" value="Add more ingredients">';
-
-
-    $body_html .= '<h2><label for="instructions">Recipe Instructions</h2>';
-
-    $body_html .= '<textarea rows="9" cols="65" name="instructions" id="instructions"></textarea>'; 
-    $body_html .= '<br />';
-
-    $body_html .= '<p>Recipe yields <input type="text" name="meal_yield"> portions.</p>';
-    $body_html .= '<input type="submit" id="submit_btn" value="Save Recipe">';
-    $body_html .= '<input type="checkbox" name="save_unregistered_foods" checked>Store all new ingredients in My Pantry'; //TODO: if this is unchecked and there are new ingredients entered, make an alert message pop up asking them if they're sure they want to proceed without saving the foods.
-    $body_html .= '</form>';
+    $body_html = create_recipe_input();
 
     echo $body_html;
-    ?>
 
-    <script>
-    /**
-    *	moreIngredients()
-    *	=================
-    *
-    *	Function that adds more ingredient fields to the ingredients table on the page.
-    *	The number added is stored in the variable extraRowAmount;
-    *
-    */
-    //TODO: incorporate this with the units_table.php->create_units_dropdown() function to keep the code DRY
-    function moreIngredients()
-    {
-	var extraRowAmount = 10; //The number of rows to increase the ingredients table by
-	var lastRow = $( "#ingredient_row_" + (numIngredients - 1) ); //select the last row in the ingredient list
-
-	//insert {extraRowAmount} of rows after the last row in the table
-	lastRow.after( function() {
-	    ingredientRows = "";
-	    var rowNum;
-            var unitList = <?php echo json_encode( $common_units ); ?>;
-	    for( var i = 0; i < extraRowAmount; i++ )
-	    {
-		rowNum = numIngredients + i;
-		ingredientRows = ingredientRows + '<tr id="ingredient_row_' + rowNum + '">';
-		ingredientRows = ingredientRows + '<td><input type="text" class="recommendation jsonify ui-autocomplete-input" type="text" name="' + rowNum + '_ing_name" id="ing_' + rowNum + '_name" autocomplete="off"></td>';
-		ingredientRows = ingredientRows + '<td><input class="jsonify" type="text" name="' + rowNum + '_ing_amt" id="ing_' + rowNum + '_amt"></td>';
-		ingredientRows = ingredientRows + '<td><select class="jsonify" name="' + rowNum + '_ing_unit" id="ing_' + rowNum + '_unit">';
-
-                $.each( unitList, function( index, unit ){
-                    if( unit ) 
-                    {
-                        ingredientRows = ingredientRows +  '<option value="' + unit + '">' + unit + '(s)</option>';
-                    }
-                    else
-                    {
-                        ingredientRows = ingredientRows +  '<option value="' + unit + '">' + unit + '</option>'; //dont display the (s) if the field is blank
-                    }
-                });
-                
-                ingredientRows = ingredientRows + '</td>';
-		ingredientRows = ingredientRows + '</tr>';
-	    }
-
-	    return ingredientRows;
-	});
-
-        refreshJQuery();
-	numIngredients += extraRowAmount;
-    }
-    </script>
-
-
-    <script>
-    var ingredients = new Array(); //will store the ingredients list for this recipe
-    /**
-       refreshJQuery()
-    *   =====================
-    *
-    *   Takes all of the elements in the ingredients sections and refreshes the 
-    *   jquery on them. This is used for when the user clicks "Add more ingredients".  
-    *   This makes sure that the new ingredient boxes work as properly (i.e. have 
-    *   autocorrect functionality, they convert their values to json, etc.)
-    *
-     */
-    function refreshJQuery()
-    {
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    //%								        	%
-    //% 			   Autocomplete					%
-    //%										%
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        //set up the category autocomplete widget
-        $.widget( "custom.catcomplete", $.ui.autocomplete, {
-	    _renderMenu: function( ul, items ) {
-	        var that = this,
-	        currentCategory = "";
-	        $.each( items, function( index, item ) {
-		    if ( item.category != currentCategory ) {
-		        ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
-		        currentCategory = item.category;
-		    }
-		    that._renderItemData( ul, item );
-	        });
-	    }
-        });
-        
-        //attach the autocomplete to items that have class "recommendation"
-        //TODO: make the autocomplete show  the matched characters in bold or underline
-        $(".recommendation").catcomplete({
-	    
-	    //define callback to format results
-	    source: function(request, response){
-	        // console.log("request = %o", request);
-
-	        $.ajax({
-		        url: "<?php echo INCLUDE_PATH_BASE; ?>food_recommendation.php",
-		        method: "GET",
-		        dataType: "json",
-		        data: {
-			        user_input: request.term
-		        },
-		        success: function( data ){
-                            // console.log("Response = %o", data); //DEBUG
-                            displayData = new Array; //TODO: build the array to display and also the hidden one to store the food id
-
-                            $.each( data, function( index, value ){
-                                //take the category and label values from the ajax returned data, and put them into displayData
-                                displayData.push({ 
-                                    'category'  : value['category'],
-                                    'label'     : value['label']
-                                });
-                            });
-                            // console.log( "displayData = %o", displayData ); //DEBUG
-			    response( displayData );
-		        }
-	        });
-	    }//,
-	    
-	    
-	    //TODO: eventually make this have the functionality to display a box around the text in the ingredient field if it was selected.  clicking that box will delete the food in the entry
-	    //define select handler
-	    // select:
-	    //     function(e, ui) {
-	    // 	//create formatted friend
-	    // 	var 	food = ui.item.value;
-	    // 	var	span = $("<span>").text(food);
-	    // 	var 	a = $("<a>").addClass("remove").attr({
-	    // 				href: "javascript:",
-	    // 				title: "Remove " + food
-	    // 			}).text("x").appendTo(span);
-
-	    // 	//add food into the text box
-	    // 	span.insertBefore(this);
-	    //     },
-
-	    // //define select handler
-	    // change:
-	    //     function(){
-	    // 	//prevent 'recommendation' field from being updated. Also, correct the position
-	    // 	$(".recommendation").val("").css("top", 2);
-	    //     }
-        }); //END autocomplete
-
-
-        /**
-        * jsonify stuff
-        * =============
-        */
-        
-        //TODO: make all of this happen when the submit button is pressed instead of when blurred
-        //TODO: implement form validation.  If any field is blank while others in its row are not, make an error
-        // JSONify the ingredient list when one of the ingredient fields loses focus
-        $(".jsonify").blur(function(){
-            if( $(this).val() === "" )
-            {
-                return;
-            }
-
-            var input = $(this).attr('name'); //this will have the format [num]_ing_[name, amt, unit]
-            var num = input.substr(0, input.indexOf("_"));    //which number is assigned to the ingredient field
-            // console.log("num = " + num ); //DEBUG
-
-            input = input.substr( input.indexOf("_") + 1); //get rid of everything before the first underscore (the number)
-            var type = input.substr( input.indexOf("_") + 1); //get rid of everything before the next underscore (a string containing "ing"). type tells you whether it's an ingredient name, unit, or amount
-            
-            // console.log("type  = " + type ); //DEBUG
-            if( !ingredients[num] )
-            {
-                ingredients[num] = {
-                    'name'      : null,
-                    'food_id'   : null,
-                    'amt'       : null,
-                    'unit'      : null
-                }
-            }
-
-            //put the value of the field into the ingredients variable
-            ingredients[num][type] = $(this).val();
-
-            // TODO: this may be a little inefficient. find a faster way of doing this
-            //look through all the foods in $_SESSION['saved_foods'] to find which name matches the one created
-            $.each( <?php echo json_encode($_SESSION['saved_foods']); ?>, function( i, savedFood ){
-                //if the currently checked element in saved_foods matches the one that was just selected by the user
-                if( savedFood['user_def_food_name'] == ingredients[num]['name'] )
-                {
-                    ingredients[num]['food_id'] = savedFood['id']; //save the food's id number
-                }
-            });
-
-            $("#ingredient_list").val( JSON.stringify(ingredients) );
-            console.log( ingredients );
-        });
-    }
-
-    refreshJQuery();
-    </script>
-
-    <script>
-    $("#submit_btn").click( function(){
-        
-        $.each( ingredients, function( ingredientIndex, ingredient ){
-            if( ingredient['food_id'] == null )
-            {
-                $("#new_foods_present").val("true");
-            }
-        });
-
-        console.log( ingredients );
-    });
-    </script>
-
-
-    <?php
+    echo create_ingredient_js();
 }
 
 include( FOOTER_PATH ); 
