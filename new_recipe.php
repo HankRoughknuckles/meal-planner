@@ -1,5 +1,7 @@
 <?php
-//TODO: URGENT! make the first screen have drop down menus that only display the units that are stored for each food in ESHA (ie if cheese can only be measured in cups in ESHA, only display cups
+//TODO: URGENT! make the first screen have drop down menus that only display 
+//the units that are stored for each food in ESHA (ie if cheese can only be 
+//measured in cups in ESHA, only display cups
 //TODO: implement form checking on ingredients to make sure they are not blank 
 //and also have the right format
 
@@ -13,7 +15,9 @@ $pageTitle = "New Recipe";
 include( HEADER_PATH );
 
 // Define constants
-define( 'DEFAULT_FIELD_AMOUNT', 	10 ); //the number of ingredient fields to be displayed by default on page load-up.
+
+//the number of ingredient fields to be displayed by default on page load-up.
+define( 'DEFAULT_FIELD_AMOUNT', 	10 ); 
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -231,7 +235,7 @@ function create_recipe_input()
     $form_html .= create_ingredients_table();
 
     //Button to display more ingredients for the user to enter
-    $form_html .= '<a href=# onclick="moreIngredients()">Add more 
+    $form_html .= '<a href=# id="more_ingredients">Add more 
         ingredients</a>';
 
     //Recipe instructions
@@ -315,7 +319,23 @@ function create_ingredients_table()
  */
 function create_ingredient_js()
 {
-    $js = 'var numIngredients =  json_encode( DEFAULT_FIELD_AMOUNT )';
+    global $common_units;
+    $js = '<script>';
+    
+    // numIngredients           = the number of ingredients displayed
+    // unitList                 = array containing the list of common 
+    //                              measurement units
+    // savedFoods               = list of the foods saved in the user's pantry
+    // foodRecommendationPath   = path to the file for ajax to call to get food 
+    //                              recommendations
+    $js .= 'var numIngredients =  '.json_encode( DEFAULT_FIELD_AMOUNT ).';';
+    $js .= 'var unitList = '.json_encode( $common_units ).';';
+    $js .= 'var savedFoods ='. json_encode($_SESSION['saved_foods']).';';
+    $js .= 'var foodRecommendationPath = "'.
+        INCLUDE_PATH_BASE .'food_recommendation.php";';
+
+    $js .= '</script>';
+
     $js .= '<script src=' . RECIPE_PATH . 'recipe.js></script>';
 
     return $js;

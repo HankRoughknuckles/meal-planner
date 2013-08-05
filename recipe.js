@@ -7,16 +7,17 @@
 *
 */
 //TODO: incorporate this with the units_table.php->create_units_dropdown() function to keep the code DRY
-function moreIngredients()
-{
-    var extraRowAmount = 10; //The number of rows to increase the ingredients table by
-    var lastRow = $( "#ingredient_row_" + (numIngredients - 1) ); //select the last row in the ingredient list
+$("#more_ingredients").click( function() {
+
+    //extraRowAmount = The number of rows to increase the ingredients table by
+    //lastRow = the jquery object for the last row in the ingredient list
+    var extraRowAmount = 10; 
+    var lastRow = $( "#ingredient_row_" + (numIngredients - 1) ); 
 
     //insert {extraRowAmount} of rows after the last row in the table
     lastRow.after( function() {
 	ingredientRows = "";
 	var rowNum;
-        var unitList = <?php echo json_encode( $common_units ); ?>;
 	for( var i = 0; i < extraRowAmount; i++ )
 	{
 	    rowNum = numIngredients + i;
@@ -45,7 +46,7 @@ function moreIngredients()
 
     refreshJQuery();
     numIngredients += extraRowAmount;
-}
+});
 
 
 var ingredients = new Array(); //will store the ingredients list for this recipe
@@ -91,7 +92,7 @@ function refreshJQuery()
 	    // console.log("request = %o", request);
 
 	    $.ajax({
-		    url: "<?php echo INCLUDE_PATH_BASE; ?>food_recommendation.php",
+		    url: foodRecommendationPath,
 		    method: "GET",
 		    dataType: "json",
 		    data: {
@@ -177,7 +178,7 @@ function refreshJQuery()
 
         // TODO: this may be a little inefficient. find a faster way of doing this
         //look through all the foods in $_SESSION['saved_foods'] to find which name matches the one created
-        $.each( <?php echo json_encode($_SESSION['saved_foods']); ?>, function( i, savedFood ){
+        $.each( savedFoods, function( i, savedFood ){
             //if the currently checked element in saved_foods matches the one that was just selected by the user
             if( savedFood['user_def_food_name'] == ingredients[num]['name'] )
             {
