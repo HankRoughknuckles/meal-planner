@@ -21,19 +21,34 @@ $("#more_ingredients").click( function() {
 	for( var i = 0; i < extraRowAmount; i++ )
 	{
 	    rowNum = numIngredients + i;
-	    ingredientRows = ingredientRows + '<tr id="ingredient_row_' + rowNum + '">';
-	    ingredientRows = ingredientRows + '<td><input type="text" class="recommendation jsonify ui-autocomplete-input" type="text" name="' + rowNum + '_ing_name" id="ing_' + rowNum + '_name" autocomplete="off"></td>';
-	    ingredientRows = ingredientRows + '<td><input class="jsonify" type="text" name="' + rowNum + '_ing_amt" id="ing_' + rowNum + '_amt"></td>';
-	    ingredientRows = ingredientRows + '<td><select class="jsonify" name="' + rowNum + '_ing_unit" id="ing_' + rowNum + '_unit">';
+	    ingredientRows = ingredientRows + 
+                '<tr id="ingredient_row_' + rowNum + '">';
+	    ingredientRows = ingredientRows + 
+                '<td><input type="text" ' + 
+                'class="recommendation jsonify ui-autocomplete-input" ' +  
+                'type="text" name="' + rowNum + '_ing_name" id="ing_' + 
+                rowNum + '_name" autocomplete="off"></td>';
+	    ingredientRows = ingredientRows + 
+                '<td><input class="jsonify" type="text" ' + 
+                'name="' + rowNum + '_ing_amt" id="ing_' + rowNum + '_amt">' + 
+                '</td>';
+	    ingredientRows = ingredientRows + 
+                '<td><select class="jsonify" name="' + rowNum + '_ing_unit" ' +
+                'id="ing_' + rowNum + '_unit">';
 
             $.each( unitList, function( index, unit ){
                 if( unit ) 
                 {
-                    ingredientRows = ingredientRows +  '<option value="' + unit + '">' + unit + '(s)</option>';
+                    ingredientRows = ingredientRows +  
+                        '<option value="' + unit + '">' + unit +
+                        '(s)</option>';
                 }
                 else
                 {
-                    ingredientRows = ingredientRows +  '<option value="' + unit + '">' + unit + '</option>'; //dont display the (s) if the field is blank
+                    //dont display the (s) if the field is blank
+                    ingredientRows = ingredientRows +  
+                        '<option value="' + unit + '">' + unit + 
+                        '</option>'; 
                 }
             });
             
@@ -75,7 +90,8 @@ function refreshJQuery()
 	    currentCategory = "";
 	    $.each( items, function( index, item ) {
 		if ( item.category != currentCategory ) {
-		    ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
+		    ul.append( "<li class='ui-autocomplete-category'>" + 
+                        item.category + "</li>" );
 		    currentCategory = item.category;
 		}
 		that._renderItemData( ul, item );
@@ -100,23 +116,28 @@ function refreshJQuery()
 		    },
 		    success: function( data ){
                         // console.log("Response = %o", data); //DEBUG
-                        displayData = new Array; //TODO: build the array to display and also the hidden one to store the food id
+                        displayData = new Array; 
+                        //TODO: build the array to display and also the hidden
+                        //one to store the food id
 
+
+                        //take the category and label values from the ajax
+                        //returned data, and put them into displayData
                         $.each( data, function( index, value ){
-                            //take the category and label values from the ajax returned data, and put them into displayData
                             displayData.push({ 
                                 'category'  : value['category'],
                                 'label'     : value['label']
                             });
                         });
-                        // console.log( "displayData = %o", displayData ); //DEBUG
 			response( displayData );
 		    }
 	    });
 	}//,
 	
 	
-	//TODO: eventually make this have the functionality to display a box around the text in the ingredient field if it was selected.  clicking that box will delete the food in the entry
+	//TODO: eventually make this have the functionality to display a box
+        //around the text in the ingredient field if it was selected.  clicking
+        //that box will delete the food in the entry
 	//define select handler
 	// select:
 	//     function(e, ui) {
@@ -135,7 +156,8 @@ function refreshJQuery()
 	// //define select handler
 	// change:
 	//     function(){
-	// 	//prevent 'recommendation' field from being updated. Also, correct the position
+	// 	//prevent 'recommendation' field from being updated. Also,
+        // 	//correct the position
 	// 	$(".recommendation").val("").css("top", 2);
 	//     }
     }); //END autocomplete
@@ -146,8 +168,11 @@ function refreshJQuery()
     * =============
     */
     
-    //TODO: make all of this happen when the submit button is pressed instead of when blurred
-    //TODO: implement form validation.  If any field is blank while others in its row are not, make an error
+    //TODO: make all of this happen when the submit button is pressed instead
+    //of when blurred
+    //TODO: implement form validation.  If any field is blank while others in
+    //its row are not, make an error
+    
     // JSONify the ingredient list when one of the ingredient fields loses focus
     $(".jsonify").blur(function(){
         if( $(this).val() === "" )
@@ -155,14 +180,12 @@ function refreshJQuery()
             return;
         }
 
-        var input = $(this).attr('name'); //this will have the format [num]_ing_[name, amt, unit]
-        var num = input.substr(0, input.indexOf("_"));    //which number is assigned to the ingredient field
-        // console.log("num = " + num ); //DEBUG
-
-        input = input.substr( input.indexOf("_") + 1); //get rid of everything before the first underscore (the number)
-        var type = input.substr( input.indexOf("_") + 1); //get rid of everything before the next underscore (a string containing "ing"). type tells you whether it's an ingredient name, unit, or amount
+        //build the name for the input field
+        var input = $(this).attr('name'); 
+        var num = input.substr(0, input.indexOf("_"));    
+        input = input.substr( input.indexOf("_") + 1); 
+        var type = input.substr( input.indexOf("_") + 1);
         
-        // console.log("type  = " + type ); //DEBUG
         if( !ingredients[num] )
         {
             ingredients[num] = {
@@ -177,12 +200,15 @@ function refreshJQuery()
         ingredients[num][type] = $(this).val();
 
         // TODO: this may be a little inefficient. find a faster way of doing this
-        //look through all the foods in $_SESSION['saved_foods'] to find which name matches the one created
+        
+        //look through all the foods in $_SESSION['saved_foods'] to find which
+        //name matches the one created. If an element is found that matches the
+        //one that was just selected by the user, save that foods' id number in
+        //the ingredients array
         $.each( savedFoods, function( i, savedFood ){
-            //if the currently checked element in saved_foods matches the one that was just selected by the user
             if( savedFood['user_def_food_name'] == ingredients[num]['name'] )
             {
-                ingredients[num]['food_id'] = savedFood['id']; //save the food's id number
+                ingredients[num]['food_id'] = savedFood['id']; 
             }
         });
 
