@@ -1,4 +1,7 @@
 <?php
+//TODO: make the links for the food query results also store the available 
+//units for the foods.  Store those units in the db as well.
+
 //TODO: make individual folders for URLs. (i.e. - instead of having 
 // /new_food.php, have /newFood/, or something)
 
