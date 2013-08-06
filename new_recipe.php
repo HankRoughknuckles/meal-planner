@@ -389,7 +389,6 @@ else
     $_SESSION['saved_foods'] = $saved_foods;
 
     $body_html = create_recipe_input();
-
     echo $body_html;
 
     echo create_ingredient_js();

@@ -11,7 +11,9 @@ if( $_GET['user_input'] )
 	$user_input = $_GET['user_input'];
 	$saved_foods = $_SESSION['saved_foods'];
 
-	$matched_results = array(); //the saved foods that match the name typed by the user
+        //$matched_results is the list of saved foods that match the name typed 
+        //by the user
+	$matched_results = array(); 
 	
 
 	foreach( $saved_foods as $saved_food )

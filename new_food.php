@@ -248,7 +248,7 @@ function prepare_nutrition_lookup_data()
 
 
 /*
- * handle_save_food()
+ * save_food_in_pantry()
  * ==================
  *
  * This function is called when the user has specified all the data necessary 
@@ -258,16 +258,38 @@ function prepare_nutrition_lookup_data()
  * @param   -   null
  * @return  -   null
  */
-function handle_save_food()
+function save_food_in_pantry()
 {
     include UNITS_TABLE_PATH;
 
     $save_food_vars = import_save_food_vars();
-
+    extract( $save_food_vars );
     $save_food_vars['error_array'] = save_food_form_validation( $save_food_vars );
 
-    save_food( $save_food_vars );
+    // Set up and insert data into the database if there are no errors
+    if( count( $save_food_vars['error_array'] ) == 0 ){
 
+	$params = array(
+	    'user_def_food_name'    => $user_def_food_name,
+	    'serving_size'          => $serving_size,
+	    'serving_units_esha'    => $serving_units_esha,
+	    'cost'                  => $cost,
+	    'currency'              => $currency,
+	    'json_esha'             => $json_esha,
+	    'esha_food_id'          => $esha_food_id,
+	    'user_id'               => $user_id,
+            'calories'              => $calories
+	);
+
+        $db = new Database_handler;
+        $db->insert_row( 't_foods', $params ); 
+
+        return null;
+    }
+    else
+    {
+        return $save_food_vars['error_array'];
+    }
 }
 
 /**
@@ -371,45 +393,6 @@ function save_food_form_validation( $save_food_vars )
 }
 
 
-
-/*
- * save_food()
- * ===========
- *
- * Takes in the POST variables and saves the food described in them to the SQL 
- * database
- *
- * @param   -   $save_food_vars     -   the POST entries for the food
- *
- *
- * @return  -   null
- */
-function save_food( $save_food_vars )
-{
-    extract( $save_food_vars );
-
-    // Set up and insert data into the database if there are no errors
-    if( count( $error_array ) == 0 ){
-
-	$params = array(
-	    'user_def_food_name'    => $user_def_food_name,
-	    'serving_size'          => $serving_size,
-	    'serving_units_esha'    => $serving_units_esha,
-	    'cost'                  => $cost,
-	    'currency'              => $currency,
-	    'json_esha'             => $json_esha,
-	    'esha_food_id'          => $esha_food_id,
-	    'user_id'               => $user_id,
-            'calories'              => $calories
-	);
-
-        $db = new Database_handler;
-        $db->insert_row( 't_foods', $params ); 
-    }
-    echo '<p>Food Saved!</p>';
-}
-
-
 /**
  * display_init_page()
  * ===================
@@ -491,8 +474,12 @@ function make_results_table( $search_result )
 	$html .= '<tr>';
 	$html .= '<td>' . htmlspecialchars( $food->description ) . '</td>';
 
-	//make links that correspond to each returned food match. idx in the GET corresponds to the index of the selected food in the $_SESSION['matched_foods'] array
-	$html .= '<td><a href="' . BASE_URL . 'new_food.php?status=food_selected&idx=' . $i . '">Select</a></td>';
+	//make links that correspond to each returned food match. idx in the 
+	//GET corresponds to the index of the selected food in 
+	//the $_SESSION['matched_foods'] array
+	$html .= '<td><a href="' . BASE_URL . 
+            'new_food.php?status=food_selected&idx=' . $i . 
+            '">Select</a></td>';
 	$i++;
 
 	$html .= '</tr>';
@@ -518,7 +505,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
     // ------------------------------------------------------------------
     // 1st step - After the user has searched for a food name
     // ------------------------------------------------------------------
-    if( $_POST["status"] == "name_selected" )
+    if( $_POST['status'] == "name_selected" )
     {
         //store the food name in session variable and go to the page 
         //displaying the search results
@@ -547,9 +534,13 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
     //	The last step - saving the user's choices to the database
     //	(Note: the steps in between are below - in the non-POST section)
     // ------------------------------------------------------------------
-    else if( $_POST["status"] == "save_food" )
+    else if( $_POST['status'] == "save_food" )
     {
-        handle_save_food();
+        $db_errors = save_food_in_pantry();
+        if( ! $db_errors )
+        {
+            echo '<p>Food Saved!</p>';
+        }
     }
 } //end if request method == POST
 
@@ -690,4 +681,8 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "submitted" )
 ?>
 
 <?php 
+
+$js_source_paths = array(
+    'new_food.js'
+);
 include( FOOTER_PATH );

@@ -77,20 +77,26 @@ function fetch_food_details( $esha_food_id, $qty, $esha_unit, $api_key)
     $response = curl_exec( $ch );
 
     //if the database didn't return anything properly, give a fatal error
-    //the conditional has the strpos() > 25 to prevent the response body from containing "200 OK" and potentially allowing the program to continue
-    if ( strpos( $response, "200 OK" ) == false 	OR 		strpos( $response, "200 OK" ) > 25 )
+    //the conditional has the strpos() > 25 to prevent the response body from 
+    //containing "200 OK" and potentially allowing the program to continue
+    if ( strpos( $response, "200 OK" ) == false 	
+        OR strpos( $response, "200 OK" ) > 25 )
     {
-        echo 'ESHA Query Error: Response code: ' . $response . '.  Printing stack backtrace';
+        echo 'ESHA Query Error: Response code: '.$response.
+            '.  Printing stack backtrace';
         var_dump( debug_backtrace() );
 	die(); //TODO: handle this more gracefully.  have some kind of error handling
 
     }
 
-    //knock off the html headers and start at the beginning of the actual query results (note: they're in JSON so we have to decode them)
+    //knock off the html headers and start at the beginning of the actual query 
+    //results (note: they're in JSON so we have to decode them)
     $foods = substr( $response, strpos($response, '{"items":') );
     $foods = json_decode( $foods );
 
-    return $foods->results;
+    $details = $foods->results;
+
+    return $details;
 }
 
 

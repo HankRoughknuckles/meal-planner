@@ -78,11 +78,11 @@ var ingredients = new Array(); //will store the ingredients list for this recipe
 function refreshJQuery()
 {
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//%								        	%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%							        	%
 //% 			   Autocomplete					%
-//%										%
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%									%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     //set up the category autocomplete widget
     $.widget( "custom.catcomplete", $.ui.autocomplete, {
 	_renderMenu: function( ul, items ) {
@@ -132,26 +132,25 @@ function refreshJQuery()
 			response( displayData );
 		    }
 	    });
-	}//,
+	},
 	
 	
 	//TODO: eventually make this have the functionality to display a box
         //around the text in the ingredient field if it was selected.  clicking
         //that box will delete the food in the entry
 	//define select handler
-	// select:
-	//     function(e, ui) {
-	// 	//create formatted friend
-	// 	var 	food = ui.item.value;
-	// 	var	span = $("<span>").text(food);
-	// 	var 	a = $("<a>").addClass("remove").attr({
-	// 				href: "javascript:",
-	// 				title: "Remove " + food
-	// 			}).text("x").appendTo(span);
-
-	// 	//add food into the text box
-	// 	span.insertBefore(this);
-	//     },
+	select:
+	    function(e, ui) {
+		var food = ui.item.value;
+		// var	span = $("<span>").text(food);
+		// var 	a = $("<a>").addClass("remove").attr({
+		// 			href: "javascript:",
+		// 			title: "Remove " + food
+		// 		}).text("x").appendTo(span);
+// 
+// 		//add food into the text box
+// 		span.insertBefore(this);
+	    }//,
 
 	// //define select handler
 	// change:
