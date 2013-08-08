@@ -42,7 +42,6 @@ $_SESSION['user_id'] = "-1";
 *
 *	@param 	-	$inTitle 	-	the title to be displayed
 *
-*
 *	@return -	NULL
 */
 function display_page_header( $inTitle )
@@ -473,7 +472,8 @@ function make_results_table( $search_result )
     $html =  '<table>';
     $i = 0;
 
-    foreach( $search_result as $food ) {
+    foreach( $search_result as $food ) 
+    {
 	$html .= '<tr>';
 	$html .= '<td>' . htmlspecialchars( $food->description ) . '</td>';
 
@@ -484,7 +484,6 @@ function make_results_table( $search_result )
             'new_food.php?status=food_selected&idx=' . $i . 
             '">Select</a></td>';
 	$i++;
-
 	$html .= '</tr>';
     }
     $html .= '</table>';
@@ -575,16 +574,14 @@ else if( isset($_GET['status']) AND $_GET['status'] == "find" )
     );
 
     $search_result = fetch_query_results( $_SESSION['food_name_query'] );
- 
+    $_SESSION['esha_matches'] = $search_result;
+
     $table_html = make_results_table( $search_result );
     echo $table_html;
 }
 
-
-// ==================================================================
-//
+// ------------------------------------------------------------------
 // Step 3:	Specifying cost per serving for the food
-//
 // ------------------------------------------------------------------
 else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 {
@@ -593,6 +590,7 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 
     $_SESSION['selected_food'] = $_SESSION['matched_foods'][ $_GET['idx'] ];
     $selected_food = $_SESSION['selected_food'];
+    var_dump($selected_food); //DEBUG
     $food_name = $selected_food->description;
 
     display_page_header( $_SESSION['page_title'] . ' - ' . $food_name );
@@ -667,25 +665,19 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 // }
 
 
-// ==================================================================
-//
+// ------------------------------------------------------------------
 // Step 4 - Food saved successfully
-//
 // ------------------------------------------------------------------
 else if( isset($_GET["status"]) AND $_GET["status"] == "submitted" )
 {
-					//display the page title
-	display_page_header( "Save Successful" );
+    display_page_header( "Save Successful" );
 
-	echo "<p>Food saved!</p>";
-	echo '<a href="' . BASE_URL . 'new_food.php">Enter a new food</a>';
-	exit();
+    echo "<p>Food saved!</p>";
+    echo '<a href="' . BASE_URL . 'new_food.php">Enter a new food</a>';
+    exit();
 }
 ?>
 
 <?php 
 
-$js_source_paths = array(
-    'new_food.js'
-);
 include( FOOTER_PATH );

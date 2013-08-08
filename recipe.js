@@ -78,11 +78,9 @@ var ingredients = new Array(); //will store the ingredients list for this recipe
 function refreshJQuery()
 {
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//%							        	%
-//% 			   Autocomplete					%
-//%									%
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    //----------------------------------------------------------------------------
+    //                              Autocomplete
+    //----------------------------------------------------------------------------
     //set up the category autocomplete widget
     $.widget( "custom.catcomplete", $.ui.autocomplete, {
 	_renderMenu: function( ul, items ) {
@@ -138,35 +136,75 @@ function refreshJQuery()
 	//TODO: eventually make this have the functionality to display a box
         //around the text in the ingredient field if it was selected.  clicking
         //that box will delete the food in the entry
-	//define select handler
 	select:
 	    function(e, ui) {
-		var food = ui.item.value;
-		// var	span = $("<span>").text(food);
-		// var 	a = $("<a>").addClass("remove").attr({
-		// 			href: "javascript:",
-		// 			title: "Remove " + food
-		// 		}).text("x").appendTo(span);
-// 
-// 		//add food into the text box
-// 		span.insertBefore(this);
+		var nameOfSelectedFood = ui.item.value;
+                var currentIngredientIndex =
+                    $(this).attr("name").substring(0,1);
+                var matchedFood;
+                var unitsDropdownMenu = $( "#"+ currentIngredientIndex + "_ing_unit" );
+
+                //TODO: find a faster way to do this
+                //find the food from the db that matches the selection
+                $.each( savedFoods, function( i, savedFood ){
+                    if( savedFood['user_def_food_name'] === nameOfSelectedFood ){
+                        matchedFood = savedFood;
+                    }
+                });
+
+                console.log( "matchedFood = %o", matchedFood );
+
+                //remove all existing unit options and replace them with the
+                //ones that esha offers for this particular food.
+                unitsDropdownMenu.children().remove();
+                populateUnitsMenu(unitsDropdownMenu, matchedFood);
 	    }//,
 
-	// //define select handler
-	// change:
-	//     function(){
-	// 	//prevent 'recommendation' field from being updated. Also,
-        // 	//correct the position
-	// 	$(".recommendation").val("").css("top", 2);
-	//     }
+    // change:
+    //     function(){
+    // 	//prevent 'recommendation' field from being updated. Also,
+    // 	//correct the position
+    // 	$(".recommendation").val("").css("top", 2);
+    //     }
     }); //END autocomplete
 
 
-    /**
-    * jsonify stuff
-    * =============
-    */
-    
+    refreshJSONify();
+}
+
+
+
+function populateUnitsMenu( menu, food )
+{
+    menu.append("<option value></option>");
+    $.each( food.available_units, function( code, unit )
+        {
+            if( unit.toLowerCase() === "each" )
+            {
+                menu.append('<option value="' +
+                    unit + '">' + unit + "</option>");
+            }
+            else
+            {
+                menu.append('<option value="' +
+                    unit + '">' + unit + '(s)</option>');
+            }
+    });
+}
+
+/**
+ * refreshJSONify()
+ * ================
+ *
+ * reapplies the ability to convert the ingredients to json on all fields in
+ * the ingredients list.
+ *
+ * This is used when the "add more ingredients" button in pressed, which would
+ * make them not have the jsonify feature on them.  This makes sure that
+ * jsonify gets applied to them as well.
+ */
+function refreshJSONify()
+{
     //TODO: make all of this happen when the submit button is pressed instead
     //of when blurred
     //TODO: implement form validation.  If any field is blank while others in
@@ -212,7 +250,7 @@ function refreshJQuery()
         });
 
         $("#ingredient_list").val( JSON.stringify(ingredients) );
-        console.log( ingredients );
+        // console.log( ingredients );
     });
 }
 
@@ -227,6 +265,6 @@ $("#submit_btn").click( function(){
         }
     });
 
-    console.log( ingredients );
+    // console.log( ingredients );
 });
 

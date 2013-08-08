@@ -54,8 +54,6 @@ function make_cost_table()
         
         $matching_saved_food = $saved_foods[$ingredient->food_id];
 
-        // TODO: ESHA gets pissy when you try to use units of "Pieces" and "Cups", 
-        // check out why. Check with all the other units too
         //Get calories of the entered ingredient
         var_dump( $unit_to_code_table[ $ingredient->unit ] ); // DEBUG
 
@@ -298,7 +296,8 @@ function create_ingredients_table()
 	$table_html .= '<td>';
         $dropdown_attr = array(
             'class'     => 'jsonify',
-            'name'      => $i . '_ing_unit'
+            'name'      => $i . '_ing_unit',
+            'id'        => $i . '_ing_unit'
         );
         $table_html .=       create_serving_units_dropdown( $dropdown_attr, 
             $common_units );
@@ -320,7 +319,23 @@ function create_ingredients_table()
 function create_ingredient_js()
 {
     global $common_units;
+    global $code_to_unit_table;
     $js = '<script>';
+
+    //add the units available to esha straight into the 'saved_foods' session 
+    //variable.  They are stored in an array called $available_units in the 
+    //form <esha_unit_code> => <unit name>
+    foreach( $_SESSION['saved_foods'] as & $saved_food )
+    {
+        $food_esha_info = json_decode(stripslashes($saved_food['json_esha']) );
+        $coded_available_units = $food_esha_info->units;
+        $available_units = array();
+        foreach( $coded_available_units as $unit_code )
+        {
+            $available_units[$unit_code] = $code_to_unit_table[$unit_code];
+        }
+        $saved_food['available_units'] = $available_units;
+    }
     
     // numIngredients           = the number of ingredients displayed
     // unitList                 = array containing the list of common 
@@ -363,17 +378,9 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 
     else //if all the foods in the recipe are already registered
     {
-        //var_dump( $_SESSION['saved_foods'] ); //DEBUG
-        // $ingredient_list = json_decode($_POST['ingredient_list']);
-        // $saved_foods = $_SESSION['saved_foods'];
-        
         $table_html = make_cost_table();
         echo $table_html;
-
-        // var_dump( $_POST ); //DEBUG
-        var_dump( $nutrition_info ); //DEBUG
     }
-
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
