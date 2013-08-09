@@ -44,8 +44,6 @@ function make_cost_table()
     $table_html .= '<th>Cost</th>';
     $table_html .= '</tr>';
 
-    var_dump( $ingredient_list );
-
     $_SESSION['total_recipe_calories'] = 0;
     $_SESSION['total_recipe_cost'] = 0;
 
@@ -53,6 +51,15 @@ function make_cost_table()
     {
         $table_html .= draw_recipe_row( $ingredient );
     }
+
+    $table_html .= '<tr>';
+    $table_html .= '<td>';
+    $table_html .= 'Total:';
+    $table_html .= '</td>';
+    $table_html .= '<td></td>';
+    $table_html .= '<td>'.$_SESSION['total_recipe_calories'].'</td>';
+    $table_html .= '<td>'.$_SESSION['total_recipe_cost'].'</td>';
+    $table_html .= '</tr>';
 
     $table_html .= '</table>';
 
@@ -115,13 +122,13 @@ function display_ingredient_amount( $ingredient )
 {
     $html = "";
 
-    if( $ingredient->unit == 1 )
+    if( $ingredient->unit == 1 OR strtolower($ingredient->unit) == "each" )
     {
-        $html .= $ingredient->amt .  ' ' .  strtolower($ingredient->unit);
+        $html .= $ingredient->amt.' '.strtolower($ingredient->unit);
     }
     else
     {
-        $html .= $ingredient->amt .  ' ' .  strtolower($ingredient->unit) . 's';
+        $html .= $ingredient->amt.' '.strtolower($ingredient->unit).'s';
     }
 
 
@@ -167,13 +174,15 @@ function get_ingredient_nutrition( $ingredient )
 function get_ingredient_cost( 
     $ingredient, $ingredient_calories, $matching_saved_food )
 {
-    //TODO: test this
+    //TODO: test this -- there's a bug that whenever a food is selected that 
+    //has a really low number of calories, (e.g. - celery), the cost and 
+    //calories are not displayed properly
     $ratio = $ingredient_calories / floatval($matching_saved_food['calories']);
     var_dump( $matching_saved_food );
     var_dump( $ingredient );
 
     echo "ratio = " . $ratio;
-    $ingredient_cost = $matching_saved_food['cost'] * $ratio;
+    $ingredient_cost = round( $matching_saved_food['cost'] * $ratio, 2 );
 
     return $ingredient_cost;
 
