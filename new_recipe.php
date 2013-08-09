@@ -1,7 +1,4 @@
 <?php
-//TODO: URGENT! make the first screen have drop down menus that only display 
-//the units that are stored for each food in ESHA (ie if cheese can only be 
-//measured in cups in ESHA, only display cups
 //TODO: implement form checking on ingredients to make sure they are not blank 
 //and also have the right format
 
@@ -40,59 +37,147 @@ function make_cost_table()
     $saved_foods = $_SESSION['saved_foods'];
 
     $table_html = '<table id="recipe_tabulation">';
-    $table_html .=   '<tr>';
-    $table_html .=       '<th>Amount</th>';
-    $table_html .=       '<th>Food</th>';
-    $table_html .=       '<th>Calories</th>';
-    $table_html .=       '<th>Cost</th>';
-    $table_html .=   '</tr>';
+    $table_html .= '<tr>';
+    $table_html .= '<th>Amount</th>';
+    $table_html .= '<th>Food</th>';
+    $table_html .= '<th>Calories</th>';
+    $table_html .= '<th>Cost</th>';
+    $table_html .= '</tr>';
 
-    //get nutrition information about each ingredient
-    foreach( $ingredient_list as $ingredient ){
-        var_dump( $ingredient ); //DEBUG
-        // var_dump( $_SESSION['saved_foods'] ); //DEBUG
-        
-        $matching_saved_food = $saved_foods[$ingredient->food_id];
+    var_dump( $ingredient_list );
 
-        //Get calories of the entered ingredient
-        var_dump( $unit_to_code_table[ $ingredient->unit ] ); // DEBUG
+    $_SESSION['total_recipe_calories'] = 0;
+    $_SESSION['total_recipe_cost'] = 0;
 
-        $ingredient_calories = fetch_food_details(
-            $matching_saved_food['esha_food_id'],
-            $ingredient->amt,
-            $unit_to_code_table[ $ingredient->unit ],
-            ESHA_API_KEY
-        );
-        $ingredient_calories = $ingredient_calories[0]->value;
-        echo 'esha successfully polled, calories are ' . $ingredient_calories;
-
-        // Find calorie ratio between saved food amount and entered 
-        // ingredient amount. Use this ratio to determine cost of using 
-        // the ingredient.
-        echo floatval($matching_saved_food['calories']);
-        $ratio = floatval($matching_saved_food['calories']) / $ingredient_calories;
-        echo $ratio;
-        
-        // $ingredient_cost = 
-        
-        $table_html .=       '<tr>';
-        $table_html .=       '<td>';
-        if( $ingredient->unit == 1 )
-        {
-            $table_html .=           $ingredient->name . ':  ' . $ingredient->amt . ' ' . strtolower($ingredient->unit);
-        }
-        else
-        {
-            $table_html .=           $ingredient->name . ':  ' . $ingredient->amt . ' ' . strtolower($ingredient->unit) . 's';
-        }
-        $table_html .=       '</td>';
-        $table_html .=       '</tr>';
+    foreach( $ingredient_list as $ingredient )
+    {
+        $table_html .= draw_recipe_row( $ingredient );
     }
+
     $table_html .= '</table>';
 
     return $table_html;
 }
 
+
+/*
+ * draw_recipe_row()
+ * =================
+ *
+ * //TODO: make documentation here
+ */
+function draw_recipe_row( $ingredient )
+{
+    $matching_saved_food = $_SESSION['saved_foods'][$ingredient->food_id];
+
+    $html = '<tr>';
+    
+    //Display Ingredient Amount
+    $html .= '<td>';
+    $html .= display_ingredient_amount( $ingredient );
+    $html .= '</td>';
+
+
+    //Display food name
+    $html .= '<td>';
+    $html .= $ingredient->name;
+    $html .= '</td>';
+
+
+    //information about the ingredient's nutrition 
+    $html .= '<td>';
+    $ingredient_calories = get_ingredient_nutrition( $ingredient );
+    $html .= $ingredient_calories;
+    $_SESSION['total_recipe_calories'] += $ingredient_calories;
+    $html .= '</td>';
+    
+
+    $html .= '<td>';
+    $ingredient_cost = get_ingredient_cost( $ingredient, $ingredient_calories, 
+        $matching_saved_food );
+    $html .= $ingredient_cost;
+    $_SESSION['total_recipe_cost'] += $ingredient_cost;
+    $html .= '</td>';
+
+
+    $html .= '</tr>';
+
+    return $html;
+}
+
+/*
+ * display_ingredient_amount()
+ * ===========================
+ *
+ *
+ */
+function display_ingredient_amount( $ingredient )
+{
+    $html = "";
+
+    if( $ingredient->unit == 1 )
+    {
+        $html .= $ingredient->amt .  ' ' .  strtolower($ingredient->unit);
+    }
+    else
+    {
+        $html .= $ingredient->amt .  ' ' .  strtolower($ingredient->unit) . 's';
+    }
+
+
+    return $html;
+}
+
+
+/**
+ * get_ingredient_nutrition()
+ * ===============================
+ *
+ * //TODO: make documentation here
+ */
+function get_ingredient_nutrition( $ingredient )
+{
+    global $unit_to_code_table;
+
+    //$matching_saved_food is the food matching the ingredient that the user 
+    //has saved in the pantry
+    $matching_saved_food = $_SESSION['saved_foods'][$ingredient->food_id];
+
+    $ingredient_calories = fetch_food_details(
+        $matching_saved_food['esha_food_id'],
+        $ingredient->amt,
+        $unit_to_code_table[ $ingredient->unit ],
+        ESHA_API_KEY
+    );
+
+    $ingredient_calories = round( $ingredient_calories[0]->value );
+    
+    return $ingredient_calories;
+}
+
+
+/**
+ * get_ingredient_cost()
+ * =====================
+ *
+ * Find calorie ratio between saved food amount and entered 
+ * ingredient amount. Use this ratio to determine cost of using 
+ * the ingredient.
+ */
+function get_ingredient_cost( 
+    $ingredient, $ingredient_calories, $matching_saved_food )
+{
+    //TODO: test this
+    $ratio = $ingredient_calories / floatval($matching_saved_food['calories']);
+    var_dump( $matching_saved_food );
+    var_dump( $ingredient );
+
+    echo "ratio = " . $ratio;
+    $ingredient_cost = $matching_saved_food['cost'] * $ratio;
+
+    return $ingredient_cost;
+
+}
 
 /*
  * This function will handle saving unregistered foods that were entered in the 
