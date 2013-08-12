@@ -49,7 +49,7 @@ function make_cost_table()
 
     foreach( $ingredient_list as $ingredient )
     {
-        $table_html .= draw_recipe_row( $ingredient );
+        $table_html .= draw_recipe_tally_row( $ingredient );
     }
 
     $table_html .= '<tr>';
@@ -68,12 +68,12 @@ function make_cost_table()
 
 
 /*
- * draw_recipe_row()
+ * draw_recipe_tally_row()
  * =================
  *
  * //TODO: make documentation here
  */
-function draw_recipe_row( $ingredient )
+function draw_recipe_tally_row( $ingredient )
 {
     $matching_saved_food = $_SESSION['saved_foods'][$ingredient->food_id];
 
@@ -94,7 +94,7 @@ function draw_recipe_row( $ingredient )
     //information about the ingredient's nutrition 
     $html .= '<td>';
     $ingredient_calories = get_ingredient_nutrition( $ingredient );
-    $html .= $ingredient_calories;
+    $html .= round( $ingredient_calories, 1 );
     $_SESSION['total_recipe_calories'] += $ingredient_calories;
     $html .= '</td>';
     
@@ -155,9 +155,16 @@ function get_ingredient_nutrition( $ingredient )
         $ingredient->amt,
         $unit_to_code_table[ $ingredient->unit ],
         ESHA_API_KEY
-    );
+    )[0]->value;
 
-    $ingredient_calories = round( $ingredient_calories[0]->value );
+    // $ingredient_calories = $ingredient_calories[0]->value;
+
+
+    //to prevent divide by zero errors
+    if( $ingredient_calories == 0 )
+    {
+        $ingredient_calories = 0.001;
+    }
     
     return $ingredient_calories;
 }
@@ -376,10 +383,6 @@ function create_ingredients_table()
     $table_html .= '<th>Unit</th>';
     $table_html .= '</tr>';
 
-?>
-
-
-    <?php
     for( $i = 0; $i < DEFAULT_FIELD_AMOUNT; $i++ )
     {
 	$table_html .= '<tr id="ingredient_row_' . $i . '">';

@@ -340,6 +340,7 @@ function import_save_food_vars()
     $vars['esha_food_id'] = 
         trim( $_SESSION['selected_food']->id ); 
 
+
     $vars['calories'] = 
         fetch_food_details( 
             $vars['esha_food_id'],
@@ -347,6 +348,14 @@ function import_save_food_vars()
             $vars['serving_units_esha'],
             ESHA_API_KEY 
         )[0]->value;
+
+    //TODO: this is just a temporary fix to make sure that no random bugs occur 
+    //if the food has 0 calories.  A more robust method should be implemented 
+    //for dealing with this problem
+    if( $vars['calories'] == 0 )
+    {
+        $vars['calories'] = 0.001;
+    }
 
 
     // replace any blank fields with NULL instead
