@@ -45,7 +45,7 @@ function make_cost_table()
     $table_html .= '<th colspan="2">Amount</th>';
     $table_html .= '<th>Food</th>';
     $table_html .= '<th>Calories</th>';
-    $table_html .= '<th>Cost</th>';
+    $table_html .= '<th>Cost (USD)</th>';
     $table_html .= '</tr>';
 
     $_SESSION['total_recipe_calories'] = 0;
@@ -62,7 +62,7 @@ function make_cost_table()
     $table_html .= '</td>';
     $table_html .= '<td></td>';
     $table_html .= '<td>'.round( $_SESSION['total_recipe_calories'], 1 ).'</td>';
-    $table_html .= '<td>'.$_SESSION['total_recipe_cost'].'</td>';
+    $table_html .= '<td>$'.$_SESSION['total_recipe_cost'].'</td>';
     $table_html .= '</tr>';
 
     $table_html .= '</table>';
@@ -104,7 +104,7 @@ function draw_recipe_tally_row( $ingredient )
     $html .= '<td>';
     $ingredient_cost = get_ingredient_cost( $ingredient, $ingredient_calories, 
         $matching_saved_food['calories'], $matching_saved_food['cost'] );
-    $html .= $ingredient_cost;
+    $html .= '$'.$ingredient_cost;
     $_SESSION['total_recipe_cost'] += $ingredient_cost;
     $html .= '</td>';
 
@@ -473,16 +473,48 @@ function save_recipe()
 
     foreach( $ingredient_list as $ingredient )
     {
-        insert_ingredient_in_db(
-            array(
-                'name'          => $name,
-                'recipe_id'     => $recipe_id,
-                'amount'        => $amount,
-                'unit'          => $unit,
-                'cost'          => $cost
-            );
+        insert_ingredient_in_db( array(
+            'name'          => $name,
+            'recipe_id'     => $recipe_id,
+            'amount'        => $amount,
+            'unit'          => $unit,
+            'cost'          => $cost
+        ));
     }
+}
 
+
+/**
+ * insert_recipe_in_db()
+ * =====================
+ *
+ * TODO: make doc
+ */
+function insert_recipe_in_db()
+{
+    //note that the table t_recipes will have the following columns:
+        //name
+        //recipe id
+}
+
+
+/**
+ * insert_ingredient_in_db()
+ * =========================
+ *
+ * TODO: make doc
+ */
+function insert_ingredient_in_db()
+{
+    //note that the table t_ingredients will have the following columns:
+        //name
+        //ingredient id
+        //recipe id (foreign key to t_recipes table)
+        //food id (foreign key to t_foods table)
+        //amount
+        //unit
+        //cost
+        //calories
 }
 
 

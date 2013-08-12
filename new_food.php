@@ -120,9 +120,9 @@ function make_pantry_save_form( $default_food_name, $unit_list )
     $html_text .= '<td>';
     $html_text .= '<input type="text" name="cost" value="">';
     $html_text .= '</td>';
-    $html_text .= '<td>';
-    $html_text .= create_currency_dropdown();
-    $html_text .=' </td>';
+    // $html_text .= '<td>';
+    // $html_text .= create_currency_dropdown();
+    // $html_text .=' </td>';
     $html_text .=' <td>';
     $html_text .= '<input type="hidden" name="status" value="save_food">'; 
     $html_text .= '<input type="submit" value="Save that food!">';
@@ -276,7 +276,7 @@ function save_food_in_pantry()
 	    'serving_size'          => $serving_size,
 	    'serving_units_esha'    => $serving_units_esha,
 	    'cost'                  => $cost,
-	    'currency'              => $currency,
+	    /* 'currency'              => $currency, */
 	    'json_esha'             => $json_esha,
 	    'esha_food_id'          => $esha_food_id,
 	    'user_id'               => $user_id,
@@ -331,8 +331,8 @@ function import_save_food_vars()
     $vars['cost'] = 
         $_POST['cost']; 
 
-    $vars['currency'] = 
-        trim( $_POST['currency'] );
+    // $vars['currency'] = 
+    //     trim( $_POST['currency'] );
 
     $vars['json_esha'] = 
         addslashes( json_encode( $_SESSION['selected_food'] ) ); 
@@ -371,9 +371,9 @@ function import_save_food_vars()
     if( $vars['cost'] == "" ){
 	$vars['cost'] = NULL;
     }
-    if( $vars['currency'] == "" ){
+    // if( $vars['currency'] == "" ){
 	$vars['currency'] = NULL;
-    }
+    // }
 
 
     return $vars;
