@@ -2,8 +2,12 @@
 //TODO: implement form checking on ingredients to make sure they are not blank 
 //and also have the right format
 
+//TODO: make the ingredient tally page able to handle zero calorie ingredients 
+//for tallying costs
+
 require_once("/inc/config.php");
 require_once( LOGIN_PATH );
+require_once( UNITS_TABLE_PATH );
 
 session_start();
 
@@ -38,7 +42,7 @@ function make_cost_table()
 
     $table_html = '<table id="recipe_tabulation">';
     $table_html .= '<tr>';
-    $table_html .= '<th>Amount</th>';
+    $table_html .= '<th colspan="2">Amount</th>';
     $table_html .= '<th>Food</th>';
     $table_html .= '<th>Calories</th>';
     $table_html .= '<th>Cost</th>';
@@ -53,11 +57,11 @@ function make_cost_table()
     }
 
     $table_html .= '<tr>';
-    $table_html .= '<td>';
+    $table_html .= '<td colspan="2">';
     $table_html .= 'Total:';
     $table_html .= '</td>';
     $table_html .= '<td></td>';
-    $table_html .= '<td>'.$_SESSION['total_recipe_calories'].'</td>';
+    $table_html .= '<td>'.round( $_SESSION['total_recipe_calories'], 1 ).'</td>';
     $table_html .= '<td>'.$_SESSION['total_recipe_cost'].'</td>';
     $table_html .= '</tr>';
 
@@ -80,9 +84,7 @@ function draw_recipe_tally_row( $ingredient )
     $html = '<tr>';
     
     //Display Ingredient Amount
-    $html .= '<td>';
     $html .= display_ingredient_amount( $ingredient );
-    $html .= '</td>';
 
 
     //Display food name
@@ -101,7 +103,7 @@ function draw_recipe_tally_row( $ingredient )
 
     $html .= '<td>';
     $ingredient_cost = get_ingredient_cost( $ingredient, $ingredient_calories, 
-        $matching_saved_food );
+        $matching_saved_food['calories'], $matching_saved_food['cost'] );
     $html .= $ingredient_cost;
     $_SESSION['total_recipe_cost'] += $ingredient_cost;
     $html .= '</td>';
@@ -116,19 +118,27 @@ function draw_recipe_tally_row( $ingredient )
  * display_ingredient_amount()
  * ===========================
  *
+ * returns the html code for the table cells that hold the amount of each 
+ * ingredient in the recipe.
  *
+ * @param $ingredient       - an object for an ingredient.  Must have the 
+ *                              fields 
+ *                              ->amt  (the amount of the ingredient present)
+ *                              ->unit (the unit that amt is denominated in)
  */
 function display_ingredient_amount( $ingredient )
 {
     $html = "";
 
+    $html .= '<td>'.$ingredient->amt.'</td>';
+
     if( $ingredient->unit == 1 OR strtolower($ingredient->unit) == "each" )
     {
-        $html .= $ingredient->amt.' '.strtolower($ingredient->unit);
+        $html .= '<td>'.strtolower($ingredient->unit).'</td>';
     }
     else
     {
-        $html .= $ingredient->amt.' '.strtolower($ingredient->unit).'s';
+        $html .= '<td>'.strtolower($ingredient->unit).'s</td>';
     }
 
 
@@ -174,26 +184,23 @@ function get_ingredient_nutrition( $ingredient )
  * get_ingredient_cost()
  * =====================
  *
- * Find calorie ratio between saved food amount and entered 
- * ingredient amount. Use this ratio to determine cost of using 
+ * Finds calorie ratio between saved food amount and entered 
+ * ingredient amount. Uses this ratio to determine cost of using 
  * the ingredient.
+ *
+ *   //TODO: there's a bug here where the costs will not calculate properly if 
+ *   //the ingredient's calories = 0.  Make a more robust way of finding the 
+ *   //cost
  */
-function get_ingredient_cost( 
-    $ingredient, $ingredient_calories, $matching_saved_food )
+function get_ingredient_cost( $ingredient, $ingredient_calories, 
+    $saved_foods_calories, $saved_foods_cost )
 {
-    //TODO: test this -- there's a bug that whenever a food is selected that 
-    //has a really low number of calories, (e.g. - celery), the cost and 
-    //calories are not displayed properly
-    $ratio = $ingredient_calories / floatval($matching_saved_food['calories']);
-    var_dump( $matching_saved_food );
-    var_dump( $ingredient );
-
-    echo "ratio = " . $ratio;
-    $ingredient_cost = round( $matching_saved_food['cost'] * $ratio, 2 );
+    $ratio = $ingredient_calories / floatval($saved_foods_calories);
+    $ingredient_cost = round( $saved_foods_cost * $ratio, 2 );
 
     return $ingredient_cost;
-
 }
+
 
 /*
  * This function will handle saving unregistered foods that were entered in the 
@@ -454,11 +461,39 @@ function create_ingredient_js()
 }
 
 
+/**
+ * save_recipe()
+ * =============
+ *
+ * TODO: make doc
+ */
+function save_recipe()
+{
+    $recipe_id = insert_recipe_in_db();
+
+    foreach( $ingredient_list as $ingredient )
+    {
+        insert_ingredient_in_db(
+            array(
+                'name'          => $name,
+                'recipe_id'     => $recipe_id,
+                'amount'        => $amount,
+                'unit'          => $unit,
+                'cost'          => $cost
+            );
+    }
+
+}
+
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%							        	%
-//% 			   POST handling				%
+//% 			        Main Code				%
 //%									%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//-----------------------------------------------------------------------
+//                          POST handling
+//-----------------------------------------------------------------------
 if( $_SERVER["REQUEST_METHOD"] == "POST")
 {
     require_once INCLUDE_PATH . 'esha.php';
@@ -475,27 +510,46 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 
     else //if all the foods in the recipe are already registered
     {
-        $table_html = make_cost_table();
-        echo $table_html;
+        $body_html = '<h2>'.ucfirst( $_POST['recipe_name'] ).'</h2>';
+        $body_html .= '<h2>Ingredient tally</h2>';
+        $body_html .= make_cost_table();
+
+        $body_html .= '<a href="'.BASE_URL.'new_recipe.php?status=saved">'.
+            'Save that food!</a>';
+        echo $body_html;
     }
 }
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//%							        	%
-//% 			   non-POST handling				%
-//%									%
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//-----------------------------------------------------------------------
+//                          non-POST handling
+//-----------------------------------------------------------------------
 else
 {
-    require_once( UNITS_TABLE_PATH );
+    if( !isset($_GET['status']) )
+    {
+        $saved_foods = get_user_pantry_foods();
+        $_SESSION['saved_foods'] = $saved_foods;
 
-    $saved_foods = get_user_pantry_foods();
-    $_SESSION['saved_foods'] = $saved_foods;
+        $body_html = create_recipe_input();
+        echo $body_html;
 
-    $body_html = create_recipe_input();
-    echo $body_html;
-
-    echo create_ingredient_js();
+        echo create_ingredient_js();
+    }
+    else if( $_GET['status'] == 'saved' )
+    {
+        $body_html = "";
+        $db_error = save_recipe();
+        
+        if( $db_error ){
+            $body_html .= '<p>Error while saving recipe</p>';
+            $body_html .= '<p>'.$db_error.'</p>';
+        }
+        else
+        {
+            $body_html .= '<p>Recipe saved successfully!</p>';
+            $body_html .= '<a href="'.BASE_URL.'/new_recipe.php">Make a new recipe</a>';
+        }
+    }
 }
 
 include( FOOTER_PATH ); 
