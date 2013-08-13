@@ -11,14 +11,12 @@ define( 'EXEC_FAIL'	, 	2 );
 
 class Database_handler
 {
-    //%%%%%%%%%%%   FIELDS   %%%%%%%%%%%%%%
+//%%%%%%%%%%%   FIELDS   %%%%%%%%%%%%%%
     protected $conn; //the connection variable for the database session
     protected $command; //the actual sql query to be sent to the database
 
-
     
-    //%%%%%%%%%%%   FUNCTIONS   %%%%%%%%%%%%%%
-
+//%%%%%%%%%%%   FUNCTIONS   %%%%%%%%%%%%%%
     /**
      *	get_command()
      *	=============
@@ -50,18 +48,18 @@ class Database_handler
      * inserts a row into the specified table with data 
      * according to the $params input
      *
-     * @param 	-	$table 		-	a string specifying the table name
+     * @param 	- $table	-a string specifying the table name
      *
-     * @param 	-	$params 	-	an associative array with keys equal to 
-     * 								the column name and values equal to the 
-     * 								row value.
-     * 								Ex: array( 'serving_size' => 10 )
+     * @param 	- $params 	-an associative array with keys equal to 
+     * 				    the column name and values equal to the 
+     * 				    row value.
+     * 				    Ex: array( 'serving_size' => 10 )
      *
-     * @return 	- SUCCESS 	-	If the command executed successfully
+     * @return 	- SUCCESS 	-If the command executed successfully
      *
-     * 			- PREP_FAIL	-	If the command preparation failed
+     * 	        - PREP_FAIL	-If the command preparation failed
      *
-     * 			- EXEC_FAIL -	If the command execution failed
+     * 		- EXEC_FAIL 	-If the command execution failed
      */
     function insert_row( $table, $params )
     {
@@ -69,8 +67,9 @@ class Database_handler
 
         //TODO: TEST THIS!
         $command = 'INSERT INTO ' . $table . ' (';
-
-        foreach( $params as $col => $row) //build the query based off the contents of $params
+        
+        //build the query based off the contents of $params
+        foreach( $params as $col => $row) 
         {
             $command .= $col . ', ';
         }
@@ -86,12 +85,9 @@ class Database_handler
         $command = substr( $command, 0, -2 ); //remove last comma
         $command .= ')';
 
-
-        //$command = "INSERT INTO $table (user_def_food_name, serving_size, serving_units_esha, cost, currency, json_esha, esha_food_id, user_id) VALUES (:user_def_food_name, :serving_size, :serving_units_esha, :cost, :currency, :json_esha, :esha_food_id, :user_id)";
-        
-        //TODO: TEST THIS!
-        $formatted_params = array(); //same format as $params, but the keys (or column names) start with a colon (:)
-        //the params to go into the ?'s in the $command variable
+        //$formatted_params has same format as $params, but the keys (or column 
+        //names) start with a colon (:)
+        $formatted_params = array();    
         foreach( $params as $col => $row )
         {
             $formatted_params[ ':' . $col ] = $row;
@@ -101,19 +97,43 @@ class Database_handler
         $query = $this->conn->prepare( $command ); 
         if( !$query )
         {
-	        echo 'Query preparation failed! - (' . $query->errno . ') ' . $query->error;
+	    echo 'Query preparation failed! - (' . $query->errno . ') ' . 
+                $query->error;
         }
         
         //crank the parameters into the statement and execute
         $query = $query->execute( $params ); 
         if( !$query )
         {
-	        echo 'Query execution failed! - (' . $query->errno . ') ' . $query->error;
+	    echo 'Query execution failed! - (' . $query->errno . ') ' . 
+                $query->error;
         }
 
         $this->close_connection();
     }
 
+
+    /**
+     * query_table()
+     * =============
+     *
+     * @param   - $command          -The actual SQL command to be sent
+     *                                  e.g. - SELECT * from t_foods
+     *
+     * @returns - $results
+     */
+    function query_table( $table_name, $command )
+    {
+        //TODO: test this
+        $this->open_connection();
+
+        $response = $this->conn->query( $command );
+
+        $this->close_connection();
+
+        var_dump( $response );
+        return $response;
+    }
 
 
     /**
