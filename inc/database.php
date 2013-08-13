@@ -99,6 +99,9 @@ class Database_handler
         {
 	    echo 'Query preparation failed! - (' . $query->errno . ') ' . 
                 $query->error;
+
+            $this->close_connection();
+            return -1;
         }
         
         //crank the parameters into the statement and execute
@@ -107,6 +110,9 @@ class Database_handler
         {
 	    echo 'Query execution failed! - (' . $query->errno . ') ' . 
                 $query->error;
+
+            $this->close_connection();
+            return -1;
         }
 
         $this->close_connection();
@@ -122,17 +128,25 @@ class Database_handler
      *
      * @returns - $results
      */
-    function query_table( $table_name, $command )
+    function query_table( $command )
     {
         //TODO: test this
         $this->open_connection();
-
         $response = $this->conn->query( $command );
 
+        if( !$response )
+        {
+            echo 'Query error while searching a table. Printing stack ' .
+                'backtrace...';
+            var_dump( debug_backtrace() );
+            $this->close_connection();
+            return null;
+        }
+
+        $results = $response->fetchAll();
         $this->close_connection();
 
-        var_dump( $response );
-        return $response;
+        return $results;
     }
 
 

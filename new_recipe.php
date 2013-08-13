@@ -9,6 +9,7 @@ require_once("/inc/config.php");
 require_once( LOGIN_PATH );
 require_once( UNITS_TABLE_PATH );
 require_once( ROOT_PATH . 'recipe.php' );
+require_once( INCLUDE_PATH_BASE . 'database.php' );
 
 session_start();
 
@@ -98,19 +99,22 @@ function draw_recipe_tally_row( $ingredient )
     $html .= '<td>';
     $ingredient_calories = get_ingredient_nutrition( $ingredient );
     $html .= round( $ingredient_calories, 1 );
-    $_SESSION['total_recipe_calories'] += $ingredient_calories;
     $html .= '</td>';
     
-
     $html .= '<td>';
     $ingredient_cost = get_ingredient_cost( $ingredient, $ingredient_calories, 
         $matching_saved_food['calories'], $matching_saved_food['cost'] );
     $html .= '$'.$ingredient_cost;
-    $_SESSION['total_recipe_cost'] += $ingredient_cost;
     $html .= '</td>';
-
-
     $html .= '</tr>';
+
+    $matching_saved_food['calories'] = $ingredient_calories;
+    $_SESSION['total_recipe_calories'] += $ingredient_calories;
+
+    $matching_saved_food['cost'] = $ingredient_cost;
+    $_SESSION['total_recipe_cost'] += $ingredient_cost;
+
+    $_SESSION['saved_foods'][$ingredient->food_id] = $matching_saved_food;
 
     return $html;
 }
@@ -239,7 +243,6 @@ function get_user_pantry_foods()
         $saved_foods[$food_id] = $food;
     }
 
-    // var_dump($saved_foods); //DEBUG
 
     return $saved_foods;
 }
@@ -455,7 +458,7 @@ function create_ingredient_js()
 
     $js .= '</script>';
 
-    $js .= '<script src=' . RECIPE_PATH . 'recipe.js></script>';
+    $js .= '<script src=' . RECIPE_PATH . 'new_recipe.js></script>';
 
     return $js;
 }
@@ -467,20 +470,21 @@ function create_ingredient_js()
  *
  * TODO: make doc
  */
-function save_recipe()
+function save_recipe( $db, $recipe )
 {
-    require_once( INCLUDE_PATH . 'database.php' );
+    $recipe_id = insert_recipe_in_db( $db, $recipe );
 
-    $recipe_id = insert_recipe_in_db();
-
-    foreach( $ingredient_list as $ingredient )
+    // var_dump( $recipe );
+    foreach( $recipe->get_ingredients() as $ingredient )
     {
+
         insert_ingredient_in_db( array(
-            'name'          => $name,
+            'name'          => $ingredient->name,
             'recipe_id'     => $recipe_id,
-            'amount'        => $amount,
-            'unit'          => $unit,
-            'cost'          => $cost
+            'food_id'       => $ingredient->food_id,
+            'amount'        => $ingredient->amt,
+            'unit'          => $ingredient->unit
+            // 'cost'          => $ingredient->cost
         ));
     }
 }
@@ -492,24 +496,87 @@ function save_recipe()
  *
  * TODO: make doc
  */
-function insert_recipe_in_db()
+function insert_recipe_in_db( $db, $recipe )
 {
-    //note that the table t_recipes will have the following columns:
-        //name
-        //recipe id
-    var_dump( $_POST['recipe_name'] );
-    insert_row('t_recipes', array(
-        'name' => $_POST['recipe_name'])
-    );
+    is_recipe_unique( $recipe );
 
-    //get id from table
-    $recipe_id = query_table( 'SELECT recipe_id FROM t_recipes WHERE name = ' . 
-        $name );
+    //if unique
+    //{
+        //Save the recipe in the db
+        $db->insert_row('t_recipes', array( 'name' => $recipe->get_name() ));
+     
+        //get the saved recipe's id from table
+        get_recipe_id( $recipe );
+    //}
+
+
+    var_dump( $recipe_id );
 
     //TODO: check if more than one name is the same, if so, return an error to 
     //user saying to choose another name
 
     return $recipe_id;
+}
+
+/*
+ * is_recipe_unique()
+ * =========================
+ *
+ * //TODO: make doc
+ */
+function is_recipe_unique( $recipe )
+{
+    //TODO: test this
+    $occurrences = 0;
+    foreach( $saved_recipes as $saved_recipe )
+    {
+        if( $saved_recipe['name'] == $recipe->get_name() )
+        {
+            $occurrences++;
+        }
+    }
+
+    if( $occurrences > 1 )
+    {
+        $error_type = 'name';
+        echo 'You already have a saved recipe by that name. ' .
+          'Please select another name';
+
+        return $error_type;
+    }
+
+    $occurrences = 0;
+    foreach( $saved_recipes as $saved_recipe )
+    {
+        if( $saved_recipe['name'] == $recipe->get_name() )
+        {
+            $occurrences++;
+        }
+    }
+
+    if( $occurrences > 1 )
+    {
+        $error_type = 'name';
+        echo 'You already have a saved recipe by that name. ' .
+          'Please select another name';
+
+        return false;
+    }
+}
+
+
+/**
+ * get_recipe_id()
+ * ===============
+ *
+ * //TODO: make doc and test
+ */
+function get_recipe_id( $recipe )
+{
+    $command = 
+        'SELECT * FROM t_recipes WHERE name = "' .  $recipe->get_name() . '"';
+
+    return $db->query_table( $command );
 }
 
 
@@ -555,24 +622,34 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
         //autocomplete for new_foods.php before doing this
     }
 
+
     else //if all the foods in the recipe are already registered
     {
         $body_html = '<h2>'.ucfirst( $_POST['recipe_name'] ).'</h2>';
         $body_html .= '<h2>Ingredient tally</h2>';
         $body_html .= make_cost_table();
+        $body_html .= '<a href="'.BASE_URL.'new_recipe.php?status=saved">'.
+            'Save that food!</a>';
+
+        $ingredient_list = json_decode( $_POST['ingredient_list'] );
+        foreach( $ingredient_list as &$ingredient )
+        {
+            $matching_saved_food = 
+                $_SESSION['saved_foods'][$ingredient->food_id];
+
+            $ingredient->calories = $matching_saved_food['calories'];
+            $ingredient->cost = $matching_saved_food['cost'];
+        }
 
         $_SESSION['current_recipe'] = 
             new Recipe( 
                 $_POST['recipe_name'], 
-                json_decode($_POST['ingredient_list']),
+                $ingredient_list,
                 $_POST['instructions'],
                 $_SESSION['total_recipe_calories'],
                 $_SESSION['total_recipe_cost']
             );
 
-        var_dump( $_SESSION['current_recipe'] );
-        $body_html .= '<a href="'.BASE_URL.'new_recipe.php?status=saved">'.
-            'Save that food!</a>';
         echo $body_html;
     }
 }
@@ -595,7 +672,8 @@ else
     else if( $_GET['status'] == 'saved' )
     {
         $body_html = "";
-        $db_error = save_recipe();
+        $db_error = 
+            save_recipe( new Database_handler(), $_SESSION['current_recipe'] );
         
         if( $db_error ){
             $body_html .= '<p>Error while saving recipe</p>';
