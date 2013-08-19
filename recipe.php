@@ -1,6 +1,8 @@
 <?php
 
-//TODO: eventually make it to where the input ingredients should be ingredients objects (child objects of food objects).  Make constructor automatically calculate calories and cost.
+//TODO: eventually make it to where the input ingredients should be ingredients 
+//objects (child objects of food objects).  Make constructor automatically 
+//calculate calories and cost.
 
 class Recipe 
 {

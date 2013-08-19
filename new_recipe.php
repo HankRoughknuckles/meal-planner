@@ -10,6 +10,7 @@ require_once( LOGIN_PATH );
 require_once( UNITS_TABLE_PATH );
 require_once( ROOT_PATH . 'recipe.php' );
 require_once( INCLUDE_PATH_BASE . 'database.php' );
+require_once( ROOT_PATH . 'ingredient.php' );
 
 session_start();
 
@@ -33,13 +34,12 @@ define( 'DEFAULT_FIELD_AMOUNT', 10 );
  * TODO: make doc
  * @return $table_html  -   the string containing the html code for the table
  */
-function make_cost_table()
+function make_cost_table( $ingredient_list )
 {
     //TODO: finish this
     require_once UNITS_TABLE_PATH;
     global $unit_to_code_table;
 
-    $ingredient_list = json_decode($_POST['ingredient_list']);
     $saved_foods = $_SESSION['saved_foods'];
 
     $table_html = '<table id="recipe_tabulation">';
@@ -81,7 +81,7 @@ function make_cost_table()
  */
 function draw_recipe_tally_row( $ingredient )
 {
-    $matching_saved_food = $_SESSION['saved_foods'][$ingredient->food_id];
+    $matching_saved_food = $_SESSION['saved_foods'][$ingredient->get_food_id()];
 
     $html = '<tr>';
     
@@ -91,30 +91,27 @@ function draw_recipe_tally_row( $ingredient )
 
     //Display food name
     $html .= '<td>';
-    $html .= $ingredient->name;
+    $html .= $ingredient->get_name();
     $html .= '</td>';
 
 
     //information about the ingredient's nutrition 
     $html .= '<td>';
-    $ingredient_calories = get_ingredient_nutrition( $ingredient );
-    $html .= round( $ingredient_calories, 1 );
+    $html .= round( $ingredient->get_calories(), 1 );
     $html .= '</td>';
     
     $html .= '<td>';
-    $ingredient_cost = get_ingredient_cost( $ingredient, $ingredient_calories, 
-        $matching_saved_food['calories'], $matching_saved_food['cost'] );
-    $html .= '$'.$ingredient_cost;
+    $html .= '$'.$ingredient->get_cost();
     $html .= '</td>';
     $html .= '</tr>';
 
-    $matching_saved_food['calories'] = $ingredient_calories;
-    $_SESSION['total_recipe_calories'] += $ingredient_calories;
+    $matching_saved_food['calories'] = $ingredient->get_calories();
+    $_SESSION['total_recipe_calories'] += $ingredient->get_calories();
 
-    $matching_saved_food['cost'] = $ingredient_cost;
-    $_SESSION['total_recipe_cost'] += $ingredient_cost;
+    $matching_saved_food['cost'] = $ingredient->get_cost();
+    $_SESSION['total_recipe_cost'] += $ingredient->get_cost();
 
-    $_SESSION['saved_foods'][$ingredient->food_id] = $matching_saved_food;
+    $_SESSION['saved_foods'][$ingredient->get_food_id()] = $matching_saved_food;
 
     return $html;
 }
@@ -136,15 +133,17 @@ function display_ingredient_amount( $ingredient )
 {
     $html = "";
 
-    $html .= '<td>'.$ingredient->amt.'</td>';
+    $html .= '<td>'.$ingredient->get_amt().'</td>';
 
-    if( $ingredient->unit == 1 OR strtolower($ingredient->unit) == "each" )
+    if( $ingredient->get_unit() == 1 
+        OR 
+        strtolower($ingredient->get_unit()) == "each" )
     {
-        $html .= '<td>'.strtolower($ingredient->unit).'</td>';
+        $html .= '<td>'.strtolower($ingredient->get_unit()).'</td>';
     }
     else
     {
-        $html .= '<td>'.strtolower($ingredient->unit).'s</td>';
+        $html .= '<td>'.strtolower($ingredient->get_unit()).'s</td>';
     }
 
 
@@ -165,7 +164,7 @@ function get_ingredient_nutrition( $ingredient )
     //$matching_saved_food is the food matching the ingredient that the user 
     //has saved in the pantry
     $matching_saved_food = $_SESSION['saved_foods'][$ingredient->food_id];
-
+    
     $ingredient_calories = fetch_food_details(
         $matching_saved_food['esha_food_id'],
         $ingredient->amt,
@@ -475,18 +474,24 @@ function save_recipe( $db, $recipe )
 {
     $recipe_id = insert_recipe_in_db( $db, $recipe );
 
-    // var_dump( $recipe );
-    foreach( $recipe->get_ingredients() as $ingredient )
+    if( $recipe_id == null )
     {
-
-        insert_ingredient_in_db( array(
-            'name'          => $ingredient->name,
-            'recipe_id'     => $recipe_id,
-            'food_id'       => $ingredient->food_id,
-            'amount'        => $ingredient->amt,
-            'unit'          => $ingredient->unit
-            // 'cost'          => $ingredient->cost
-        ));
+        //TODO: make form for entering a different recipe name
+    }
+    else
+    {
+        // var_dump( $recipe );
+        foreach( $recipe->get_ingredients() as $ingredient )
+        {
+            insert_ingredient_in_db( array(
+                'name'          => $ingredient->name,
+                'recipe_id'     => $recipe_id,
+                'food_id'       => $ingredient->food_id,
+                'amount'        => $ingredient->amt,
+                'unit'          => $ingredient->unit,
+                'cost'          => $ingredient->cost
+            ));
+        }
     }
 }
 
@@ -509,8 +514,6 @@ function insert_recipe_in_db( $db, $recipe )
      
         //get the saved recipe's id from table
         $recipe_id = get_recipe_id( $db, $recipe );
-
-        var_dump( $recipe_id );
 
         return $recipe_id;
     }
@@ -589,7 +592,6 @@ function get_recipe_id( $db, $recipe )
 
     $results = $db->query_table( $command );
 
-    var_dump( $results );
 
     if( sizeof( $results ) != 1 )
     {
@@ -622,6 +624,35 @@ function insert_ingredient_in_db()
         //calories
 }
 
+function make_ingredients_objects()
+{
+    $ingredient_list = array();
+    $posted_ingredients = json_decode( ucfirst($_POST['ingredient_list']) );
+    
+    foreach ($posted_ingredients as $posted_ingredient) 
+    {
+        $matching_saved_food = 
+            $_SESSION['saved_foods'][$posted_ingredient->food_id];
+
+        $calories = get_ingredient_nutrition( $posted_ingredient );
+
+        $ingredient_list[] = new Ingredient( array(
+            'name'          => $posted_ingredient->name,
+            'recipe_name'   => $_POST['recipe_name'],
+            'food_id'       => $posted_ingredient->food_id,
+            'calories'      => $calories,
+            'amt'           => $posted_ingredient->amt,
+            'unit'          => $posted_ingredient->unit,
+            'cost'          => get_ingredient_cost(  
+                                    $posted_ingredient, 
+                                    $calories,
+                                    $matching_saved_food['calories'], 
+                                    $matching_saved_food['cost'] )
+        ));
+    }
+
+    return $ingredient_list;
+}
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%							        	%
@@ -648,21 +679,13 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
 
     else //if all the foods in the recipe are already registered
     {
+        $ingredient_list = make_ingredients_objects();
+
         $body_html = '<h2>'.ucfirst( $_POST['recipe_name'] ).'</h2>';
         $body_html .= '<h2>Ingredient tally</h2>';
-        $body_html .= make_cost_table();
+        $body_html .= make_cost_table( $ingredient_list );
         $body_html .= '<a href="'.BASE_URL.'new_recipe.php?status=saved">'.
             'Save that food!</a>';
-
-        $ingredient_list = json_decode( $_POST['ingredient_list'] );
-        foreach( $ingredient_list as &$ingredient )
-        {
-            $matching_saved_food = 
-                $_SESSION['saved_foods'][$ingredient->food_id];
-
-            $ingredient->calories = $matching_saved_food['calories'];
-            $ingredient->cost = $matching_saved_food['cost'];
-        }
 
         $_SESSION['current_recipe'] = 
             new Recipe( 
