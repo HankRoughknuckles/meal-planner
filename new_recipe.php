@@ -119,6 +119,7 @@ function draw_recipe_tally_row( $ingredient )
     return $html;
 }
 
+
 /*
  * display_ingredient_amount()
  * ===========================
@@ -498,25 +499,60 @@ function save_recipe( $db, $recipe )
  */
 function insert_recipe_in_db( $db, $recipe )
 {
-    is_recipe_unique( $recipe );
 
-    //if unique
-    //{
+    $saved_recipes = get_recipe_names( $db );
+
+    if( is_recipe_unique( $recipe, $saved_recipes ) )
+    {
         //Save the recipe in the db
         $db->insert_row('t_recipes', array( 'name' => $recipe->get_name() ));
      
         //get the saved recipe's id from table
-        get_recipe_id( $recipe );
-    //}
+        $recipe_id = get_recipe_id( $db, $recipe );
 
+        var_dump( $recipe_id );
 
-    var_dump( $recipe_id );
+        return $recipe_id;
+    }
+    else
+    {
+        //TODO: make it display an input for another name if there already 
+        //exists a recipe with the same name
+        echo 'There is already a recipe by that name. Please enter a new ' .
+            'name for the recipe';
 
-    //TODO: check if more than one name is the same, if so, return an error to 
-    //user saying to choose another name
-
-    return $recipe_id;
+        return false;
+    }
 }
+
+
+/**
+ * get_recipe_names()
+ * ==================
+ *
+ * Searches the database for all recipes and returns a one dimensional array 
+ * containing all names of the recipes
+ *
+ * @param - $db     -   The database_handler object pointing to the proper db
+ *
+ * @returns -   $names  - The list of names of the recipes stored
+ *                          "ex: [ 'chocolate bomber', 'hummus' ]
+ */
+function get_recipe_names( $db )
+{
+    $command = 'SELECT name FROM t_recipes';
+    $results = $db->query_table( $command );
+
+    $names = array();
+
+    foreach( $results as $result )
+    {
+        $names[] = $result['name'];
+    }
+
+    return $names;
+}
+
 
 /*
  * is_recipe_unique()
@@ -524,44 +560,19 @@ function insert_recipe_in_db( $db, $recipe )
  *
  * //TODO: make doc
  */
-function is_recipe_unique( $recipe )
+function is_recipe_unique( $recipe, $recipe_list )
 {
     //TODO: test this
     $occurrences = 0;
-    foreach( $saved_recipes as $saved_recipe )
+    foreach( $recipe_list as $list_item )
     {
-        if( $saved_recipe['name'] == $recipe->get_name() )
+        if( $list_item == $recipe->get_name() )
         {
-            $occurrences++;
+            return false;
         }
     }
 
-    if( $occurrences > 1 )
-    {
-        $error_type = 'name';
-        echo 'You already have a saved recipe by that name. ' .
-          'Please select another name';
-
-        return $error_type;
-    }
-
-    $occurrences = 0;
-    foreach( $saved_recipes as $saved_recipe )
-    {
-        if( $saved_recipe['name'] == $recipe->get_name() )
-        {
-            $occurrences++;
-        }
-    }
-
-    if( $occurrences > 1 )
-    {
-        $error_type = 'name';
-        echo 'You already have a saved recipe by that name. ' .
-          'Please select another name';
-
-        return false;
-    }
+    return true;
 }
 
 
@@ -571,12 +582,24 @@ function is_recipe_unique( $recipe )
  *
  * //TODO: make doc and test
  */
-function get_recipe_id( $recipe )
+function get_recipe_id( $db, $recipe )
 {
     $command = 
         'SELECT * FROM t_recipes WHERE name = "' .  $recipe->get_name() . '"';
 
-    return $db->query_table( $command );
+    $results = $db->query_table( $command );
+
+    var_dump( $results );
+
+    if( sizeof( $results ) != 1 )
+    {
+        echo 'an error occurred in get_recipe_id().  More than one recipe '.
+            'matched the same name as the one entered.';
+    }
+    else
+    {
+        $id = $results[0]['id'];
+    }
 }
 
 

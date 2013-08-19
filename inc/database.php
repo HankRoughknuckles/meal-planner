@@ -37,7 +37,8 @@ class Database_handler
      *	name, and sql username and password specified in LOGIN_PATH
      */
     protected function open_connection(){
-	    $this->conn = new PDO( 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, SQL_USERNM, SQL_PSWD );
+	    $this->conn = new PDO( 'mysql:host=' . DB_HOST . ';dbname=' . 
+                DB_NAME, SQL_USERNM, SQL_PSWD );
     }
 
 
