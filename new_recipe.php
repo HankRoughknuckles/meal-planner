@@ -476,7 +476,7 @@ function save_recipe( $db, $recipe )
 
     if( $recipe_id == null )
     {
-        //TODO: make form for entering a different recipe name
+        return ERR_NAME_EXISTS;
     }
     else
     {
@@ -519,11 +519,6 @@ function insert_recipe_in_db( $db, $recipe )
     }
     else
     {
-        //TODO: make it display an input for another name if there already 
-        //exists a recipe with the same name
-        echo 'There is already a recipe by that name. Please enter a new ' .
-            'name for the recipe';
-
         return false;
     }
 }
@@ -723,13 +718,20 @@ else
         
         if( $db_error ){
             $body_html .= '<p>Error while saving recipe</p>';
-            $body_html .= '<p>'.$db_error.'</p>';
+
+            if ( $db_error == ERR_NAME_EXISTS ) 
+            {
+                $body_html .= '<p>There is already a recipe by that name. '.
+                    'Please enter a new name for the recipe</p>';
+            }
         }
         else
         {
             $body_html .= '<p>Recipe saved successfully!</p>';
             $body_html .= '<a href="'.BASE_URL.'/new_recipe.php">Make a new recipe</a>';
         }
+
+        echo $body_html;
     }
 }
 
