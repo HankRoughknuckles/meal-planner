@@ -27,9 +27,12 @@ define("FOOTER_PATH", 	INCLUDE_PATH . "footer.php");
 define("LOGIN_PATH",	INCLUDE_PATH . "sensitive/login.php"); 
 
 
-//path to the file that holds the nutrients lookup table for esha nutrient ID's
-define("NUTRIENTS_TABLE_PATH", 	INCLUDE_PATH . "nutrients_table.php");
+//path to the file that holds the database functions
+define("DB_PATH", 	INCLUDE_PATH . "database.php");
 
+
+//path to the file that holds the nutrients lookup table for esha nutrient ID's
+define("NUTRIENTS_TABLE_PATH", 	INCLUDE_PATH . "nutrients_table.php"); 
 
 //path to the file that holds the units lookup table for esha unit ID's
 define("UNITS_TABLE_PATH", 	INCLUDE_PATH . "units_table.php");
