@@ -62,15 +62,51 @@ function get_foods( $db )
 
 
 /**
+ * create_js_variables()
+ * =====================
+ *
+ * creates the <script> tags for javascript which will export the passed php 
+ * variables to the javascript in the page
+ *
+ * @param       - $php_vars         - an array of the following form:
+ *                                      array(
+ *                                          array( 'var_name' => php_var ),
+ *                                          ...
+ *                                      )
+ *
+ * @return      - $js           -a string with <script> tags containing the 
+ *                                  variables in json form
+ */
+function create_js_variables( $php_vars )
+{
+    $js = '<script>';
+    foreach ($php_vars as $name => $php_var) {
+        $js .= 'var '.$name.' = '.json_encode($php_var).';';
+    }
+    $js .= '</script>';
+
+    return $js;
+}
+
+
+
+/**
 * make_food_list()
 * ================
  */
 function make_food_list( $food_list )
 {
+    $html = '<ul>';
+
     foreach( $food_list as $food )
     {
-
+        $html .= '<li><a href="#" id="'.$food['name'].'">'.$food['name'].'</a></li>';
     }
+
+    $html .= '<ul>';
+
+
+    return $html;
 }
 
 
@@ -78,8 +114,14 @@ function make_food_list( $food_list )
 //                          MAIN CODE
 //=====================================================================
 
+$body_html = '';
+
 $foods = get_foods( $db );
-make_food_list( $foods );
+$body_html .= make_food_list( $foods );
+$body_html .= create_js_variables( array( 'foods' => $foods ) );
+
+echo $body_html;
+
 
 include( FOOTER_PATH ); 
 

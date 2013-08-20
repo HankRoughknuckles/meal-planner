@@ -457,7 +457,6 @@ function create_ingredient_js()
         INCLUDE_PATH_BASE .'food_recommendation.php";';
 
     $js .= '</script>';
-
     $js .= '<script src=' . RECIPE_PATH . 'new_recipe.js></script>';
 
     return $js;
