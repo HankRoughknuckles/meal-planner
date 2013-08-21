@@ -1,9 +1,9 @@
 <?php
-//TODO: implement form checking on ingredients to make sure they are not blank 
-//and also have the right format
+//TODO: implement form checking on ingredients to make sure they are not 
+//blank and also have the right format
 
-//TODO: make the ingredient tally page able to handle zero calorie ingredients 
-//for tallying costs
+//TODO: make the ingredient tally page able to handle zero calorie 
+//ingredients for tallying costs
 
 require_once("/inc/config.php");
 require_once( LOGIN_PATH );
@@ -84,7 +84,8 @@ function make_cost_table( $ingredient_list )
  */
 function draw_recipe_tally_row( $ingredient )
 {
-    $matching_saved_food = $_SESSION['saved_foods'][$ingredient->get_food_id()];
+    $matching_saved_food = 
+        $_SESSION['saved_foods'][$ingredient->get_food_id()];
 
     $html = '<tr>';
     
@@ -114,7 +115,8 @@ function draw_recipe_tally_row( $ingredient )
     $matching_saved_food['cost'] = $ingredient->get_cost();
     $_SESSION['total_recipe_cost'] += $ingredient->get_cost();
 
-    $_SESSION['saved_foods'][$ingredient->get_food_id()] = $matching_saved_food;
+    $_SESSION['saved_foods'][$ingredient->get_food_id()] =
+        $matching_saved_food;
 
     return $html;
 }
@@ -129,8 +131,8 @@ function draw_recipe_tally_row( $ingredient )
  *
  * @param $ingredient       - an object for an ingredient.  Must have the 
  *                              fields 
- *                              ->amt  (the amount of the ingredient present)
- *                              ->unit (the unit that amt is denominated in)
+ *                              ->amt  (amount of the ingredient present)
+ *                              ->unit (unit that amt is denominated in)
  */
 function display_ingredient_amount( $ingredient )
 {
@@ -164,8 +166,8 @@ function get_ingredient_nutrition( $ingredient )
 {
     global $unit_to_code_table;
 
-    //$matching_saved_food is the food matching the ingredient that the user 
-    //has saved in the pantry
+    //$matching_saved_food is the food matching the ingredient that the 
+    //user has saved in the pantry
     $matching_saved_food = $_SESSION['saved_foods'][$ingredient->food_id];
     
     $ingredient_calories = fetch_food_details(
@@ -194,9 +196,9 @@ function get_ingredient_nutrition( $ingredient )
  * ingredient amount. Uses this ratio to determine cost of using 
  * the ingredient.
  *
- *   //TODO: there's a bug here where the costs will not calculate properly if 
- *   //the ingredient's calories = 0.  Make a more robust way of finding the 
- *   //cost
+ *   //TODO: there's a bug here where the costs will not calculate 
+ *   properly if the ingredient's calories = 0.  Make a more robust way of 
+ *   finding the cost
  */
 function get_ingredient_cost( $ingredient, $ingredient_calories, 
     $saved_foods_calories, $saved_foods_cost )
@@ -209,8 +211,8 @@ function get_ingredient_cost( $ingredient, $ingredient_calories,
 
 
 /*
- * This function will handle saving unregistered foods that were entered in the 
- * recipe
+ * This function will handle saving unregistered foods that were entered 
+ * in the recipe
  */
 function save_unregistered_foods()
 {
@@ -223,16 +225,16 @@ function save_unregistered_foods()
  * get_user_pantry_foods()
  * =======================
  *
- * takes the foods that were saved in the user's pantry and returns them in an 
- * array of the form:
+ * Takes the foods that were saved in the user's pantry and returns them 
+ * in an array of the form:
  *      array(
  *          'esha_food_id_code' => {food object}
  *          ...
  *      )
  *
  * @param   - null
- * @return  - saved_foods   - the associative array containing all the food 
- *                              objects stored in the user's pantry
+ * @return  - saved_foods   - the associative array containing all the 
+ *                              food objects stored in the user's pantry
  */
 function get_user_pantry_foods()
 {
@@ -257,9 +259,10 @@ function get_user_pantry_foods()
  *
  * @param   - null
  *
- * @return  - $queried foods    - the user's foods stored in the format of the 
+ * @return  - $queried foods    - the user's foods stored in the format of 
+ *                                  the database
+ * @return  - false             - if an error occurred while polling the 
  *                                  database
- * @return  - false             - if an error occurred while polling the database
  * @return  - null              - if the user has no stored foods
  */
 function db_fetch_saved_foods()
@@ -301,8 +304,8 @@ function db_fetch_saved_foods()
  * query_has_error()
  * ===================
  *
- * sees if there is an error with the statement returned after querying the SQL 
- * db
+ * sees if there is an error with the statement returned after querying 
+ * the SQL db
  */
 function query_has_error( $statement )
 {
@@ -328,13 +331,14 @@ function query_has_error( $statement )
 function create_recipe_input()
 {
     //it should be noted that for all these inputs, the one that will 
-    //ultimately be most important is the input "ingredient_list".  It will 
-    //contain the JSON for all the information submitted to the server
+    //ultimately be most important is the input "ingredient_list".  It 
+    //will contain the JSON for all the information submitted to the 
+    //server
 
     //Recipe name
     $form_html = '<h2><label for="recipe_name">Recipe Name</h2>';
-    $form_html .= '<form name="input" action="' . BASE_URL . 'new_recipe.php' . 
-        '" method="post">'; 
+    $form_html .= '<form name="input" action="' . BASE_URL 
+        . 'new_recipe.php" method="post">'; 
     $form_html .= '<input type="text" name="recipe_name" id="recipe_name" 
         size="70">';
 
@@ -347,11 +351,12 @@ function create_recipe_input()
     $form_html .= create_ingredients_table();
 
     //Button to display more ingredients for the user to enter
-    $form_html .= '<a href=# id="more_ingredients">Add more 
-        ingredients</a>';
+    $form_html .= '<a href=# id="more_ingredients">Add more '.
+        'ingredients</a>';
 
     //Recipe instructions
-    $form_html .= '<h2><label for="instructions">Recipe Instructions</h2>';
+    $form_html .= '<h2><label for="instructions">Recipe '.
+        'Instructions</h2>';
     $form_html .= '<textarea rows="9" cols="65" name="instructions" 
         id="instructions"></textarea>'; 
     $form_html .= '<br />';
@@ -361,12 +366,13 @@ function create_recipe_input()
         portions.</p>';
 
     //Form submission
-    $form_html .= '<input type="submit" id="submit_btn" value="Save Recipe">';
+    $form_html .= '<input type="submit" id="submit_btn" value="Save '.
+        'Recipe">';
     $form_html .= '<input type="checkbox" name="save_unregistered_foods" 
-        checked>Store all new ingredients in My Pantry'; //TODO: if this is 
-        // unchecked and there are new ingredients entered, make an alert 
-        // message pop up asking them if they're sure they want to proceed 
-        // without saving the foods.
+        checked>Store all new ingredients in My Pantry'; 
+        //TODO: if this is unchecked and there are new ingredients 
+        //entered, make an alert message pop up asking them if they're 
+        //sure they want to proceed without saving the foods.
 
     $form_html .= '</form>';
 
@@ -398,21 +404,25 @@ function create_ingredients_table()
 
     for( $i = 0; $i < DEFAULT_FIELD_AMOUNT; $i++ )
     {
-	$table_html .= '<tr id="ingredient_row_' . $i . '">';
-	$table_html .= '<td><input type="text" class="recommendation jsonify" 
-            name="' . $i . '_ing_name" id="ing_' . $i . '_name"></td>';
-	$table_html .= '<td><input type="text" class="jsonify" name="' . $i . 
-            '_ing_amt" id="ing_' . $i . '_amt"></td>';
-	$table_html .= '<td>';
-        $dropdown_attr = array(
-            'class'     => 'jsonify',
-            'name'      => $i . '_ing_unit',
-            'id'        => $i . '_ing_unit'
-        );
-        $table_html .=       create_serving_units_dropdown( $dropdown_attr, 
-            $common_units );
+	    $table_html .= '<tr id="ingredient_row_' . $i . '">';
+	    $table_html .= '<td><input type="text" class="recommendation '.
+            'jsonify" name="' . $i . '_ing_name" id="ing_' . $i .
+            '_name"></td>';
+	    $table_html .= '<td><input type="text" class="jsonify" name="' .
+            $i .  '_ing_amt" id="ing_' . $i . '_amt"></td>';
+	    $table_html .= '<td>';
+            $dropdown_attr = array(
+                'class'     => 'jsonify',
+                'name'      => $i . '_ing_unit',
+                'id'        => $i . '_ing_unit'
+            );
+        $table_html .= 
+            create_serving_units_dropdown( 
+                $dropdown_attr, 
+                $common_units 
+            );
         $table_html .= '</td>';
-	$table_html .= '</tr>';
+	    $table_html .= '</tr>';
     }
     $table_html .= '</table>';
 
@@ -432,9 +442,9 @@ function create_ingredient_js()
     global $code_to_unit_table;
     $js = '<script>';
 
-    //add the units available to esha straight into the 'saved_foods' session 
-    //variable.  They are stored in an array called $available_units in the 
-    //form <esha_unit_code> => <unit name>
+    //add the units available to esha straight into the 'saved_foods' 
+    //session variable.  They are stored in an array called 
+    //$available_units in the form <esha_unit_code> => <unit name>
     foreach( $_SESSION['saved_foods'] as & $saved_food )
     {
         $food_esha_info = json_decode(stripslashes($saved_food['json_esha']) );
@@ -450,10 +460,11 @@ function create_ingredient_js()
     // numIngredients           = the number of ingredients displayed
     // unitList                 = array containing the list of common 
     //                              measurement units
-    // savedFoods               = list of the foods saved in the user's pantry
-    // foodRecommendationPath   = path to the file for ajax to call to get food 
-    //                              recommendations
-    $js .= 'var numIngredients =  '.json_encode( DEFAULT_FIELD_AMOUNT ).';';
+    // savedFoods               = list of the foods saved in the user's 
+    //                              pantry
+    // foodRecommendationPath   = path to the file for ajax to call to get 
+    //                              food recommendations
+    $js .= 'var numIngredients =  '.json_encode(DEFAULT_FIELD_AMOUNT).';';
     $js .= 'var unitList = '.json_encode( $common_units ).';';
     $js .= 'var savedFoods ='. json_encode($_SESSION['saved_foods']).';';
     $js .= 'var foodRecommendationPath = "'.
@@ -486,12 +497,12 @@ function save_recipe( $db, $recipe )
         foreach( $recipe->get_ingredients() as $ingredient )
         {
             insert_ingredient_in_db( array(
-                'name'          => $ingredient->name,
+                'name'          => $ingredient->get_name(),
                 'recipe_id'     => $recipe_id,
-                'food_id'       => $ingredient->food_id,
-                'amount'        => $ingredient->amt,
-                'unit'          => $ingredient->unit,
-                'cost'          => $ingredient->cost
+                'food_id'       => $ingredient->get_food_id(),
+                'amount'        => $ingredient->get_amt(),
+                'unit'          => $ingredient->get_unit(),
+                'cost'          => $ingredient->get_cost()
             ));
         }
     }
@@ -512,7 +523,10 @@ function insert_recipe_in_db( $db, $recipe )
     if( is_recipe_unique( $recipe, $saved_recipes ) )
     {
         //Save the recipe in the db
-        $db->insert_row('t_recipes', array( 'name' => $recipe->get_name() ));
+        $db->insert_row(
+            't_recipes',
+            array('name' => $recipe->get_name())
+        );
      
         //get the saved recipe's id from table
         $recipe_id = get_recipe_id( $db, $recipe );
@@ -521,7 +535,7 @@ function insert_recipe_in_db( $db, $recipe )
     }
     else
     {
-        return false;
+        return null;
     }
 }
 
@@ -530,12 +544,13 @@ function insert_recipe_in_db( $db, $recipe )
  * get_recipe_names()
  * ==================
  *
- * Searches the database for all recipes and returns a one dimensional array 
- * containing all names of the recipes
+ * Searches the database for all recipes and returns a one dimensional 
+ * array containing all names of the recipes
  *
- * @param - $db     -   The database_handler object pointing to the proper db
+ * @param -     $db     -   The database_handler object pointing to the 
+ *                          proper db
  *
- * @returns -   $names  - The list of names of the recipes stored
+ * @returns -   $names  -   The list of names of the recipes stored
  *                          "ex: [ 'chocolate bomber', 'hummus' ]
  */
 function get_recipe_names( $db )
@@ -585,20 +600,25 @@ function is_recipe_unique( $recipe, $recipe_list )
 function get_recipe_id( $db, $recipe )
 {
     $command = 
-        'SELECT * FROM t_recipes WHERE name = "' .  $recipe->get_name() . '"';
+        'SELECT * FROM t_recipes WHERE name = "' .  $recipe->get_name() 
+        . '"';
 
     $results = $db->query_table( $command );
 
 
     if( sizeof( $results ) != 1 )
     {
-        echo 'an error occurred in get_recipe_id().  More than one recipe '.
-            'matched the same name as the one entered.';
+        echo 'an error occurred in get_recipe_id().  More than one '.
+            'recipe matched the same name as the one entered.';
+        return null; 
+        //TODO: may need a more robust error checking solution than this
     }
     else
     {
         $id = $results[0]['id'];
     }
+
+    return $id;
 }
 
 
@@ -624,7 +644,8 @@ function insert_ingredient_in_db()
 function make_ingredients_objects()
 {
     $ingredient_list = array();
-    $posted_ingredients = json_decode( ucfirst($_POST['ingredient_list']) );
+    $posted_ingredients = 
+        json_decode( ucfirst($_POST['ingredient_list']) );
     
     foreach ($posted_ingredients as $posted_ingredient) 
     {
@@ -652,9 +673,9 @@ function make_ingredients_objects()
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//%							        	%
-//% 			        Main Code				%
-//%									%
+//%							        	                                %
+//% 			                Main Code		                        %
+//%									                                    %
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //-----------------------------------------------------------------------
 //                          POST handling
@@ -681,8 +702,8 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
         $body_html = '<h2>'.ucfirst( $_POST['recipe_name'] ).'</h2>';
         $body_html .= '<h2>Ingredient tally</h2>';
         $body_html .= make_cost_table( $ingredient_list );
-        $body_html .= '<a href="'.BASE_URL.'new_recipe.php?status=saved">'.
-            'Save that food!</a>';
+        $body_html .= '<a href="'.BASE_URL.
+            'new_recipe.php?status=saved">Save that food!</a>';
 
         $_SESSION['current_recipe'] = 
             new Recipe( 
@@ -716,21 +737,25 @@ else
     {
         $body_html = "";
         $db_error = 
-            save_recipe( new Database_handler(), $_SESSION['current_recipe'] );
+            save_recipe( 
+                new Database_handler(), 
+                $_SESSION['current_recipe'] 
+            );
         
         if( $db_error ){
             $body_html .= '<p>Error while saving recipe</p>';
 
             if ( $db_error == ERR_NAME_EXISTS ) 
             {
-                $body_html .= '<p>There is already a recipe by that name. '.
-                    'Please enter a new name for the recipe</p>';
+                $body_html .= '<p>There is already a recipe by that ' .
+                    'name. Please enter a new name for the recipe</p>';
             }
         }
         else
         {
             $body_html .= '<p>Recipe saved successfully!</p>';
-            $body_html .= '<a href="'.BASE_URL.'/new_recipe.php">Make a new recipe</a>';
+            $body_html .= '<a href="'.BASE_URL.'new_recipe.php">' .
+                'Make a new recipe</a>';
         }
 
         echo $body_html;
