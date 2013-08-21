@@ -1,9 +1,9 @@
 <?php
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%
 //%			         PATHS
 //%				
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 define("BASE_URL",		"/");
 
 
@@ -15,15 +15,18 @@ define("INCLUDE_PATH", 	ROOT_PATH . "inc/");
 define("INCLUDE_PATH_BASE", 	BASE_URL . "inc/");
 
 
-//the path to the file that contains the header that goes at the top of every file
+//the path to the file that contains the header that goes at the top of 
+//every file
 define("HEADER_PATH", 	INCLUDE_PATH . "header.php");
 
 
-//the path to the file that contains the footer that goes at the bottom of every file
+//the path to the file that contains the footer that goes at the bottom of 
+//every file
 define("FOOTER_PATH", 	INCLUDE_PATH . "footer.php");
 
 
-//the path to the file that contains sensitive login information and api keys
+//the path to the file that contains sensitive login information and api 
+//keys
 define("LOGIN_PATH",	INCLUDE_PATH . "sensitive/login.php"); 
 
 
@@ -31,7 +34,8 @@ define("LOGIN_PATH",	INCLUDE_PATH . "sensitive/login.php");
 define("DB_PATH", 	INCLUDE_PATH . "database.php");
 
 
-//path to the file that holds the nutrients lookup table for esha nutrient ID's
+//path to the file that holds the nutrients lookup table for esha nutrient 
+//ID's
 define("NUTRIENTS_TABLE_PATH", 	INCLUDE_PATH . "nutrients_table.php"); 
 
 //path to the file that holds the units lookup table for esha unit ID's
@@ -43,7 +47,8 @@ define("STYLE_PATH", 	BASE_URL . "css/style.css");
 
 
 //path to the jQuery UI source code
-define("JQUERY_UI_PATH", 	BASE_URL . "js/jquery-ui-1.10.3.custom.min.js");
+define("JQUERY_UI_PATH", 	BASE_URL 
+    . "js/jquery-ui-1.10.3.custom.min.js");
 
 
 //path to the jQuery UI style sheet
@@ -56,11 +61,11 @@ define("RECIPE_PATH", 	BASE_URL );
 
 
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%									
 //%				DATABASE INFORMATION
 //%					
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 //the name of the mySQL database
 define("DB_NAME", 	"meal_planner");
@@ -69,10 +74,10 @@ define("DB_HOST",	"localhost");
 
 
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%									
 //%				ERROR CODES
 //%					
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 define("ERR_NAME_EXISTS",	"5");

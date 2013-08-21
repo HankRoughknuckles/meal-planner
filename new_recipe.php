@@ -20,19 +20,21 @@ include( HEADER_PATH );
 
 // Define constants
 
-//the number of ingredient fields to be displayed by default on page load-up.
+//the number of ingredient fields to be displayed by default on page 
+//load-up.
 define( 'DEFAULT_FIELD_AMOUNT', 10 ); 
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//%							        	%
-//% 			        FUNCTIONS                               %
-//%									%
+//%		                                					        	%
+//% 			                FUNCTIONS                               %
+//%							                                    		%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 /**
  * TODO: make doc
- * @return $table_html  -   the string containing the html code for the table
+ * @return $table_html  -   the string containing the html code for the 
+ *                          table
  */
 function make_cost_table( $ingredient_list )
 {
@@ -63,7 +65,8 @@ function make_cost_table( $ingredient_list )
     $table_html .= 'Total:';
     $table_html .= '</td>';
     $table_html .= '<td></td>';
-    $table_html .= '<td>'.round( $_SESSION['total_recipe_calories'], 1 ).'</td>';
+    $table_html .= '<td>'.round( $_SESSION['total_recipe_calories'], 1 ).
+        '</td>';
     $table_html .= '<td>$'.$_SESSION['total_recipe_cost'].'</td>';
     $table_html .= '</tr>';
 

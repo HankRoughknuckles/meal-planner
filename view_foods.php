@@ -52,7 +52,8 @@ function get_foods( $db )
                 $code_to_unit_table[$result['serving_units_esha']],
             'cost'          => $result['cost'],
             'calories'      => $result['calories'],
-            'esha_info'     => json_decode(stripslashes($result['json_esha']))
+            'esha_info'     => json_decode(
+                                stripslashes($result['json_esha']))
         );
     }
 
@@ -65,17 +66,17 @@ function get_foods( $db )
  * create_js_variables()
  * =====================
  *
- * creates the <script> tags for javascript which will export the passed php 
- * variables to the javascript in the page
+ * creates the <script> tags for javascript which will export the passed 
+ * php variables to the javascript in the page
  *
  * @param       - $php_vars         - an array of the following form:
  *                                      array(
- *                                          array( 'var_name' => php_var ),
+ *                                          array('var_name' => php_var),
  *                                          ...
  *                                      )
  *
- * @return      - $js           -a string with <script> tags containing the 
- *                                  variables in json form
+ * @return      - $js           -a string with <script> tags containing 
+ *                                  the variables in json form
  */
 function create_js_variables( $php_vars )
 {
@@ -96,15 +97,15 @@ function create_js_variables( $php_vars )
  */
 function make_food_list( $food_list )
 {
-    $html = '<ul>';
-
+    $html = '<div id="accordion">';
+        
     foreach( $food_list as $food )
     {
-        $html .= '<li><a href="#" id="'.$food['name'].'">'.$food['name'].'</a></li>';
+        $html .= '<h3>'.$food['name'].'</h3>';
+        $html .= '<div>'.$food['name'].'</div>';
     }
 
-    $html .= '<ul>';
-
+    $html .= '</div>';
 
     return $html;
 }
@@ -120,6 +121,7 @@ $foods = get_foods( $db );
 $body_html .= make_food_list( $foods );
 $body_html .= create_js_variables( array( 'foods' => $foods ) );
 
+$body_html .= '<script src="'.BASE_URL.'view_foods.js"></script>';
 echo $body_html;
 
 
