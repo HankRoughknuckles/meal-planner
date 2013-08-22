@@ -6,8 +6,8 @@ class Ingredient //extends Food
     //fields in the food class, and then have Ingredient inherit them
     
     private $recipe_name; 
-    private $recipe_id;     //the db id for the recipe this ingredient 
-                            //belongs to
+    private $recipe_db_id;  //the database id for the recipe this 
+                            //ingredient belongs to
     private $preparation;   //the manner in which the ingredient should be 
                             // prepared, e.g.-chopped, or boiled, etc.
 
@@ -23,7 +23,7 @@ class Ingredient //extends Food
     {
         //set all the variables
         $this->recipe_name  = $input_array['recipe_name'];
-        $this->recipe_id    = $input_array['recipe_id'];
+        $this->recipe_db_id = $input_array['recipe_db_id'];
         $this->name         = $input_array['name'];
         $this->food_id      = $input_array['food_id'];
         $this->calories     = $input_array['calories'];
@@ -84,12 +84,12 @@ class Ingredient //extends Food
         $this->preparation = $val;
     }
 
-    //recipe_id
-    function get_recipe_id(){
-        return $this->recipe_id;
+    //recipe_db_id
+    function get_recipe_db_id(){
+        return $this->recipe_db_id;
     }
-    function set_recipe_id( $val ){
-        $this->recipe_id = $val;
+    function set_recipe_db_id( $val ){
+        $this->recipe_db_id = $val;
     }
 
     //recipe_name

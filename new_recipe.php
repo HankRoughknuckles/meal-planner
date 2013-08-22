@@ -505,24 +505,27 @@ function save_recipe( $db, $recipe )
 {
     $recipe_id = insert_recipe_in_db( $db, $recipe );
 
-    if( $recipe_id == null )
+    if( $recipe_id )
     {
-        return ERR_NAME_EXISTS;
-    }
-    else
-    {
+        $recipe->set_db_id( $recipe_id );
+
         // var_dump( $recipe );
         foreach( $recipe->get_ingredients() as $ingredient )
         {
-            insert_ingredient_in_db( array(
-                'name'          => $ingredient->get_name(),
-                'recipe_id'     => $recipe_id,
-                'food_id'       => $ingredient->get_food_id(),
-                'amount'        => $ingredient->get_amt(),
-                'unit'          => $ingredient->get_unit(),
-                'cost'          => $ingredient->get_cost()
-            ));
+            insert_ingredient_in_db( $ingredient );
+            //     array(
+            //     'name'          => $ingredient->get_name(),
+            //     'recipe_id'     => $ingredient->get_recipe_id(),
+            //     'food_id'       => $ingredient->get_food_id(),
+            //     'amount'        => $ingredient->get_amt(),
+            //     'unit'          => $ingredient->get_unit(),
+            //     'cost'          => $ingredient->get_cost()
+            // ));
         }
+    }
+    else
+    {
+        return ERR_NAME_EXISTS;
     }
 }
 
@@ -646,8 +649,13 @@ function get_recipe_id( $db, $recipe )
  *
  * TODO: make doc
  */
-function insert_ingredient_in_db()
+function insert_ingredient_in_db( $ingredient )
 {
+    //take in $ingredient object
+    //get db data from it
+    //insert data into db
+    //return success or failure
+    
     //note that the table t_ingredients will have the following columns:
         //name
         //ingredient id
@@ -657,6 +665,7 @@ function insert_ingredient_in_db()
         //unit
         //cost
         //calories
+
 }
 
 function make_ingredients_objects()
@@ -675,6 +684,7 @@ function make_ingredients_objects()
         $ingredient_list[] = new Ingredient( array(
             'name'          => $posted_ingredient->name,
             'recipe_name'   => $_POST['recipe_name'],
+            'recipe_db_id'  => null,
             'food_id'       => $posted_ingredient->food_id,
             'calories'      => $calories,
             'amt'           => $posted_ingredient->amt,
@@ -724,13 +734,14 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
             'new_recipe.php?status=saved">Save that food!</a>';
 
         $_SESSION['current_recipe'] = 
-            new Recipe( 
-                $_POST['recipe_name'], 
-                $ingredient_list,
-                $_POST['instructions'],
-                $_SESSION['total_recipe_calories'],
-                $_SESSION['total_recipe_cost']
-            );
+            new Recipe( array(
+                'name'          => $_POST['recipe_name'], 
+                'db_id'         => null,
+                'ingredients'   => $ingredient_list,
+                'instructions'  => $_POST['instructions'],
+                'calories'      => $_SESSION['total_recipe_calories'],
+                'cost'          => $_SESSION['total_recipe_cost']
+            ));
 
         echo $body_html;
     }
