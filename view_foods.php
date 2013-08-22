@@ -13,27 +13,20 @@ $db = new Database_handler();
 //                          FUNCTIONS
 //=====================================================================
 /**
-* make_food_list()
+* make_accordion_menu()
 * ================
+* Makes the html for the accordion menu for the list of items passed.
+*
+* @param    -   $food_list  -   an array of Food objects
+* @returns  -   $html       -   the html for the accordion list
  */
-function make_food_list( $food_list )
+function make_accordion_menu( $accordion_id, $menu_array )
 {
-    $html = '<div id="accordion">';
+    $html = '<div id="'.$accordion_id.'">';
         
-    foreach( $food_list as $food )
+    foreach( $menu_array as $heading => $contents )
     {
-        $html .= '<h3>'.$food['name'].'</h3>';
-        $html .= '<div>';
-        $html .= '<dl>';
-        $html .= '<dt><h3>'.$food['name'].'</h3></dt>';
-
-        $html .= '<dt><h4>Cost</h4></dt>';
-        $html .= '<dd>'.print_cost_table( $food ).'</dd>';
-
-        $html .= '<dt><h4>Calories</h4></dt>';
-        $html .= '<dd>'.print_calorie_table( $food ).'</dd>';
-        $html .= '</dl>';
-        $html .= '</div>';
+        $html .= '<h3>'.$heading.'</h3>';
     }
 
     $html .= '</div>';
@@ -41,6 +34,20 @@ function make_food_list( $food_list )
     return $html;
 }
 
+
+
+//TODO: FINISH THIS
+function populate_food_list( $foods )
+{
+    $food_list = array();
+
+    foreach( $foods as $food )
+    {
+        $food_list[$food['name']] = array();
+    }
+
+    return $food_list;
+}
 
 
 /**
@@ -169,7 +176,9 @@ function print_cost_sentence( $food )
 $body_html = '';
 
 $foods = $db->get_foods();
-$body_html .= make_food_list( $foods );
+$food_list = populate_food_list( $foods );
+echo '<pre>'; var_dump($food_list); echo '</pre>'; die();
+$body_html .= make_accordion_menu( 'accordion', $food_list );
 $body_html .= create_js_variables( array( 'foods' => $foods ) );
 
 $body_html .= '<script src="'.BASE_URL.'view_foods.js"></script>';
