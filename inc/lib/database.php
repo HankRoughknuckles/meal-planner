@@ -5,11 +5,6 @@ require_once "/inc/config.php";
 require_once LOGIN_PATH; 
 require_once UNITS_TABLE_PATH;
 
-//Define the error codes
-define( 'SUCCESS'	, 	0 );
-define( 'PREP_FAIL'	, 	1 );
-define( 'EXEC_FAIL'	, 	2 );
-
 class Database_handler
 {
     //%%%%%%%%%%%   FIELDS   %%%%%%%%%%%%%%
@@ -87,8 +82,8 @@ class Database_handler
         $command = substr( $command, 0, -2 ); //remove last comma
         $command .= ')';
 
-        //$formatted_params has same format as $params, but the keys (or column 
-        //names) start with a colon (:)
+        //$formatted_params has same format as $params, but the keys (or 
+        //column names) start with a colon (:)
         $formatted_params = array();    
         foreach( $params as $col => $row )
         {
@@ -99,25 +94,26 @@ class Database_handler
         $query = $this->conn->prepare( $command ); 
         if( !$query )
         {
-	    echo 'Query preparation failed! - (' . $query->errno . ') ' . 
+	        echo 'Query preparation failed! - (' . $query->errno . ') ' . 
                 $query->error;
 
             $this->close_connection();
-            return -1;
+            return PREP_FAIL;
         }
         
         //crank the parameters into the statement and execute
         $query = $query->execute( $params ); 
         if( !$query )
         {
-	    echo 'Query execution failed! - (' . $query->errno . ') ' . 
+	        echo 'Query execution failed! - (' . $query->errno . ') ' . 
                 $query->error;
 
             $this->close_connection();
-            return -1;
+            return EXEC_FAIL1;
         }
 
         $this->close_connection();
+        return SUCCESS;
     }
 
 

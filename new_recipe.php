@@ -509,19 +509,12 @@ function save_recipe( $db, $recipe )
     {
         $recipe->set_db_id( $recipe_id );
 
-        // var_dump( $recipe );
         foreach( $recipe->get_ingredients() as $ingredient )
         {
-            insert_ingredient_in_db( $ingredient );
-            //     array(
-            //     'name'          => $ingredient->get_name(),
-            //     'recipe_id'     => $ingredient->get_recipe_id(),
-            //     'food_id'       => $ingredient->get_food_id(),
-            //     'amount'        => $ingredient->get_amt(),
-            //     'unit'          => $ingredient->get_unit(),
-            //     'cost'          => $ingredient->get_cost()
-            // ));
+            $result_code = insert_ingredient_in_db( $ingredient, $db );
         }
+            
+        return $result_code;
     }
     else
     {
@@ -647,26 +640,34 @@ function get_recipe_id( $db, $recipe )
  * insert_ingredient_in_db()
  * =========================
  *
- * TODO: make doc
+ * Takes an Ingredient object and inserts its data into the specified 
+ * database.
+ *
+ * @param       - $ingredient   -   an Ingredient object
+ * @returns     - $error_code   -   SUCCESS if submitted successfully
+ *                              
+ *                                  PREP_FAIL if sql statement preparation 
+ *                                  failed
+ *
+ *                                  EXEC_FAIL - if sql couldn't execute 
+ *                                  the code
  */
-function insert_ingredient_in_db( $ingredient )
+function insert_ingredient_in_db( $ingredient, $db )
 {
-    //take in $ingredient object
-    //get db data from it
-    //insert data into db
-    //return success or failure
+    $error_code = $db->insert_row( 't_ingredients', array(
+        'recipe_id'     => $ingredient->get_recipe_db_id(),
+        'food_id'       => $ingredient->get_food_id(),
+        'name'          => $ingredient->get_name(),
+        'amount'        => $ingredient->get_amt(),
+        'unit'          => $ingredient->get_unit(),
+        'calories'      => $ingredient->get_calories(),
+        'cost'          => $ingredient->get_cost(),
+    ));
     
-    //note that the table t_ingredients will have the following columns:
-        //name
-        //ingredient id
-        //recipe id (foreign key to t_recipes table)
-        //food id (foreign key to t_foods table)
-        //amount
-        //unit
-        //cost
-        //calories
-
+    return $error_code;
 }
+
+
 
 function make_ingredients_objects()
 {
@@ -765,19 +766,27 @@ else
     else if( $_GET['status'] == 'saved' )
     {
         $body_html = "";
-        $db_error = 
+        $result_code = 
             save_recipe( 
                 new Database_handler(), 
                 $_SESSION['current_recipe'] 
             );
         
-        if( $db_error ){
+        if( $result_code != SUCCESS ){
             $body_html .= '<p>Error while saving recipe</p>';
 
-            if ( $db_error == ERR_NAME_EXISTS ) 
+            if ( $result_code == ERR_NAME_EXISTS ) 
             {
                 $body_html .= '<p>There is already a recipe by that ' .
                     'name. Please enter a new name for the recipe</p>';
+            }
+            else if ( $result_code == PREP_FAIL ) 
+            {
+                $body_html .= '<p>SQL statement preparation failed.</p>';
+            }
+            else if ( $result_code == EXEC_FAIL ) 
+            {
+                $body_html .= '<p>Executing the statement failed.</p>';
             }
         }
         else
