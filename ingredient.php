@@ -6,6 +6,8 @@ class Ingredient //extends Food
     //fields in the food class, and then have Ingredient inherit them
     
     private $recipe_name; 
+    private $recipe_id;     //the db id for the recipe this ingredient 
+                            //belongs to
     private $preparation;   //the manner in which the ingredient should be 
                             // prepared, e.g.-chopped, or boiled, etc.
 
@@ -21,6 +23,7 @@ class Ingredient //extends Food
     {
         //set all the variables
         $this->recipe_name  = $input_array['recipe_name'];
+        $this->recipe_id    = $input_array['recipe_id'];
         $this->name         = $input_array['name'];
         $this->food_id      = $input_array['food_id'];
         $this->calories     = $input_array['calories'];
@@ -33,6 +36,38 @@ class Ingredient //extends Food
 
 
     //getter and setter functions
+    //amount
+    function get_amt(){
+        return $this->amt;
+    }
+    function set_amt( $val ){
+        $this->amt = $val;
+    }
+
+    //calories
+    function get_calories(){
+        return $this->calories;
+    }
+    function set_calories( $val ){
+        $this->calories = $val;
+    }
+
+    //cost
+    function get_cost(){
+        return $this->cost;
+    }
+    function set_cost( $val ){
+        $this->cost = $val;
+    }
+
+    //food_id
+    function get_food_id(){
+        return $this->food_id;
+    }
+    function set_food_id( $val ){
+        $this->food_id = $val;
+    }
+    
     //name
     function get_name(){
         return $this->name;
@@ -49,6 +84,14 @@ class Ingredient //extends Food
         $this->preparation = $val;
     }
 
+    //recipe_id
+    function get_recipe_id(){
+        return $this->recipe_id;
+    }
+    function set_recipe_id( $val ){
+        $this->recipe_id = $val;
+    }
+
     //recipe_name
     function get_recipe_name(){
         return $this->recipe_name;
@@ -57,43 +100,11 @@ class Ingredient //extends Food
         $this->recipe_name = $val;
     }
 
-    //food_id
-    function get_food_id(){
-        return $this->food_id;
-    }
-    function set_food_id( $val ){
-        $this->food_id = $val;
-    }
-
-    //calories
-    function get_calories(){
-        return $this->calories;
-    }
-    function set_calories( $val ){
-        $this->calories = $val;
-    }
-
-    //amount
-    function get_amt(){
-        return $this->amt;
-    }
-    function set_amt( $val ){
-        $this->amt = $val;
-    }
-
     //unit
     function get_unit(){
         return $this->unit;
     }
     function set_unit( $val ){
         $this->unit = $val;
-    }
-
-    //cost
-    function get_cost(){
-        return $this->cost;
-    }
-    function set_cost( $val ){
-        $this->cost = $val;
     }
 }
