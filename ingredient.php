@@ -6,6 +6,8 @@ class Ingredient //extends Food
     //fields in the food class, and then have Ingredient inherit them
     
     private $recipe_name; 
+    private $preparation;   //the manner in which the ingredient should be 
+                            // prepared, e.g.-chopped, or boiled, etc.
 
     private $name; //port this to food
     private $food_id;//port this to Food
@@ -18,8 +20,9 @@ class Ingredient //extends Food
     public function __construct( $input_array )
     {
         //set all the variables
-        $this->name         = $input_array['name'];
         $this->recipe_name  = $input_array['recipe_name'];
+        $this->preparation  = $input_array['preparation'];
+        $this->name         = $input_array['name'];
         $this->food_id      = $input_array['food_id'];
         $this->calories     = $input_array['calories'];
         $this->amt          = $input_array['amt'];
@@ -37,6 +40,14 @@ class Ingredient //extends Food
         $this->name = $val;
     }
     
+    //preparation
+    function get_preparation(){
+        return $this->preparation;
+    }
+    function set_preparation( $val ){
+        $this->preparation = $val;
+    }
+
     //recipe_name
     function get_recipe_name(){
         return $this->recipe_name;
