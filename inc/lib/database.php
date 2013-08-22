@@ -3,6 +3,7 @@
 
 require_once "/inc/config.php";
 require_once LOGIN_PATH; 
+require_once UNITS_TABLE_PATH;
 
 //Define the error codes
 define( 'SUCCESS'	, 	0 );
@@ -11,12 +12,12 @@ define( 'EXEC_FAIL'	, 	2 );
 
 class Database_handler
 {
-//%%%%%%%%%%%   FIELDS   %%%%%%%%%%%%%%
+    //%%%%%%%%%%%   FIELDS   %%%%%%%%%%%%%%
     protected $conn; //the connection variable for the database session
     protected $command; //the actual sql query to be sent to the database
 
     
-//%%%%%%%%%%%   FUNCTIONS   %%%%%%%%%%%%%%
+    //%%%%%%%%%%%   FUNCTIONS   %%%%%%%%%%%%%%
     /**
      *	get_command()
      *	=============
@@ -150,6 +151,53 @@ class Database_handler
         return $results;
     }
 
+
+    /**
+     * get_foods()
+     * ===========
+     * Retrieve all foods from the db. Return them all in array format
+     *
+     * @param   - $db       - a Database_handler object
+     *
+     * @returns - $foods    - the array of saved foods.  Each element has 
+     *                          the following structure:
+     *                          array(
+     *                              'id',
+     *                              'esha_food_id',
+     *                              'name'
+     *                              'serving_size'
+     *                              'serving_units'
+     *                              'cost'
+     *                              'calories'
+     *                              'esha_info'
+     *                          )
+     */
+    function get_foods()
+    {
+        global $code_to_unit_table;
+        $foods = array();
+
+        $command = "SELECT * FROM t_foods";
+        $results = $this->query_table( $command );
+
+        foreach( $results as $result )
+        {
+            $foods[$result['id']] = array(
+                'id'            => $result['id'],
+                'esha_food_id'  => $result['esha_food_id'],
+                'name'          => $result['user_def_food_name'],
+                'serving_size'  => $result['serving_size'],
+                'serving_units' => 
+                    $code_to_unit_table[$result['serving_units_esha']],
+                'cost'          => $result['cost'],
+                'calories'      => $result['calories'],
+                'esha_info'     => json_decode(
+                                    stripslashes($result['json_esha']))
+            );
+        }
+
+        return $foods;
+    }
 
     /**
      *	close_connection()

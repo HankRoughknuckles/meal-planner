@@ -24,11 +24,11 @@
 //measure, etc.
 
 require_once("/inc/config.php");
-require_once( LOGIN_PATH );
-require_once( UNITS_TABLE_PATH );
-require_once( ROOT_PATH . 'recipe.php' );
-require_once( INCLUDE_PATH_BASE . 'database.php' );
-require_once( ROOT_PATH . 'ingredient.php' );
+require_once LOGIN_PATH;
+require_once UNITS_TABLE_PATH;
+require_once DB_PATH;
+require_once ROOT_PATH . 'ingredient.php';
+require_once ROOT_PATH . 'recipe.php';
 
 session_start();
 
@@ -700,7 +700,7 @@ function make_ingredients_objects()
 //-----------------------------------------------------------------------
 if( $_SERVER["REQUEST_METHOD"] == "POST")
 {
-    require_once INCLUDE_PATH . 'esha.php';
+    require_once ESHA_PATH;
 
     //After the user has submitted the information for the recipe
     if( $_POST['save_unregistered_foods'] == 'on' AND 

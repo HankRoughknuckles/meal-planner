@@ -4,8 +4,6 @@ require_once("/inc/config.php");
 $pageTitle = "Meal Planner - Index";
 include( HEADER_PATH );
 
-require_once INCLUDE_PATH . "units_table.php"; //DEBUG
-
 session_start();
 $_SESSION['user_id'] = "-1"; //TODO: implement user accounts since THIS IS JUST FOR TESTING UNTIL WE IMPLEMENT USER ACCOUNTS
 ?>

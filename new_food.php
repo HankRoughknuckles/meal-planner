@@ -15,8 +15,8 @@
 //numbers should be.
 require_once "/inc/config.php";
 require_once LOGIN_PATH;
-require_once INCLUDE_PATH . "esha.php";
-require_once INCLUDE_PATH . "database.php";
+require_once ESHA_PATH;
+require_once DB_PATH;
 require_once UNITS_TABLE_PATH;
 
 session_start();
