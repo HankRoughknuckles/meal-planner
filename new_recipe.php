@@ -5,6 +5,24 @@
 //TODO: make the ingredient tally page able to handle zero calorie 
 //ingredients for tallying costs
 
+//TODO: implement another field in the ingredient input for preparation of 
+//the ingredient.  i.e.- if the user wants chopped celery, they enter 
+//'celery' in the food name field and then 'chopped' in the preparation 
+//field.
+
+//TODO: implement a ui that shows the word output of the ingredients the 
+//user is selecting.  Example.  When the user selects a food name for the 
+//ingredient, have that section of the table slide over to the right.  In 
+//the place where the table section was, have a sentence there saying the 
+//output of the user's input.  Say for instance the user selects Egg, and 
+//then 2, and then cups.  Those inputs will slide to the right and in 
+//their original place will be a sentence that says "2 cups of eggs".  If 
+//the user modifies the "preparation" input field to say "beaten", then 
+//the sentence will then say "2 cups of beaten eggs".  Make the sentence 
+//pieces modifiable, allowing the user to click on, say the 'cups' part, 
+//and have it make a dropdown that will have all the other units of 
+//measure, etc.
+
 require_once("/inc/config.php");
 require_once( LOGIN_PATH );
 require_once( UNITS_TABLE_PATH );
