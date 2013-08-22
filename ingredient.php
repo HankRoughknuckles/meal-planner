@@ -21,13 +21,14 @@ class Ingredient //extends Food
     {
         //set all the variables
         $this->recipe_name  = $input_array['recipe_name'];
-        $this->preparation  = $input_array['preparation'];
         $this->name         = $input_array['name'];
         $this->food_id      = $input_array['food_id'];
         $this->calories     = $input_array['calories'];
         $this->amt          = $input_array['amt'];
         $this->unit         = $input_array['unit'];
         $this->cost         = $input_array['cost'];
+
+        //TODO: add constructor for preparation field
     }
 
 
