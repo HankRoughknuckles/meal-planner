@@ -82,4 +82,8 @@ define("DB_HOST",	"localhost");
 //%					
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-define("ERR_NAME_EXISTS",	"5");
+//Define the error codes
+define( 'SUCCESS'	,    	'1' );
+define( 'PREP_FAIL'	,    	'-1' );
+define( 'EXEC_FAIL'	,    	'-2' );
+define( 'ERR_NAME_EXISTS',	'5' );
