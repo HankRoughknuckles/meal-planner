@@ -1,7 +1,13 @@
 <?php
 
+//TODO: add constructor for yield and yield_unit
+
+//TODO: make an interface called Edible which contains all the things like 
+//cost, calories, name, etc. and make this implement it
+
 //TODO: eventually make it to where the input ingredients should be ingredients 
-//objects (child objects of food objects).  
+//objects (implementing the Edible interface).  
+
 //TODO: Make constructor automatically calculate calories and cost.
 
 class Recipe 
@@ -12,6 +18,9 @@ class Recipe
     protected $instructions;
     protected $calories;
     protected $cost;
+    protected $user_id; //inherit from edible interface
+    protected $yield;
+    protected $yield_unit;
 
     public function __construct( $input )
     {
@@ -29,6 +38,8 @@ class Recipe
         $this->set_instructions( $input['instructions'] );
         $this->set_calories( $input['calories'] );
         $this->set_cost( $input['cost'] );
+        $this->set_yield( 1, $input['name'] ); //fix this later
+        $this->set_user_id( USER_ID ); //fix this later
     }
 
     //getter and setter functions
@@ -87,7 +98,24 @@ class Recipe
     //instructions
     public function get_instructions() { return $this->instructions; }
 
-    public function set_instructions( $new_instructions )
-    { $this->instructions = $new_instructions; } 
+    public function set_instructions( $val )
+    { $this->instructions = $val; } 
 
+
+    //user_id
+    public function get_user_id() { return $this->user_id; }
+    public function set_user_id( $val ) { $this->user_id = $val; } 
+
+
+    //yield
+    public function get_yield() 
+    { 
+        return $this->yield.' '.$yield_unit.'(s)';
+    }
+
+    public function set_yield( $amt, $units )
+    { 
+        $this->yield = $amt; 
+        $this->yield_unit = $units;
+    } 
 }

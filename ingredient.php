@@ -1,5 +1,7 @@
 <?php
 
+//TODO: make an interface called Edible which contains all the things like 
+//cost, calories, name, etc. and make this implement it
 class Ingredient //extends Food
 {
     //note: TODO: the lines that say "port this to food" mean to make them the 

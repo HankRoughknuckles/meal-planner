@@ -1,6 +1,8 @@
 <?php
 //This file is responsible for handling database queries and commands
 
+//TODO: rename this file to database_handler.php
+
 require_once "/inc/config.php";
 require_once LOGIN_PATH; 
 require_once UNITS_TABLE_PATH;
@@ -194,6 +196,64 @@ class Database_handler
 
         return $foods;
     }
+
+
+
+    /**
+     * get_recipes()
+     * ===========
+     * Retrieve all recipes from the db. Return them all in array format
+     *
+     * @param   - $user_id    - the id number for ther user as stored in 
+     *                          the database
+     *
+     * @returns - $recipes    - the array of saved recipes.  Each element has 
+     *                          the following structure:
+     *                          array(
+     *                              'db_id',
+     *                              'name'
+     *                              'ingredients' => array( 
+     *                                  Ingredient_A,
+     *                                  Ingredient_B,
+     *                                  ...
+     *                              )
+     *                              'cost'
+     *                              'calories'
+     *                              'user_id'
+     *                          )
+     */
+    function get_recipes( $user_id )
+    {
+        //TODO: make the database store Recipe objects, and just retrieve 
+        //the object from the db instead of trying to reconstruct it from 
+        //this fragmented data
+        global $code_to_unit_table;
+        $recipes = array();
+
+        $command = 'SELECT * FROM t_recipes LEFT JOIN (t_ingredients) ON (t_recipes.id = t_ingredients.recipe_id) WHERE t_recipes.user_id = '.USER_ID;
+        $ingredients = $this->query_table( $command );
+
+        echo '<pre>'; var_dump($ingredients); echo '</pre>'; die();
+
+        foreach( $results as $result )
+        {
+            $recipes[$result['id']] = array(
+                'id'            => $result['id'],
+                'esha_food_id'  => $result['esha_food_id'],
+                'name'          => $result['user_def_food_name'],
+                'serving_size'  => $result['serving_size'],
+                'serving_units' => 
+                    $code_to_unit_table[$result['serving_units_esha']],
+                'cost'          => $result['cost'],
+                'calories'      => $result['calories'],
+                'esha_info'     => json_decode(
+                                    stripslashes($result['json_esha']))
+            );
+        }
+
+        return $recipes;
+    }
+
 
     /**
      *	close_connection()

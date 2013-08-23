@@ -113,21 +113,20 @@ function refreshJQuery()
 			    user_input: request.term
 		    },
 		    success: function( data ){
-                        // console.log("Response = %o", data); //DEBUG
-                        displayData = new Array; 
-                        //TODO: build the array to display and also the hidden
-                        //one to store the food id
+                displayData = new Array; 
+                //TODO: build the array to display and also the hidden
+                //one to store the food id
 
 
-                        //take the category and label values from the ajax
-                        //returned data, and put them into displayData
-                        $.each( data, function( index, value ){
-                            displayData.push({ 
-                                'category'  : value['category'],
-                                'label'     : value['label']
-                            });
-                        });
-			response( displayData );
+                //take the category and label values from the ajax
+                //returned data, and put them into displayData
+                $.each( data, function( index, value ){
+                    displayData.push({ 
+                        'category'  : value['category'],
+                        'label'     : value['label']
+                    });
+                });
+			    response( displayData );
 		    }
 	    });
 	},

@@ -26,7 +26,6 @@ $_SESSION['page_title'] = "New Food";
 
 //TODO: implement user accounts since THIS -1 VALUE IS JUST FOR TESTING UNTIL 
 //WE IMPLEMENT USER ACCOUNTS
-$_SESSION['user_id'] = "-1"; 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%								        	%
@@ -279,7 +278,7 @@ function save_food_in_pantry()
 	    /* 'currency'              => $currency, */
 	    'json_esha'             => $json_esha,
 	    'esha_food_id'          => $esha_food_id,
-	    'user_id'               => $user_id,
+	    'user_id'               => USER_ID,
             'calories'              => $calories
 	);
 
@@ -316,8 +315,7 @@ function import_save_food_vars()
 
     $vars = array();
 
-    $vars['user_id'] =
-        trim( $_SESSION['user_id'] ); 
+    $vars['user_id'] = USER_ID;
 
     $vars['user_def_food_name'] = 
         trim( $_POST['user_def_food_name'] ); 

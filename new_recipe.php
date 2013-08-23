@@ -302,7 +302,7 @@ function db_fetch_saved_foods()
         return false;
     }
 
-    $params = array( $_SESSION[ 'user_id' ] );
+    $params = array( USER_ID );
 
     $result = $query->execute( $params ); 
     $query_error = query_has_error( $result );

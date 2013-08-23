@@ -19,9 +19,11 @@
 function create_js_variables( $php_vars )
 {
     $js = '<script>';
+
     foreach ($php_vars as $name => $php_var) {
         $js .= 'var '.$name.' = '.json_encode($php_var).';';
     }
+
     $js .= '</script>';
 
     return $js;

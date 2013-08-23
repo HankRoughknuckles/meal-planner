@@ -8,8 +8,28 @@
 *
 * Note: this only works if the input $menu_array has 2 levels or less
 *
+*
 * @param    -   $accordion_id   -   the desired id for the accordion div
-* @param    -   $menu_array     -   an array of Food objects
+* @param    -   $menu_array     -   an array up to 2 levels deep  
+*                                   where the key of each level will be 
+*                                   the heading for that section in the 
+*                                   list
+*                                   Ex:
+*                                   array(
+*                                       'Name' => array(
+*                                           'Cost'      => 5.00
+*                                           'Calories'  => 100
+*                                       )
+*                                   )
+*
+*                                   Will have an accordion menu with one 
+*                                   item, where 'Name' will appear on the 
+*                                   button.  When the 'Name' button is 
+*                                   clicked, it will open up to reveal 
+*                                   a tiered list of items where Cost is 
+*                                   the headline of one, with the contents 
+*                                   of '5.00' and Calories is another 
+*                                   headline with the contents of '100'
 *
 * @returns  -   $html           -   the html for the accordion list
  */
@@ -38,7 +58,12 @@ function make_accordion_menu( $accordion_id, $menu_array )
         {
             $html .=        '<li><h4>'.ucfirst($sub_heading).'</h4>';
             $html .=            '<ul>';
-            $html .=                '<li>'.$sub_contents.'</li>';
+
+            foreach ($sub_contents as $sub_sub_contents) 
+            {
+                $html .=                '<li>'.$sub_sub_contents.'</li>';
+            }
+
             $html .=            '</ul>';
             $html .=        '</li>';
         }
@@ -52,6 +77,81 @@ function make_accordion_menu( $accordion_id, $menu_array )
     $html .= '</div>'; //END accordion div
 
     return $html;
+}
+
+
+
+/**
+ * print_cost_table()
+ * ==================
+ *
+ * Makes the html for a food giving the amount of the food and how much it 
+ * costs
+ */
+function print_cost_table( $edible )
+{
+    //TODO: eventually merge this into one single method with 
+    //print_calorie_table to have one flexible function that can print any 
+    //type of table
+    $amt = round( $edible['serving_size'], 2 );
+    $unit = $edible['serving_units'];
+    $cost = round($edible['cost'], 2);
+
+    if( $amt != 1 )
+    {
+        $unit .= 's';
+    }
+
+    if( strtolower($unit) == "each" OR strtolower($unit) == "eachs" )
+    {
+        $unit = '';
+    }
+
+    $table_html = '<table border="1">';
+    $table_html .= '<tr><th>Amount</th><th>Cost</th></tr>';
+    $table_html .= '<td>'.$amt.' '.$unit.'</td>';
+    $table_html .= 
+        '<td>$'.number_format( (float)$cost, 2, '.', '').'</td>';
+    $table_html .= '</table>';
+
+    return $table_html;
+}
+
+
+
+/**
+ * print_calorie_table()
+ * =====================
+ *
+ * Makes the html for a food giving the amount of the food and how many 
+ * calories it has
+ */
+function print_calorie_table( $edible )
+{
+    //TODO: eventually merge this into one single method with 
+    //print_cost_table to have one flexible function that can print any 
+    //type of table
+    $amt = round( $edible['serving_size'], 2 );
+    $unit = $edible['serving_units'];
+    $calories = round($edible['calories'], 2);
+
+    if( $amt != 1 )
+    {
+        $unit .= 's';
+    }
+
+    if( strtolower($unit) == "each" OR strtolower($unit) == "eachs" )
+    {
+        $unit = '';
+    }
+
+    $table_html = '<table border="1">';
+    $table_html .= '<tr><th>Amount</th><th>Calories</th></tr>';
+    $table_html .= '<td>'.$amt.' '.$unit.'</td>';
+    $table_html .= '<td>'.$calories.'</td>';
+    $table_html .= '</table>';
+
+    return $table_html;
 }
 
 
