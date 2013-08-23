@@ -5,6 +5,7 @@ $pageTitle = "Foods";
 include( HEADER_PATH );
 require_once DB_PATH;
 require_once LIB_PATH.'javascript.php';
+require_once LIB_PATH.'accordion.php';
 
 $db = new Database_handler();
 
@@ -12,30 +13,6 @@ $db = new Database_handler();
 //=====================================================================
 //                          FUNCTIONS
 //=====================================================================
-/**
-* make_accordion_menu()
-* ================
-* Makes the html for the accordion menu for the list of items passed.
-*
-* @param    -   $food_list  -   an array of Food objects
-* @returns  -   $html       -   the html for the accordion list
- */
-function make_accordion_menu( $accordion_id, $menu_array )
-{
-    $html = '<div id="'.$accordion_id.'">';
-        
-    foreach( $menu_array as $heading => $contents )
-    {
-        $html .= '<h3>'.$heading.'</h3>';
-    }
-
-    $html .= '</div>';
-
-    return $html;
-}
-
-
-
 //TODO: FINISH THIS
 function populate_food_list( $foods )
 {
@@ -43,7 +20,11 @@ function populate_food_list( $foods )
 
     foreach( $foods as $food )
     {
-        $food_list[$food['name']] = array();
+        $name = $food['name'];
+        $food_list[$name] = array();
+
+        $food_list[$name]['cost'] = print_cost_table($food);
+        $food_list[$name]['calories'] = print_calorie_table($food);
     }
 
     return $food_list;
@@ -79,7 +60,8 @@ function print_cost_table( $food )
     $table_html = '<table border="1">';
     $table_html .= '<tr><th>Amount</th><th>Cost</th></tr>';
     $table_html .= '<td>'.$amt.' '.$unit.'</td>';
-    $table_html .= '<td>$'.$cost.'</td>';
+    $table_html .= 
+        '<td>$'.number_format( (float)$cost, 2, '.', '').'</td>';
     $table_html .= '</table>';
 
     return $table_html;
@@ -177,8 +159,8 @@ $body_html = '';
 
 $foods = $db->get_foods();
 $food_list = populate_food_list( $foods );
-echo '<pre>'; var_dump($food_list); echo '</pre>'; die();
 $body_html .= make_accordion_menu( 'accordion', $food_list );
+// echo '<pre>'; var_dump($body_html); echo '</pre>'; die();
 $body_html .= create_js_variables( array( 'foods' => $foods ) );
 
 $body_html .= '<script src="'.BASE_URL.'view_foods.js"></script>';
