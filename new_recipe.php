@@ -539,7 +539,10 @@ function insert_recipe_in_db( $db, $recipe )
         //Save the recipe in the db
         $db->insert_row(
             't_recipes',
-            array('name' => $recipe->get_name())
+            array(
+                'name'      => $recipe->get_name(),
+                'user_id'   => USER_ID
+            )
         );
      
         //get the saved recipe's id from table
