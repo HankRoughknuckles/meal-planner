@@ -81,12 +81,26 @@ class Recipe
     }
 
 
+
+    public function ingredients_present()
+    {
+        $ingredients = $this->get_ingredients();
+        if( $ingredients == null )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+
     //getter and setter functions
     //calories
     public function get_calories() { 
         if( $this->calories == null )
         {
-            //calculate them based off the ingredients
+            //calculate calories based off the ingredients
             $calories = 0;
 
             foreach( $this->get_ingredients() as $ing )
@@ -104,7 +118,7 @@ class Recipe
     {
         if( $val == null )
         {
-            //calculate them based off the ingredients
+            //calculate calories based off the ingredients
             $calories = 0;
 
             foreach( $this->get_ingredients() as $ing )
@@ -121,10 +135,23 @@ class Recipe
     }
 
 
+
     //cost
     public function get_cost() 
     {
         //TODO: fix this up the way as was done in get_calories
+        if( $this->cost == null )
+        {
+            //calculate cost based off the ingredients
+            $cost = 0;
+
+            foreach( $this->get_ingredients() as $ing )
+            {
+                $cost += $ing->get_cost();
+            }
+
+            $this->cost = $cost;
+        }
         return $this->cost; 
     }
 
@@ -132,13 +159,20 @@ class Recipe
     { 
         if( $val == null )
         {
-            $ingredients = $this->get_ingredients();
-            //calculate them based off the ingredients
-            if( $ingredients == null )
+            if ( !ingredients_present() ) 
             {
-                $this->cost = INSUFFICIENT_DATA;
-                return;
+                return INSUFFICIENT_DATA;
             }
+            
+            //calculate cost based off the ingredients
+            $cost = 0;
+
+            foreach( $this->get_ingredients() as $ing )
+            {
+                $cost += $ing->get_cost();
+            }
+
+            $this->cost = $cost;
         }
         else
         {
