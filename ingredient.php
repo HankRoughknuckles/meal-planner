@@ -37,6 +37,28 @@ class Ingredient //extends Food
     }
 
 
+
+    /*
+     * to_string()
+     * ===========
+     *
+     * Outputs the amount, unit, and name of the ingredient in the 
+     * following form:
+     *      2 chopped onions
+     *
+     *      or
+     *
+     *      1 cup of uncooked rice
+     */
+    public function to_string()
+    {
+        //TODO: finish this
+        return $this->get_amt().' '.$this->get_unit().
+            ' of '.$this->get_name();
+    }
+
+
+
     //getter and setter functions
     //amount
     function get_amt(){

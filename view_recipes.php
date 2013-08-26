@@ -3,6 +3,7 @@ $pageTitle = "Recipes";
 
 require_once "/inc/config.php";
 require_once DB_PATH;
+require_once LIB_PATH.'accordion.php';
 
 include HEADER_PATH;
 
@@ -39,15 +40,23 @@ function populate_recipe_list( $recipes )
 
     foreach ( $recipes as $recipe ) 
     {
+        $ing_list = '';
+        $ing_strings = $recipe->get_ingredient_strings();
         $name = $recipe->get_name();
 
+        foreach ($ing_strings as $ing_string) 
+        {
+            $ing_list .= '<p>'.$ing_string.'</p>';
+        }
+
         $recipe_list[$name] = array(
-            'cost'          => print_cost_table( $recipe ),
-            'calories'      => print_calorie_table( $recipe ),
-            'ingredients'   => $recipe->get_ingredients(),
+            'cost'          => '$'.$recipe->get_cost(),
+            'calories'      => $recipe->get_calories().' kCal', //TODO: FIX THIS
+            'ingredients'   => $ing_list,
             'instructions'  => $recipe->get_instructions(),
             'yield'         => $recipe->get_yield()
         );
+
     }
 
     return $recipe_list;

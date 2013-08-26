@@ -59,9 +59,16 @@ function make_accordion_menu( $accordion_id, $menu_array )
             $html .=        '<li><h4>'.ucfirst($sub_heading).'</h4>';
             $html .=            '<ul>';
 
-            foreach ($sub_contents as $sub_sub_contents) 
+            if( is_array($sub_contents) )
             {
-                $html .=                '<li>'.$sub_sub_contents.'</li>';
+                foreach ($sub_contents as $sub_sub_contents) 
+                {
+                    $html .=            '<li>'.$sub_sub_contents.'</li>';
+                }
+            }
+            else
+            {
+                $html .=            '<li>'.$sub_contents.'</li>';
             }
 
             $html .=            '</ul>';

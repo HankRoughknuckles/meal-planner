@@ -85,7 +85,8 @@ define("USER_ID",	"-1");
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 //Define the error codes
-define( 'SUCCESS'	,    	'1' );
-define( 'PREP_FAIL'	,    	'-1' );
-define( 'EXEC_FAIL'	,    	'-2' );
-define( 'ERR_NAME_EXISTS',	'5' );
+define( 'SUCCESS'	,    	     '1' );
+define( 'PREP_FAIL'	,    	    '-1' );
+define( 'EXEC_FAIL'	,    	    '-2' );
+define( 'ERR_NAME_EXISTS',	    '-3' );
+define( 'INSUFFICIENT_DATA',    '-4' );
