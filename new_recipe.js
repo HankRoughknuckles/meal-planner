@@ -133,30 +133,30 @@ function refreshJQuery()
 	
 	
 	//TODO: eventually make this have the functionality to display a box
-        //around the text in the ingredient field if it was selected.  clicking
-        //that box will delete the food in the entry
+    //around the text in the ingredient field if it was selected.
+    //clicking that box will delete the food in the entry
 	select:
 	    function(e, ui) {
-		var nameOfSelectedFood = ui.item.value;
-                var currentIngredientIndex =
-                    $(this).attr("name").substring(0,1);
-                var matchedFood;
-                var unitsDropdownMenu = $( "#"+ currentIngredientIndex + "_ing_unit" );
+		    var nameOfSelectedFood = ui.item.value;
+            var currentIngredientIndex =
+                $(this).attr("name").substring(0,1);
+            var matchedFood;
+            var unitsDropdownMenu = $( "#"+ currentIngredientIndex + "_ing_unit" );
 
-                //TODO: find a faster way to do this
-                //find the food from the db that matches the selection
-                $.each( savedFoods, function( i, savedFood ){
-                    if( savedFood['user_def_food_name'] === nameOfSelectedFood ){
-                        matchedFood = savedFood;
-                    }
-                });
+            //TODO: find a faster way to do this
+            //find the food from the db that matches the selection
+            $.each( savedFoods, function( i, savedFood ){
+                if( savedFood['user_def_food_name'] === nameOfSelectedFood ){
+                    matchedFood = savedFood;
+                }
+            });
 
-                console.log( "matchedFood = %o", matchedFood );
+            console.log( "matchedFood = %o", matchedFood );
 
-                //remove all existing unit options and replace them with the
-                //ones that esha offers for this particular food.
-                unitsDropdownMenu.children().remove();
-                populateUnitsMenu(unitsDropdownMenu, matchedFood);
+            //remove all existing unit options and replace them with the
+            //ones that esha offers for this particular food.
+            unitsDropdownMenu.children().remove();
+            populateUnitsMenu(unitsDropdownMenu, matchedFood);
 	    }//,
 
     // change:

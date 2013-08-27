@@ -31,3 +31,33 @@ function create_js_variables( $php_vars )
 
 
 
+/**
+ * creates a string filled with script tags giving the references to other 
+ * javascript documents to be included in the file.
+ *
+ * @param   - $filenames    -   an array of the following form:
+ *                              array( 
+ *                                  "javascript_filename_1.js"
+ *                                  "javascript_filename_2.js"
+ *                                  "javascript_filename_3.js"
+ *                                  ...
+ *                              )
+ *                              note, these filenames will appear with the 
+ *                              same scope as the document calling this 
+ *                              function, so it may be safest to specify 
+ *                              the absolute file path for each file.
+ *
+ * @returns - $js           -   a string containing the <script src=".."> 
+ *                              tags for each filename given
+ */
+function create_js_references( $filenames )
+{
+    $js = '';
+
+    foreach ($filenames as $filename) 
+    {
+        $js .= '<script src="'.$filename.'"></script>';
+    }
+
+    return $js;
+}

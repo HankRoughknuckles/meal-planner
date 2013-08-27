@@ -1,4 +1,10 @@
 <?php
+//TODO: make sure that this also saves the instructions for the recipe 
+//into the db as well
+
+//TODO: make this store the Recipe object in the database, for easy 
+//retrieval and reconstruction
+
 //TODO: implement form checking on ingredients to make sure they are not 
 //blank and also have the right format
 

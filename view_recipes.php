@@ -4,6 +4,7 @@ $pageTitle = "Recipes";
 require_once "/inc/config.php";
 require_once DB_PATH;
 require_once LIB_PATH.'accordion.php';
+require_once LIB_PATH.'javascript.php';
 
 include HEADER_PATH;
 
@@ -51,7 +52,7 @@ function populate_recipe_list( $recipes )
 
         $recipe_list[$name] = array(
             'cost'          => '$'.$recipe->get_cost(),
-            'calories'      => $recipe->get_calories().' kCal', //TODO: FIX THIS
+            'calories'      => $recipe->get_calories().' kCal',
             'ingredients'   => $ing_list,
             'instructions'  => $recipe->get_instructions(),
             'yield'         => $recipe->get_yield()
@@ -69,13 +70,20 @@ function populate_recipe_list( $recipes )
 $body_html = '';
 $db = new Database_handler();
 
-//get the ingredients and put them into the accordion menu
+//get the ingredients from the database
 $recipes = $db->get_recipes( USER_ID );
+
+
+//prepare the accordion menu list and then make the accordion
+$accordion_id = 'accordion';
 $recipe_list = populate_recipe_list( $recipes );
-$body_html .= make_accordion_menu( 'accordion', $recipe_list );
+$body_html .= make_accordion_menu( $accordion_id, $recipe_list );
 
 
-$body_html .= '<script src="'.BASE_URL.'view_recipes.js"></script>';
+//prepare the javascript code
+$body_html .= create_js_variables( 
+    array('accordionId' => $accordion_id) );
+$body_html .= create_js_references( array(BASE_URL.'view_recipes.js') );
 
 
 echo $body_html;
