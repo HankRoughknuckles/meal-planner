@@ -538,27 +538,27 @@ function save_recipe( $db, $recipe )
  */
 function insert_recipe_in_db( $db, $recipe )
 {
-
     $saved_recipes = get_recipe_names( $db );
 
     if( is_recipe_unique( $recipe, $saved_recipes ) )
     {
         //Save the recipe in the db
-        $db->insert_row(
+        $result = $db->insert_row(
             't_recipes',
             array(
                 'name'          => $recipe->get_name(),
                 'user_id'       => USER_ID,
-                'instructions'  => $recipe->get_instructions(),
-                'yield'         => $recipe->get_yield(),
-                'yield_unit'    => $recipe->get_yield_unit()
+                'recipe_object' => json_encode($recipe)
             )
         );
      
-        //get the saved recipe's id from table
-        $recipe_id = get_recipe_id( $db, $recipe );
 
-        return $recipe_id;
+        if( $result != SUCCESS )
+        {
+            return null;
+        }
+
+        return $result;
     }
     else
     {
@@ -776,6 +776,7 @@ else
 
         echo create_ingredient_js();
     }
+
     else if( $_GET['status'] == 'saved' )
     {
         $body_html = "";
