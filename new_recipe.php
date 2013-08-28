@@ -387,8 +387,13 @@ function create_recipe_input()
     $form_html .= '<br />';
 
     //Recipe yield
-    $form_html .= '<p>Recipe yields <input type="text" name="meal_yield"> 
-        portions.</p>';
+    $form_html .= '<p>Recipe yields ';
+    $form_html .= '<input type="text" name="yield" value="1">';
+    $form_html .= '<input type="text" name="yield_unit" value="portion">';
+    //TODO: make javascript to make 1 and portion disappear when the user 
+    //clicks on the input
+    $form_html .= '</p>';
+
 
     //Form submission
     $form_html .= '<input type="submit" id="submit_btn" value="Save '.
@@ -506,37 +511,18 @@ function create_ingredient_js()
  * save_recipe()
  * =============
  *
- * TODO: make doc
+ * Save the passed recipe in the database.
+ *
+ * @param   - $db       - Database object for the database to store the 
+ *                          recipe in
+ * @param   - $recipe   - A Recipe object to store
+ *
+ *
+ * @returns - $result   - SUCCESS - if inserted successfully
+ *                      - Throws exception if fail
+ *                      
  */
 function save_recipe( $db, $recipe )
-{
-    $recipe_id = insert_recipe_in_db( $db, $recipe );
-
-    if( $recipe_id )
-    {
-        $recipe->set_db_id( $recipe_id );
-
-        foreach( $recipe->get_ingredients() as $ingredient )
-        {
-            $result_code = insert_ingredient_in_db( $ingredient, $db );
-        }
-            
-        return $result_code;
-    }
-    else
-    {
-        return ERR_NAME_EXISTS;
-    }
-}
-
-
-/**
- * insert_recipe_in_db()
- * =====================
- *
- * TODO: make doc
- */
-function insert_recipe_in_db( $db, $recipe )
 {
     $saved_recipes = get_recipe_names( $db );
 
@@ -548,23 +534,20 @@ function insert_recipe_in_db( $db, $recipe )
             array(
                 'name'          => $recipe->get_name(),
                 'user_id'       => USER_ID,
-                'recipe_object' => json_encode($recipe)
+                'recipe_object' => serialize( $recipe )
             )
         );
      
-
-        if( $result != SUCCESS )
-        {
-            return null;
-        }
-
         return $result;
     }
     else
     {
-        return null;
+        //TODO: extend this exception type to have its own custom error 
+        //code, etc.
+        throw new Exception('Desired recipe name already exists');
     }
 }
+
 
 
 /**
@@ -754,7 +737,10 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
                 'ingredients'   => $ingredient_list,
                 'instructions'  => $_POST['instructions'],
                 'calories'      => $_SESSION['total_recipe_calories'],
-                'cost'          => $_SESSION['total_recipe_cost']
+                'cost'          => $_SESSION['total_recipe_cost'],
+                'yield'         => $_POST['yield'],
+                'yield_unit'    => $_POST['yield_unit'],
+                'user_id'       => USER_ID
             ));
 
         echo $body_html;
@@ -786,6 +772,8 @@ else
                 $_SESSION['current_recipe'] 
             );
         
+        //TODO: change this if block to account for the exceptions that 
+        //save_recipe now throws
         if( $result_code != SUCCESS ){
             $body_html .= '<p>Error while saving recipe</p>';
 

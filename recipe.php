@@ -47,8 +47,8 @@ class Recipe
             $this->set_cost( $input['cost'] );
         }
 
-        $this->set_yield( 1, $input['name'] ); //fix this later
-        $this->set_user_id( USER_ID ); //fix this later
+        $this->set_yield( 1, $input['yield_unit'] ); 
+        $this->set_user_id( $input['user_id'] ); 
     }
 
 

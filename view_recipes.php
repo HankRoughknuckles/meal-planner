@@ -53,13 +53,13 @@ function populate_recipe_list( $recipes )
         }
 
         $recipe_list[$name] = array(
-            'cost'          => '$'.$recipe->get_cost(),
-            'calories'      => $recipe->get_calories().' kCal',
             'ingredients'   => $ing_list,
             'instructions'  => $recipe->get_instructions(),
-            'yield'         => $recipe->get_yield_string()
+            'yield'         => $recipe->get_yield_string(),
+            'cost'          => '$'.$recipe->get_cost(),
+            'calories'      => $recipe->get_calories().' kCal',
+            //TODO: put cost per portion and calories per portion here
         );
-
     }
 
     return $recipe_list;

@@ -60,7 +60,7 @@ class Database_handler
      *
      * 	        - PREP_FAIL	-If the command preparation failed
      *
-     * 		- EXEC_FAIL 	-If the command execution failed
+     * 		    - EXEC_FAIL -If the command execution failed
      */
     function insert_row( $table, $params )
     {
@@ -209,110 +209,21 @@ class Database_handler
      * @param   - $user_id    - the id number for ther user as stored in 
      *                          the database
      *
-     * @returns - $recipes    - the array of saved recipes.  Each element has 
-     *                          the following structure:
-     *                          array(
-     *                              'db_id',
-     *                              'name'
-     *                              'ingredients' => array( 
-     *                                  Ingredient_A,
-     *                                  Ingredient_B,
-     *                                  ...
-     *                              )
-     *                              'cost'
-     *                              'calories'
-     *                              'user_id'
-     *                          )
+     * @returns - $recipes    - the array of saved Recipe objects. 
      */
     function get_recipes( $user_id )
     {
-        //TODO: make the database store Recipe objects, and just retrieve 
-        //the object from the db instead of trying to reconstruct it from 
-        //this fragmented data
-        global $code_to_unit_table;
         $recipes = array();
 
-        $ingredients = $this->fetch_all_ingredients( $user_id );
-        $recipe_query_results = $this->fetch_all_recipes( $user_id );
+        $command = 'SELECT * FROM t_recipes';
+        $results = $this->query_table( $command, PDO::FETCH_UNIQUE );
 
-
-        foreach( $recipe_query_results as $result )
+        //add an element in each array that gives the recipe id and add 
+        //the database id
+        foreach( $results as $idx => $result )
         {
-            $recipes[$result['id']] = new Recipe( array(
-                'name'          => $result['name'],
-                'db_id'         => $result['id'],
-                'ingredients'   => $ingredients,
-                'instructions'  => $result['instructions'],
-                'user_id'       => $result['user_id'], 
-                'yield'         => $result['yield'],
-                'yield_unit'    => $result['yield_unit']
-            ));
-        }
-
-        return $recipes;
-    }
-
-
-    /**
-     * fetch_all_ingredients()
-     * =======================
-     *
-     * TODO: make doc
-     */
-    function fetch_all_ingredients( $user_id )
-    {
-        $command = 'SELECT t_ingredients.* FROM
-                        t_ingredients LEFT JOIN t_recipes
-                        ON
-                        (t_ingredients.recipe_id = t_recipes.id)
-                    WHERE
-                        t_recipes.user_id = '.$user_id;
-
-        $ingredients = $this->query_table( $command );
-
-        $object_list = array();
-
-        foreach( $ingredients as $ingredient )
-        {
-            $object_list[] = new Ingredient( array(
-                'recipe_name'       => null,
-                'recipe_db_id'      => $ingredient['recipe_id'],
-                'name'              => $ingredient['name'],
-                'food_id'           => $ingredient['id'],
-                'calories'          => $ingredient['calories'],
-                'amt'               => $ingredient['amount'],
-                'unit'              => $ingredient['unit'],
-                'cost'              => $ingredient['cost']
-            ));
-        }
-
-        return $object_list;
-    }
-
-
-
-    /**
-     * fetch_all_recipes()
-     * ===================
-     *
-     * TODO: make doc
-     */
-    function fetch_all_recipes( $user_id )
-    {
-        $command = 'SELECT t_recipes.* FROM
-                        t_ingredients LEFT JOIN t_recipes
-                        ON
-                        (t_ingredients.recipe_id = t_recipes.id)
-                    WHERE
-                        t_recipes.user_id = '.$user_id;
-
-        $recipes = $this->query_table( $command, PDO::FETCH_UNIQUE );
-
-
-        //add an element in each array that gives the recipe id
-        foreach( $recipes as $idx => &$recipe )
-        {
-            $recipe['id'] = $idx;
+            $recipes[$idx] = unserialize( $result['recipe_object'] );
+            $recipes[$idx]->set_db_id( $idx );
         }
 
         return $recipes;
