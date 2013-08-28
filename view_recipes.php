@@ -1,4 +1,6 @@
 <?php
+//TODO: make sure that this displays the actual yield unit that's in the 
+//database, rather than just the name of the recipe
 $pageTitle = "Recipes";
 
 require_once "/inc/config.php";
@@ -55,7 +57,7 @@ function populate_recipe_list( $recipes )
             'calories'      => $recipe->get_calories().' kCal',
             'ingredients'   => $ing_list,
             'instructions'  => $recipe->get_instructions(),
-            'yield'         => $recipe->get_yield()
+            'yield'         => $recipe->get_yield_string()
         );
 
     }

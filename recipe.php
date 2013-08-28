@@ -94,6 +94,22 @@ class Recipe
     }
 
 
+    /**
+     * get_yield_string()
+     * ==================
+     *
+     * Returns a string that contains the yield and the unit.  For 
+     * example: '3 meal(s)'
+     *
+     * @param   - null
+     * @return  - a string containing the yield and the unit that the 
+     *              yield is denominated in.
+     */
+    public function get_yield_string() 
+    { 
+        return $this->yield.' '.$this->yield_unit.'(s)';
+    }
+
 
     //getter and setter functions
     //calories
@@ -236,12 +252,30 @@ class Recipe
     //yield
     public function get_yield() 
     { 
-        return $this->yield.' '.$this->yield_unit.'(s)';
+        return $this->yield;
     }
-
-    public function set_yield( $amt, $units )
+    public function set_yield( $amt, $units = null )
     { 
         $this->yield = $amt; 
-        $this->yield_unit = $units;
+
+        if( $units )
+        {
+            $this->yield_unit = $units;
+        }
     } 
+
+
+    //yield_unit
+    function get_yield_unit(){
+        return $this->yield_unit;
+    }
+    function set_yield_unit( $val ){
+        $this->yield_unit = $val;
+    }
+    function get_yield_units(){
+        return $this->yield_unit;
+    }
+    function set_yield_units( $val ){
+        $this->yield_unit = $val;
+    }
 }

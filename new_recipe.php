@@ -1,6 +1,7 @@
 <?php
-//TODO: make sure that this also saves the instructions for the recipe 
-//into the db as well
+//TODO: change the way that this stores instructions in order to make it 
+//output a line break wherever the user puts in a line break.  (Right now, 
+//it just crams all the lines into one)
 
 //TODO: make this store the Recipe object in the database, for easy 
 //retrieval and reconstruction
@@ -546,8 +547,11 @@ function insert_recipe_in_db( $db, $recipe )
         $db->insert_row(
             't_recipes',
             array(
-                'name'      => $recipe->get_name(),
-                'user_id'   => USER_ID
+                'name'          => $recipe->get_name(),
+                'user_id'       => USER_ID,
+                'instructions'  => $recipe->get_instructions(),
+                'yield'         => $recipe->get_yield(),
+                'yield_unit'    => $recipe->get_yield_unit()
             )
         );
      
