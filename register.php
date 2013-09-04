@@ -1,6 +1,7 @@
 <?php
 require_once "/inc/config.php";
 require_once DB_PATH;
+require_once LIB_PATH.'PasswordHash.php';
 
 //Display the header
 $pageTitle = "Register";
@@ -47,7 +48,7 @@ function make_registration_form( $errors = null, $entered_info = null )
   $form_html .= display_form_error( '<tr>', array('password_syntax', 
     'password_match'), $errors );
   $form_html .= '<td><th><label for="password">Password:</th></td>';
-  $form_html .= '<td><input type="text" name="password" id="password" 
+  $form_html .= '<td><input type="password" name="password" id="password" 
     size="50"';
 
   if( isset($entered_info['password']) )
@@ -65,7 +66,7 @@ function make_registration_form( $errors = null, $entered_info = null )
     'password_match'), $errors );
   $form_html .= '<td><th><label for="password">Confirm 
     Password:</th></td>';
-  $form_html .= '<td><input type="text" name="password_conf" 
+  $form_html .= '<td><input type="password" name="password_conf" 
     id="password_conf" size="50"';
 
   if( isset($entered_info['password_conf']) )
@@ -209,10 +210,37 @@ function validate_password_match( $pass1, $pass2, $error_msgs )
 }
 
 
-//save the user and their password into the database
+/**
+ * save_user()
+ * ===========
+ *
+ * Save the user and their password into the database
+ *
+ * @param   - email     - the email address of the user 
+ * @param   - $password - the hashed password of the user
+ *
+ * @return -  $result   - true if saved successfully
+ *                      - false if not saved
+ */
 function save_user( $email, $password )
 {
+  $db = new Database_handler();
 
+  $params = array(
+    'email'     => $email,
+    'password'  => $password
+  );
+    
+  $result = $db->insert_row( 't_users', $params );
+
+  if( $result == SUCCESS )
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 
@@ -244,16 +272,23 @@ if( $_SERVER['REQUEST_METHOD'] == 'GET' )
 else if( $_SERVER['REQUEST_METHOD'] == 'POST' )
 {
   $error_msgs = validate_registration_input();
+  $body_html = '';
 
   if( sizeof($error_msgs) == 0 )
   {
-    //TODO: make the password safe
-    save_user( $email, $password );
-    //TODO: finish this
+    //TODO: make validation where the site will send an email link that 
+    //the user has to click on
+
+    $password_hasher = new PasswordHash(8, FALSE);
+    $hash = $password_hasher->HashPassword( $_POST['password'] );
+
+    save_user( $_POST['email'], $hash );
+    //TODO: get user_id, set it as _SESSION['user_id'] and redirect to 
+    //index.php
   }
   else
   {
-    $body_html = display_errors( $error_msgs );
+    $body_html .= display_errors( $error_msgs );
     $body_html .= make_registration_form( $error_msgs, $_POST );
   }
 
