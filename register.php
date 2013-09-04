@@ -169,7 +169,7 @@ function validate_email_uniqueness( $email, $error_msgs )
 {
   $db = new Database_handler();
 
-  $matches = $db->query_table('SELECT name FROM t_users WHERE name 
+  $matches = $db->query_table('SELECT email FROM t_users WHERE email 
     = "'.$email.'"');
 
   if( $matches )
