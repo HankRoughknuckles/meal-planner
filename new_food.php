@@ -5,14 +5,14 @@
 //TODO: make individual folders for URLs. (i.e. - instead of having 
 // /new_food.php, have /newFood/, or something)
 
-//TODO: make the program inform the user if there is already a food saved of 
-//the same type as what they are entering
+//TODO: make the program inform the user if there is already a food saved 
+//of the same type as what they are entering
 
-//TODO: parse the esha query results into a class that you can standardize and 
-//work with
+//TODO: parse the esha query results into a class that you can standardize 
+//and work with
 
-//TODO: implement error handling in case the user inputs a letter where only 
-//numbers should be.
+//TODO: implement error handling in case the user inputs a letter where 
+//only numbers should be.
 require_once "/inc/config.php";
 require_once LOGIN_PATH;
 require_once ESHA_PATH;
@@ -24,14 +24,14 @@ session_start();
 $_SESSION['page_title'] = "New Food";
 
 
-//TODO: implement user accounts since THIS -1 VALUE IS JUST FOR TESTING UNTIL 
-//WE IMPLEMENT USER ACCOUNTS
+//TODO: implement user accounts since THIS -1 VALUE IS JUST FOR TESTING 
+//UNTIL WE IMPLEMENT USER ACCOUNTS
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//%								        	%
-//%     			   Functions                                    %
-//%										%
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%
+//%     			                    FUNCTIONS
+//%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 /**
 *	display_page_header()
 *	=====================
@@ -54,33 +54,36 @@ function display_page_header( $inTitle )
 *   make_pantry_save_form()
 *   =========================
 *   
-*   Creates a form in HTML that has the layout for saving a food in the user's
-*   pantry. This form has information for the user to input like food name,
-*   serving size, serving units, Cost per serving size, and the currency that
+*   Creates a form in HTML that has the layout for saving a food in the 
+*   user's pantry. This form has information for the user to input like 
+*   food name, serving size, serving units, Cost per serving size, and the 
+*   currency that
 *   cost is denominated in.
 *   
-*   @param  -   $default_food_name  -   The name of the food that will show up
-*   					in the "food name" field when the page
-*   					first loads up.
+*   @param  -   $default_food_name  -   The name of the food that will 
+*                                       show up in the "food name" field 
+*                                       when the page first loads up.
 *   
 *   @param  -   $unit_list  -   an array containing the desired serving
-*   			        units to be displayed
+*   			                      units to be displayed
 *   
-*   @return -   $html_text  -   The html string that will build the save form
+*   @return -   $html_text  -   The html string that will build the save 
+*                               form
 *
 */
 function make_pantry_save_form( $default_food_name, $unit_list )
 {
-    //TODO: make this return a string that contains all the html code instead 
-    //of directly outputting it through echo.
+    //TODO: make this return a string that contains all the html code 
+    //instead of directly outputting it through echo.
     
-    //TODO: do form validation for this text input to make sure all the inputs 
-    //are in number fomat
+    //TODO: do form validation for this text input to make sure all the 
+    //inputs are in number fomat
     $html_text = '<form name="input" action="' . 
         BASE_URL . 'new_food.php' . '" method="post">';
     $html_text .= '<table>';
     $html_text .= '<tr>';
-    $html_text .= '<th><label for="user_def_food_name">Name:</label></th>';
+    $html_text .= '<th><label 
+      for="user_def_food_name">Name:</label></th>';
     $html_text .= 	    
         '<td>' . 
             '<input type="text" '.
@@ -100,7 +103,8 @@ function make_pantry_save_form( $default_food_name, $unit_list )
     $html_text .= '<tr>';
     $html_text .= '<td>';
     $html_text .= 
-        '<input type="text" name="serving_size" id="serving_size" value="1">';
+        '<input type="text" name="serving_size" id="serving_size" 
+        value="1">';
     $html_text .= '</td>'; 
     $html_text .= '<td>';
 
@@ -145,8 +149,8 @@ function make_pantry_save_form( $default_food_name, $unit_list )
 *    dropdown menu and the function will return false.
 *    
 *    @param $currencies	-	A one dimensional array containing 
-*                               the currencies that will be in the dropdown 
-*                               menu
+*                               the currencies that will be in the 
+*                               dropdown menu
 *                               Ex: $units = array("USD", "EUR", "JPY");
 *    
 *    @param $default_currency -	a string containing the currency that 
@@ -154,9 +158,11 @@ function make_pantry_save_form( $default_food_name, $unit_list )
 *                               dropdown menu
 *    
 *  
-*    @return $output -	        the corresponding html string for the dropdown menu
+*    @return $output -	        the corresponding html string for the 
+*                               dropdown menu
 */
-function create_currency_dropdown( $currencies = NULL, $default_currency = "USD" )
+function create_currency_dropdown( $currencies = NULL, $default_currency 
+  = "USD" )
 {
     //initialize the currencies array if nothing is passed as an argument
     if( $currencies == NULL )
@@ -223,8 +229,8 @@ function my_var_dump( $var_name, $variable )
  * prepare_nutrition_lookup_data()
  * ===============================
  *
- * This function prepares the data necessary to let the user view the nutrition 
- * info for the food he/she wants to store.  
+ * This function prepares the data necessary to let the user view the 
+ * nutrition info for the food he/she wants to store.  
  * In particular, this function:
  *      -finds the ESHA code for the user-specified serving units
  *      -stores the user-specified serving size in $_SESSION
@@ -252,9 +258,9 @@ function prepare_nutrition_lookup_data()
  * save_food_in_pantry()
  * ==================
  *
- * This function is called when the user has specified all the data necessary 
- * to save the new food in their pantry. This function performs form 
- * validation, and then saves the food in the SQL database
+ * This function is called when the user has specified all the data 
+ * necessary to save the new food in their pantry. This function performs 
+ * form validation, and then saves the food in the SQL database
  *
  * @param   -   null
  * @return  -   null
@@ -265,7 +271,8 @@ function save_food_in_pantry()
 
     $save_food_vars = import_save_food_vars();
     extract( $save_food_vars );
-    $save_food_vars['error_array'] = save_food_form_validation( $save_food_vars );
+    $save_food_vars['error_array'] = save_food_form_validation( 
+      $save_food_vars );
 
     // Set up and insert data into the database if there are no errors
     if( count( $save_food_vars['error_array'] ) == 0 ){
@@ -297,16 +304,19 @@ function save_food_in_pantry()
  * import_save_food_vars()
  * =======================
  *
- * imports from _POST and _SESSION the variables needed to store the selected 
- * food in the sql database
+ * imports from _POST and _SESSION the variables needed to store the 
+ * selected food in the sql database
  * 
  * user_id               = id of the user currently logged in
  * user_def_food_name    = name the user saved the food as
- * serving_size          = cost per serving size specified in $serving_size
- * serving_units_esha    = esha code for the serving units (i.e. cups, etc.)
+ * serving_size          = cost per serving size specified in 
+ *                          $serving_size
+ * serving_units_esha    = esha code for the serving units (i.e. cups, 
+ *                          etc.)
  * cost                  = money cost per serving
  * currency              = currency the cost is denominated in
- * json_esha             = the json encoded esha information about the food
+ * json_esha             = the json encoded esha information about the 
+ *                          food
  * esha_food_id          = the food id as found in the esha database
 */
 function import_save_food_vars()
@@ -347,9 +357,9 @@ function import_save_food_vars()
             ESHA_API_KEY 
         )[0]->value;
 
-    //TODO: this is just a temporary fix to make sure that no random bugs occur 
-    //if the food has 0 calories.  A more robust method should be implemented 
-    //for dealing with this problem
+    //TODO: this is just a temporary fix to make sure that no random bugs 
+    //occur if the food has 0 calories.  A more robust method should be 
+    //implemented for dealing with this problem
     if( $vars['calories'] == 0 )
     {
         $vars['calories'] = 0.001;
@@ -383,14 +393,14 @@ function import_save_food_vars()
  * save_food_form_validation()
  * ===========================
  *
- * This function checks the POST inputs from the forms when a user sends food 
- * data to be saved.  If there are any errors or blank entries, this will mark 
- * them in $error_array
+ * This function checks the POST inputs from the forms when a user sends 
+ * food data to be saved.  If there are any errors or blank entries, this 
+ * will mark them in $error_array
  *
  * @param   -   $save_food_vars     -   the POST entries to be checked
  *
- * @return  -   $error_array        -   an array containing the errors in the 
- *                                      forms
+ * @return  -   $error_array        -   an array containing the errors in 
+ *                                      the forms
  */
 function save_food_form_validation( $save_food_vars )
 {
@@ -406,8 +416,9 @@ function save_food_form_validation( $save_food_vars )
  * display_init_page()
  * ===================
  *
- * Makes the initial page that prompts the user to enter a food name to search 
- * for.  It includes a form with a text input for the user to enter a food name 
+ * Makes the initial page that prompts the user to enter a food name to 
+ * search for.  It includes a form with a text input for the user to enter 
+ * a food name 
  * along with a search button. 
  *
  * @param   -   null
@@ -423,12 +434,16 @@ function display_init_page()
 
     if( isset($error_array["name"]) AND $error_array["name"] == true )
     {
-	echo '<p>Please enter a food name</p>';
+	    echo '<p>Please enter a food name</p>';
     }
 
-    echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" method="post">';
+    echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" 
+      method="post">';
     echo '<input type="text" name="name" value="">';
-    echo '<input type="hidden" name="status" value="name_selected">'; //since there are multiple posts on this page, this field tells the site that the first stage, the food name submission stage is complete
+    echo '<input type="hidden" name="status" value="name_selected">'; 
+    //since there are multiple posts on this page, this field tells the 
+    // site that the first stage, the food name submission stage is 
+    // complete
     echo '<input type="submit" value="Find Food">';
 }
 
@@ -437,13 +452,13 @@ function display_init_page()
  * fetch_query_results()
  * =====================
  *
- * queries the ESHA database for any foods matching the passed string.  returns 
- * the ESHA formatted object that ESHA returns.
+ * queries the ESHA database for any foods matching the passed string.  
+ * returns the ESHA formatted object that ESHA returns.
  *
  * @param   -   query_str   -   the name of the food to be searched for
  *
- * @return  -   search_result   -   the ESHA formatted object with the query 
-*                                   results
+ * @return  -   search_result   -   the ESHA formatted object with the 
+ *                                  query results
  */
 function fetch_query_results( $query_str )
 {
@@ -451,8 +466,8 @@ function fetch_query_results( $query_str )
     $search_result = 
         json_decode( 
             file_get_contents( 
-                "http://api.esha.com/foods?apikey=" .  ESHA_API_KEY . "&query=" 
-                . urlencode( $query_str ) . '&spell=true' ) 
+                "http://api.esha.com/foods?apikey=" .  ESHA_API_KEY 
+                . "&query=" . urlencode( $query_str ) . '&spell=true' ) 
     ); 
 
     $search_result = $search_result->items;
@@ -466,13 +481,13 @@ function fetch_query_results( $query_str )
  * make_results_table()
  * ====================
  *
- * Displays the results of an ESHA foods query in a table. Returns the html 
- * code for the table. 
+ * Displays the results of an ESHA foods query in a table. Returns the 
+ * html code for the table. 
  * 
  * @param   -   $search_result  -   the query results from the ESHA search
  *
- * @return  -   $html           -   the html code for the table containing all 
- *                                  the results
+ * @return  -   $html           -   the html code for the table containing 
+ *                                  all the results
  */
 function make_results_table( $search_result )
 {
@@ -500,11 +515,11 @@ function make_results_table( $search_result )
 
 
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//%								        	%
-//%     			   Main code    				%
-//%										%
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%
+//%     			                     MAIN CODE
+//%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 //POST HANDLING
 if( $_SERVER["REQUEST_METHOD"] == "POST")
@@ -536,7 +551,8 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
     else if( $_POST['status'] == 'nutrition_facts' )
     {
         prepare_nutrition_lookup_data();
-        header( "Location: " . BASE_URL . "new_food.php?status=nutrition_facts" );
+        header( "Location: " . BASE_URL 
+          . "new_food.php?status=nutrition_facts" );
     }
     
     // ------------------------------------------------------------------
@@ -592,10 +608,11 @@ else if( isset($_GET['status']) AND $_GET['status'] == "find" )
 // ------------------------------------------------------------------
 else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 {
-    //TODO: use AJAX (eventually) to show nutrition facts as the user changes 
-    //the serving size on this page
+    //TODO: use AJAX (eventually) to show nutrition facts as the user 
+    //changes the serving size on this page
 
-    $_SESSION['selected_food'] = $_SESSION['matched_foods'][ $_GET['idx'] ];
+    $_SESSION['selected_food'] =
+      $_SESSION['matched_foods'][ $_GET['idx'] ];
     $selected_food = $_SESSION['selected_food'];
     var_dump($selected_food); //DEBUG
     $food_name = $selected_food->description;
@@ -608,7 +625,8 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
     //give the user the option to search for the food's nutrition facts... 
     $html_text = '<hr>';
     $html_text .= '<h3>Save the food in your pantry</h3>';
-    $html_text .= make_pantry_save_form( $selected_food->description, $units );	
+    $html_text .= 
+      make_pantry_save_form( $selected_food->description, $units );	
 
     echo $html_text;
 }
@@ -619,12 +637,14 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 // // Step 3.5 - Look at food nutrition facts
 // //
 // // ------------------------------------------------------------------
-// else if( isset($_GET['status']) AND $_GET['status'] == 'nutrition_facts' )
+// else if( isset($_GET['status']) AND $_GET['status'] == 
+// 'nutrition_facts' )
 // {
 //     //require( units_table_path );
 //     require_once( NUTRIENTS_TABLE_PATH );
 // 
-//     display_page_header( "nutrition facts - " . $_session['selected_food']->description );
+//     display_page_header( "nutrition facts 
+//     - " . $_session['selected_food']->description );
 //     $nutrition_facts = fetch_food_details( 
 // 	$_session['selected_food']->id, 
 // 	$_session['lookup_serving_size'], 
@@ -638,14 +658,18 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 //     echo 		'<th>serving size:</th>';
 // 
 //     //put the units in plural if the serving is != 1
-//     //todo: implement inch'es' instead of 'inchs'.  make the units correctly either have 's' or 'es' at the end, depending on the word
+//     //todo: implement inch'es' instead of 'inchs'.  make the units 
+//     correctly either have 's' or 'es' at the end, depending on the word
 //     if(	$_session['lookup_serving_size'] == 1 )
 //     {
-// 	echo 	'<td>' . $_session['lookup_serving_size'] . ' ' . $code_to_unit_table[ $_session['lookup_serving_units_id'] ];
+// 	echo 	'<td>' . $_session['lookup_serving_size'] 
+// 	. ' ' . $code_to_unit_table[ $_session['lookup_serving_units_id'] ];
 //     }
 //     else
 //     {
-// 	echo 	'<td>' . $_session['lookup_serving_size'] . ' ' . $code_to_unit_table[ $_session['lookup_serving_units_id'] ] . 's';
+// 	echo 	'<td>' . $_session['lookup_serving_size'] 
+// 	. ' ' . $code_to_unit_table[ $_session['lookup_serving_units_id'] 
+// 	] . 's';
 //     }
 //     echo 	'</tr>';
 // 
@@ -665,10 +689,12 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "food_selected" )
 //     echo '</table>';
 // 
 //     echo '<hr>';
-//     echo '<p>' . htmlspecialchars('if you want to save this food in your pantry, please specify how much it costs:') . '</p>';
+//     echo '<p>' . htmlspecialchars('if you want to save this food in 
+//     your pantry, please specify how much it costs:') . '</p>';
 // 
 //     $units = create_units_array( $_session['selected_food'] );
-//     make_pantry_save_form( $_session['selected_food']->description, $units );
+//     make_pantry_save_form( $_session['selected_food']->description, 
+//     $units );
 // }
 
 
