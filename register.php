@@ -115,9 +115,13 @@ function save_user( $email, $password )
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if( $_SERVER['REQUEST_METHOD'] == 'GET' & !isset($_GET['status']) )
 {
-  $body_html = make_registration_form();
-  echo $body_html;
+  if( !isset($_GET['status']) )
+  {
+    $body_html = make_registration_form();
+    echo $body_html;
+  }
 }
+
 else if( $_SERVER['REQUEST_METHOD'] == 'POST' )
 {
   extract($_POST);
