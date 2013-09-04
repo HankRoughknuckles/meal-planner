@@ -56,8 +56,8 @@ function validate_email_syntax( $email, $error_msgs )
 {
   if( !filter_var( $email, FILTER_VALIDATE_EMAIL ) )
   {
-    $error_msgs[] = 'Your email address is not valid, please enter a valid 
-      email address';
+    $error_msgs['email_syntax'] = 'Your email address is not valid, please 
+      enter a valid email address';
   }
 
   return $error_msgs;
@@ -78,8 +78,8 @@ function validate_email_uniqueness( $email, $error_msgs )
 
   if( $matches )
   {
-    $error_msgs[] = 'An email already exists with that name, please check 
-      that you have not already registered.';
+    $error_msgs['email_uniqueness'] = 'An email already exists with that 
+      name, please check that you have not already registered.';
   }
 
   return $error_msgs;
@@ -90,6 +90,11 @@ function validate_email_uniqueness( $email, $error_msgs )
 //(i.e., number of characters, etc.)
 function validate_password_syntax( $password, $error_msgs )
 {
+  if( strlen( $password ) < 5 )
+  {
+    $error_msgs['password_syntax'] = 'Please choose a password that is 
+      greater than 5 characters';
+  }
   return $error_msgs;
 }
 
@@ -126,6 +131,7 @@ else if( $_SERVER['REQUEST_METHOD'] == 'POST' )
   $error_msgs = validate_password_match( $password, $password_conf, 
     $error_msgs );
 
+  // echo '<pre>'; var_dump($error_msgs); echo '</pre>'; die(); //DEBUG
 
   if( sizeof($error_msgs) == 0 )
   {
