@@ -1,5 +1,6 @@
 <?php
-require_once("/inc/config.php");
+require_once "/inc/config.php";
+require_once DB_PATH;
 
 //Display the header
 $pageTitle = "Register";
@@ -55,7 +56,6 @@ function validate_email_syntax( $email, $error_msgs )
 {
   if( !filter_var( $email, FILTER_VALIDATE_EMAIL ) )
   {
-    echo 'Theres a problem here!';
     $error_msgs[] = 'Your email address is not valid, please enter a valid 
       email address';
   }
@@ -67,7 +67,22 @@ function validate_email_syntax( $email, $error_msgs )
 //makes sure that no other email address exists that shares the one passed
 function validate_email_uniqueness( $email, $error_msgs )
 {
+  if( !isset($_SESSION['db']) )
+  {
+    $db = new Database_handler();
+    $_SESSION['db'] = $db;
+  }
 
+  $matches = $db->query_table('SELECT name FROM t_users WHERE name 
+    = "'.$email.'"');
+
+  if( $matches )
+  {
+    $error_msgs[] = 'An email already exists with that name, please check 
+      that you have not already registered.';
+  }
+
+  return $error_msgs;
 }
 
 
@@ -75,14 +90,14 @@ function validate_email_uniqueness( $email, $error_msgs )
 //(i.e., number of characters, etc.)
 function validate_password_syntax( $password, $error_msgs )
 {
-
+  return $error_msgs;
 }
 
 
 //makes sure that the two passed passwords match eachother
 function validate_password_match( $pass1, $pass2, $error_msgs )
 {
-
+  return $error_msgs;
 }
 
 
