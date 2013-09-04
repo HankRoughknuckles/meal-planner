@@ -255,6 +255,29 @@ function display_errors( $errors )
 
   return $error_html;
 }
+
+
+/**
+ * get_user_id()
+ * =============
+ *
+ * query the db for the name that matches the passed email. return the 
+ * database id that results from the query
+ *
+ * @param   - $email  - the email address of the user
+ *
+ * @returns   - the user id if successful
+ */
+function get_user_id( $email )
+{
+  $db = new Database_handler();
+  $command = 'SELECT id FROM t_users WHERE email = "'.$email.'"';
+  $results = $db->query_table( $command );
+
+  return $results[0]['id'];
+}
+
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%		                                              					        	%
 //% 			                    MAIN CODE                                 %
@@ -283,8 +306,8 @@ else if( $_SERVER['REQUEST_METHOD'] == 'POST' )
     $hash = $password_hasher->HashPassword( $_POST['password'] );
 
     save_user( $_POST['email'], $hash );
-    //TODO: get user_id, set it as _SESSION['user_id'] and redirect to 
-    //index.php
+    $_SESSION['user_id'] = get_user_id( $_POST['email'] );
+    header( "Location: " . BASE_URL . "index.php" );
   }
   else
   {
