@@ -4,6 +4,7 @@ require_once("/inc/config.php");
 //Display the header
 $pageTitle = "Register";
 include( HEADER_PATH );
+session_start();
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%		                                              					        	%
@@ -48,6 +49,41 @@ function make_registration_form()
 }
 
 
+//validates that the email has the proper form (i.e. - xxxxxxx@xxxx.com, 
+//etc.)
+function validate_email_syntax( $email, $error_msgs )
+{
+
+}
+
+
+//makes sure that no other email address exists that shares the one passed
+function validate_email_uniqueness( $email, $error_msgs )
+{
+
+}
+
+
+//makes sure that the password matches the syntax required by the website 
+//(i.e., number of characters, etc.)
+function validate_password_syntax( $password, $error_msgs )
+{
+
+}
+
+
+//makes sure that the two passed passwords match eachother
+function validate_password_match( $pass1, $pass2, $error_msgs )
+{
+
+}
+
+
+//save the user and their password into the database
+function save_user( $email, $password )
+{
+
+}
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%		                                              					        	%
 //% 			                    MAIN CODE                                 %
@@ -55,8 +91,25 @@ function make_registration_form()
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if( $_SERVER['REQUEST_METHOD'] == 'GET' & !isset($_GET['status']) )
 {
-  $body_html = "";
-  $body_html .= make_registration_form();
+  $body_html = make_registration_form();
   echo $body_html;
 }
+else if( $_SERVER['REQUEST_METHOD'] == 'POST' )
+{
+  extract($_POST);
+  $error_msgs = array();
+  $error_msgs = validate_email_syntax( $email, $error_msgs );
+  $error_msgs = validate_email_uniqueness( $email, $error_msgs );
+  $error_msgs = validate_password_syntax( $password, $error_msgs );
+  $error_msgs = validate_password_match( $password, $password_conf, 
+    $error_msgs );
+
+  if( sizeof($error_msgs) == 0 )
+  {
+    //TODO: make the password safe
+    save_user( $email, $password );
+  }
+}
+
+
 include( FOOTER_PATH ); 
