@@ -99,6 +99,12 @@ function validate_password_syntax( $password, $error_msgs )
 //makes sure that the two passed passwords match eachother
 function validate_password_match( $pass1, $pass2, $error_msgs )
 {
+  if( $pass1 != $pass2 )
+  {
+    $error_msgs['password_match'] = 'Passwords do not match, please enter 
+      and confirm your password again.';
+  }
+
   return $error_msgs;
 }
 
@@ -113,7 +119,7 @@ function save_user( $email, $password )
 //% 			                    MAIN CODE                                 %
 //%							                                                     		%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if( $_SERVER['REQUEST_METHOD'] == 'GET' & !isset($_GET['status']) )
+if( $_SERVER['REQUEST_METHOD'] == 'GET' )
 {
   if( !isset($_GET['status']) )
   {
@@ -132,7 +138,7 @@ else if( $_SERVER['REQUEST_METHOD'] == 'POST' )
   $error_msgs = validate_password_match( $password, $password_conf, 
     $error_msgs );
 
-  // echo '<pre>'; var_dump($error_msgs); echo '</pre>'; die(); //DEBUG
+  echo '<pre>'; var_dump($error_msgs); echo '</pre>'; die(); //DEBUG
 
   if( sizeof($error_msgs) == 0 )
   {
