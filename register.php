@@ -53,7 +53,14 @@ function make_registration_form()
 //etc.)
 function validate_email_syntax( $email, $error_msgs )
 {
+  if( !filter_var( $email, FILTER_VALIDATE_EMAIL ) )
+  {
+    echo 'Theres a problem here!';
+    $error_msgs[] = 'Your email address is not valid, please enter a valid 
+      email address';
+  }
 
+  return $error_msgs;
 }
 
 
@@ -103,6 +110,7 @@ else if( $_SERVER['REQUEST_METHOD'] == 'POST' )
   $error_msgs = validate_password_syntax( $password, $error_msgs );
   $error_msgs = validate_password_match( $password, $password_conf, 
     $error_msgs );
+
 
   if( sizeof($error_msgs) == 0 )
   {
