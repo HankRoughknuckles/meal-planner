@@ -67,11 +67,7 @@ function validate_email_syntax( $email, $error_msgs )
 //makes sure that no other email address exists that shares the one passed
 function validate_email_uniqueness( $email, $error_msgs )
 {
-  if( !isset($_SESSION['db']) )
-  {
-    $db = new Database_handler();
-    $_SESSION['db'] = $db;
-  }
+  $db = new Database_handler();
 
   $matches = $db->query_table('SELECT name FROM t_users WHERE name 
     = "'.$email.'"');
@@ -81,6 +77,7 @@ function validate_email_uniqueness( $email, $error_msgs )
     $error_msgs['email_uniqueness'] = 'An email already exists with that 
       name, please check that you have not already registered.';
   }
+
 
   return $error_msgs;
 }
