@@ -291,7 +291,7 @@ else if( $_SERVER['REQUEST_METHOD'] == 'POST' )
     //TODO: make validation where the site will send an email link that 
     //the user has to click on
 
-    $password_hasher = new PasswordHash(8, FALSE);
+    $password_hasher = new PasswordHash(8, false);
     $hash = $password_hasher->HashPassword( $_POST['password'] );
 
     save_user( $_POST['email'], $hash );
