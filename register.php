@@ -16,9 +16,9 @@ session_start();
 /**
  * make_registration_form()
  * ========================
- * Makes a web form for the user to register on the website.
- * This function will also display any errors as mentioned in the $errors 
- * argument
+ * Returns the html for a web form for the user to register on the 
+ * website. This function will also display in the form any errors as 
+ * mentioned in the $errors argument
  */
 function make_registration_form( $errors = null, $entered_info = null )
 {
