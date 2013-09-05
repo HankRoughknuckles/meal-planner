@@ -2,6 +2,7 @@
 require_once "/inc/config.php";
 require_once DB_PATH;
 require_once LIB_PATH.'PasswordHash.php';
+require_once LIB_PATH.'validator.php';
 
 //Display the header
 $pageTitle = "Register";
@@ -243,18 +244,6 @@ function save_user( $email, $password )
   }
 }
 
-
-//Display the errors contained in $errors on screen
-function display_errors( $errors )
-{
-  $error_html = '';
-  foreach( $errors as $error )
-  {
-    $error_html .= '<p class="error_message">'.$error.'</p>';
-  }
-
-  return $error_html;
-}
 
 
 /**
