@@ -24,6 +24,9 @@ session_start();
  */
 function make_sign_in_form()
 {
+  //TODO: this sign_in_form() function should take in an array of errors 
+  //depending on what portion of the form was not filled out. The form 
+  //should make these invalid fields have a class of form-error
   $form_html = '<form name = "input" action="'.SIGN_IN_PATH.'" 
     method="post">';
   $form_html .= '<table>';
