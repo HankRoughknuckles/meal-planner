@@ -23,7 +23,7 @@ session_start();
 function make_registration_form( $errors = null, $entered_info = null )
 {
   $form_html = "";
-  $form_html .= '<form name = "input" action="'.BASE_URL.'register.php" 
+  $form_html .= '<form name = "input" action="'.REGISTER_PATH.'" 
     method="post">';
   $form_html .= '<table>';
 

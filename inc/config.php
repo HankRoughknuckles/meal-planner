@@ -37,6 +37,8 @@ define("FOOTER_PATH", 	INCLUDE_PATH."footer.php");
 
 //the path to the file that contains sensitive login information and api 
 //keys
+//TODO: Change this name to something that is not so similar to 
+//SIGN_IN_PATH
 define("LOGIN_PATH",	INCLUDE_PATH."sensitive/login.php"); 
 
 
@@ -61,7 +63,11 @@ define("JQUERY_UI_STYLE_PATH", 	BASE_URL .
 //path to Recipe stuff
 define("RECIPE_PATH", 	BASE_URL );
 
+//path to sign-in page
+define('SIGN_IN_PATH',  BASE_URL.'sign_in.php');
 
+//path to account registration page
+define('REGISTER_PATH',  BASE_URL.'register.php');
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%									
