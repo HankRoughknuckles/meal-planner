@@ -5,23 +5,22 @@ $pageTitle = "Meal Planner - Index";
 include( HEADER_PATH );
 
 session_start();
-$_SESSION['user_id'] = NOT_LOGGED_IN; //DEBUG
-?>
-<?php if( $_SESSION['user_id'] == NOT_LOGGED_IN ){ ?>
-<div class='login'>
+
+if( $_SESSION['user_id'] == NOT_LOGGED_IN ){ ?>
+  <div class='login'>
     <ul>
-        <li><a href="<?php echo BASE_URL ?>sign_in.php">Sign In</a></li>
-        <li><a href="<?php echo BASE_URL ?>register.php">Register</a></li>
+      <li><a href="<?php echo BASE_URL ?>sign_in.php">Sign In</a></li>
+      <li><a href="<?php echo BASE_URL ?>register.php">Register</a></li>
     </ul>
-</div> <!-- END login div -->
+  </div> <!-- END login div -->
 
 <?php } else { ?>
 
-<div class='login'>
+  <div class='login'>
     <ul>
-        <li><a href="<?php echo BASE_URL ?>sign_in.php">Sign Out</a></li>
+      <li><a href="<?php echo BASE_URL ?>sign_in.php">Sign Out</a></li>
     </ul>
-</div> <!-- END login div -->
+  </div> <!-- END login div -->
 
 <?php } ?>
 
@@ -29,10 +28,10 @@ $_SESSION['user_id'] = NOT_LOGGED_IN; //DEBUG
 
 <div class="user-actions">
 <ul>
-    <li><a href="<?php echo BASE_URL ?>new_recipe.php">New Recipe</a></li>
-    <li><a href="<?php echo BASE_URL ?>new_food.php">New Food</a></li>
-    <li><a href="<?php echo BASE_URL ?>view_foods.php">My Foods</a></li>
-    <li><a href="<?php echo BASE_URL ?>view_recipes.php">My Recipes</a></li>
+  <li><a href="<?php echo BASE_URL ?>new_recipe.php">New Recipe</a></li>
+  <li><a href="<?php echo BASE_URL ?>new_food.php">New Food</a></li>
+  <li><a href="<?php echo BASE_URL ?>view_foods.php">My Foods</a></li>
+  <li><a href="<?php echo BASE_URL ?>view_recipes.php">My Recipes</a></li>
 </ul>
 </div>
 <?php include( FOOTER_PATH ); 

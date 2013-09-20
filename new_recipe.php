@@ -1,4 +1,7 @@
 <?php
+//TODO: display another page prompting the user to log in if they haven't 
+//already done so.
+
 //TODO: change the way that this stores instructions in order to make it 
 //output a line break wherever the user puts in a line break.  (Right now, 
 //it just crams all the lines into one)
@@ -295,34 +298,40 @@ function db_fetch_saved_foods()
     //TODO: put this query method into another file as a function to keep 
     //the code DRY
     
-    $conn = new PDO( 
-        'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, 
-        SQL_USERNM, 
-        SQL_PSWD );
+  $db = new DAtabase_handler();
+  $command = 'SELECT * FROM t_foods WHERE user_id 
+    = '.$_SESSION['user_id'];
+  $results = $db->query_table( $command );
 
-    $sql = 'SELECT * FROM t_foods WHERE user_id = ?';
-    $query = $conn->prepare( $sql ); 
-    $query_error = query_has_error( $query );
-
-    if( $query_error ) 
-    {
-        return false;
-    }
-
-    $params = array( USER_ID );
-
-    $result = $query->execute( $params ); 
-    $query_error = query_has_error( $result );
-
-    if( $query_error ) 
-    {
-        return false;
-    }
-    
-    //close the connection by setting it to null
-    $conn = null; 
-
-    return $queried_foods = $query->fetchAll( PDO::FETCH_ASSOC ); 
+  return $results;
+//  $conn = new PDO( 
+//      'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, 
+//      SQL_USERNM, 
+//      SQL_PSWD );
+//
+//  $sql = 'SELECT * FROM t_foods WHERE user_id = ?';
+//  $query = $conn->prepare( $sql ); 
+//  $query_error = query_has_error( $query );
+//
+//  if( $query_error ) 
+//  {
+//      return false;
+//  }
+//
+//  $params = array( USER_ID );
+//
+//  $result = $query->execute( $params ); 
+//  $query_error = query_has_error( $result );
+//
+//  if( $query_error ) 
+//  {
+//      return false;
+//  }
+//  
+//  //close the connection by setting it to null
+//  $conn = null; 
+//
+//  return $queried_foods = $query->fetchAll( PDO::FETCH_ASSOC ); 
 }
 
 /*
@@ -336,9 +345,9 @@ function query_has_error( $statement )
 {
     if( !$statement )
     {
-	echo 'Query preparation failed! - (' . $statement->errno . ') ' . 
-            $statement->error;
-        return true;
+	    echo 'Query preparation failed! - (' . $statement['errno'] . ') 
+        ' .  $statement['error'];
+      return true;
     }
 
     return false;
