@@ -1,6 +1,7 @@
 <?php
 /*
- *	This file contians functionality for communicating with the ESHA server.
+ *	This file contians functionality for communicating with the ESHA 
+ *	server.
 */
 
 require_once "/inc/config.php";
@@ -36,67 +37,70 @@ require_once UNITS_TABLE_PATH;
 */
 function fetch_food_details( $esha_food_id, $qty, $esha_unit, $api_key)
 {
-    // use cURL to fetch from ESHA
-    $header = array(
-	"Accept: application/json",
-	"Content-Type: application/json"
+  // use cURL to fetch from ESHA
+  $header = array(
+	  "Accept: application/json",
+	  "Content-Type: application/json"
 	);
 
-    $data = json_encode(
-	array(
+  $data = json_encode(
+	  array(
 	    'items' => array(
-		'id' => $esha_food_id,  
-		'quantity' => $qty, 
-		'unit' => $esha_unit 
+		    'id' => $esha_food_id,  
+		    'quantity' => $qty, 
+		    'unit' => $esha_unit 
 	    )
-	)
-    );
+	  )
+  );
 
-    //initialize cURL with the ESHA URL 
+  //initialize cURL with the ESHA URL 
 
-    $ch = curl_init( "http://api.esha.com/analysis?apikey=" . $api_key ); 	   
-    
-    // CURLOPT_POST = 1             -- specify that it will be a POST request
-    // CURLOPT_HTTPHEADER = $header -- insert the proper header defined above	
-    // CURLOPT_POSTFIELDS = $data   -- the data to be sent in JSON format
-    // CURLOPT_FOLLOWLOCATION = 0   -- do not go to any LOCATION: header that 
-    //                                  the server sends back
-    // CURLOPT_HEADER = 1           -- make the response return http headers
-    // CURLOPT_RETURNTRANSFER = 1   -- make the response return the contents of 
-    //                                  the call
-    // CURLOPT_VERBOSE = 1          -- make the response verbose.  
-    //                                  FOR DEBUGGING PURPOSES
-    curl_setopt($ch, CURLOPT_POST,		1); 		    
-    curl_setopt($ch, CURLOPT_HTTPHEADER,	$header);	
-    curl_setopt($ch, CURLOPT_POSTFIELDS,	$data); 	
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION,	0); 		
-    curl_setopt($ch, CURLOPT_HEADER,		1);  	
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER,	1);  		
-    curl_setopt($ch, CURLOPT_VERBOSE,	        1);  		
+  $ch = curl_init( "http://api.esha.com/analysis?apikey=" . $api_key ); 	   
 
-    $response = curl_exec( $ch );
+  // CURLOPT_POST = 1             -- specify that it will be a POST 
+  //                                  request
+  // CURLOPT_HTTPHEADER = $header -- insert the proper header defined 
+  //                                  above	
+  // CURLOPT_POSTFIELDS = $data   -- the data to be sent in JSON format
+  // CURLOPT_FOLLOWLOCATION = 0   -- do not go to any LOCATION: header 
+  //                                  that the server sends back
+  // CURLOPT_HEADER = 1           -- make the response return http headers
+  // CURLOPT_RETURNTRANSFER = 1   -- make the response return the contents 
+  //                                  of the call
+  // CURLOPT_VERBOSE = 1          -- make the response verbose.  
+  //                                  FOR DEBUGGING PURPOSES
+  curl_setopt($ch, CURLOPT_POST,		        1); 		    
+  curl_setopt($ch, CURLOPT_HTTPHEADER,	    $header);	
+  curl_setopt($ch, CURLOPT_POSTFIELDS,	    $data); 	
+  curl_setopt($ch, CURLOPT_FOLLOWLOCATION,	0); 		
+  curl_setopt($ch, CURLOPT_HEADER,		      1);  	
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER,	1);  		
+  curl_setopt($ch, CURLOPT_VERBOSE,	        1);  		
 
-    //if the database didn't return anything properly, give a fatal error
-    //the conditional has the strpos() > 25 to prevent the response body from 
-    //containing "200 OK" and potentially allowing the program to continue
-    if ( strpos( $response, "200 OK" ) == false 	
-        OR strpos( $response, "200 OK" ) > 25 )
-    {
-        echo 'ESHA Query Error: Response code: '.$response.
-            '.  Printing stack backtrace';
-        var_dump( debug_backtrace() );
-	die(); //TODO: handle this more gracefully.  have some kind of error handling
+  $response = curl_exec( $ch );
 
-    }
+  //if the database didn't return anything properly, give a fatal error
+  //the conditional has the strpos() > 25 to prevent the response body 
+  //from containing "200 OK" and potentially allowing the program to 
+  //continue
+  if ( strpos( $response, "200 OK" ) == false 	
+    OR strpos( $response, "200 OK" ) > 25 )
+  {
+    echo 'ESHA Query Error: Response code: '.$response.
+      '.  Printing stack backtrace';
+    var_dump( debug_backtrace() );
+	  die(); //TODO: handle this more gracefully.  use error handling
 
-    //knock off the html headers and start at the beginning of the actual query 
-    //results (note: they're in JSON so we have to decode them)
-    $foods = substr( $response, strpos($response, '{"items":') );
-    $foods = json_decode( $foods );
+  }
 
-    $details = $foods->results;
+  //knock off the html headers and start at the beginning of the actual 
+  //query results (note: they're in JSON so we have to decode them)
+  $foods = substr( $response, strpos($response, '{"items":') );
+  $foods = json_decode( $foods );
 
-    return $details;
+  $details = $foods->results;
+
+  return $details;
 }
 
 
@@ -135,8 +139,9 @@ function create_units_array ( $food )
  * 	get_common_units()
  *  ==================  
  *
- *  fetches all "common" unit types and returns a 1-dimensional, non-associative array of them.
- *  The 
+ *  fetches all "common" unit types and returns a 1-dimensional, 
+ *  non-associative array of them.  Examples: 'cups', 'tablespoons', 
+ *  'lbs', etc.
 */
 function get_common_units()
 {
