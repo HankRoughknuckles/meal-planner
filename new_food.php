@@ -321,70 +321,68 @@ function save_food_in_pantry()
 */
 function import_save_food_vars()
 {
-    include UNITS_TABLE_PATH;
+  include UNITS_TABLE_PATH;
 
-    $vars = array();
+  $vars = array();
 
-    $vars['user_id'] = USER_ID;
+  $vars['user_id'] = USER_ID;
 
-    $vars['user_def_food_name'] = 
-        trim( $_POST['user_def_food_name'] ); 
+  $vars['user_def_food_name'] = 
+    trim( $_POST['user_def_food_name'] ); 
 
-    $vars['serving_size'] = 
-        $_POST['serving_size'];
+  $vars['serving_size'] = 
+    $_POST['serving_size'];
 
-    $vars['serving_units_esha'] = 
-        $unit_to_code_table[ trim( $_POST['serving_units'] ) ];
+  $vars['serving_units_esha'] = 
+    $unit_to_code_table[ trim( $_POST['serving_units'] ) ];
 
-    $vars['cost'] = 
-        $_POST['cost']; 
+  $vars['cost'] = 
+    $_POST['cost']; 
 
-    // $vars['currency'] = 
-    //     trim( $_POST['currency'] );
+  $vars['json_esha'] = 
+    addslashes( json_encode( $_SESSION['selected_food'] ) ); 
 
-    $vars['json_esha'] = 
-        addslashes( json_encode( $_SESSION['selected_food'] ) ); 
-
-    $vars['esha_food_id'] = 
-        trim( $_SESSION['selected_food']->id ); 
+  $vars['esha_food_id'] = 
+    trim( $_SESSION['selected_food']->id ); 
 
 
-    $vars['calories'] = 
-        fetch_food_details( 
-            $vars['esha_food_id'],
-            $vars['serving_size'],
-            $vars['serving_units_esha'],
-            ESHA_API_KEY 
-        )[0]->value;
+  $food_details = 
+    fetch_food_details( 
+      $vars['esha_food_id'],
+      $vars['serving_size'],
+      $vars['serving_units_esha'],
+      ESHA_API_KEY 
+    );
+  $vars['calories'] = $food_details[0]->value;
 
-    //TODO: this is just a temporary fix to make sure that no random bugs 
-    //occur if the food has 0 calories.  A more robust method should be 
-    //implemented for dealing with this problem
-    if( $vars['calories'] == 0 )
-    {
-        $vars['calories'] = 0.001;
-    }
+  //TODO: this is just a temporary fix to make sure that no random bugs 
+  //occur if the food has 0 calories.  A more robust method should be 
+  //implemented for dealing with this problem
+  if( $vars['calories'] == 0 )
+  {
+    $vars['calories'] = 0.001;
+  }
 
 
-    // replace any blank fields with NULL instead
-    if( $vars['user_def_food_name'] == "" ){
-	$vars['user_def_food_name'] = NULL;
-    }
-    if( $vars['serving_size'] == "" ){
-	$vars['serving_size'] = NULL;
-    }
-    if( $vars['serving_units_esha'] == "" ){
-	$vars['serving_units_esha'] = NULL;
-    }
-    if( $vars['cost'] == "" ){
-	$vars['cost'] = NULL;
-    }
-    // if( $vars['currency'] == "" ){
+  // replace any blank fields with NULL instead
+  if( $vars['user_def_food_name'] == "" ){
+	  $vars['user_def_food_name'] = NULL;
+  }
+  if( $vars['serving_size'] == "" ){
+	  $vars['serving_size'] = NULL;
+  }
+  if( $vars['serving_units_esha'] == "" ){
+	  $vars['serving_units_esha'] = NULL;
+  }
+  if( $vars['cost'] == "" ){
+	  $vars['cost'] = NULL;
+  }
+  // if( $vars['currency'] == "" ){
 	$vars['currency'] = NULL;
-    // }
+  // }
 
 
-    return $vars;
+  return $vars;
 }
 
 

@@ -198,12 +198,13 @@ function get_ingredient_nutrition( $ingredient )
     //user has saved in the pantry
     $matching_saved_food = $_SESSION['saved_foods'][$ingredient->food_id];
     
-    $ingredient_calories = fetch_food_details(
-        $matching_saved_food['esha_food_id'],
-        $ingredient->amt,
-        $unit_to_code_table[ $ingredient->unit ],
-        ESHA_API_KEY
-    )[0]->value;
+    $food_details = fetch_food_details(
+      $matching_saved_food['esha_food_id'],
+      $ingredient->amt,
+      $unit_to_code_table[ $ingredient->unit ],
+      ESHA_API_KEY
+    );
+    $ingredient_calories = $food_details[0]->value;
 
 
     //to prevent divide by zero errors
