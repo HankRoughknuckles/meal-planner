@@ -24,9 +24,6 @@ session_start();
 $_SESSION['page_title'] = "New Food";
 
 
-//TODO: implement user accounts since THIS -1 VALUE IS JUST FOR TESTING 
-//UNTIL WE IMPLEMENT USER ACCOUNTS
-
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%
 //%     			                    FUNCTIONS
@@ -73,9 +70,6 @@ function display_page_header( $inTitle )
 */
 function make_pantry_save_form( $default_food_name, $unit_list )
 {
-    //TODO: make this return a string that contains all the html code 
-    //instead of directly outputting it through echo.
-    
     //TODO: do form validation for this text input to make sure all the 
     //inputs are in number fomat
     $html_text = '<form name="input" action="' . 
@@ -436,7 +430,7 @@ function display_init_page()
     }
 
     echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" 
-      method="post">';
+      method="post" id="food-search">';
     echo '<input type="text" name="name" value="">';
     echo '<input type="hidden" name="status" value="name_selected">'; 
     //since there are multiple posts on this page, this field tells the 
@@ -711,4 +705,8 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "submitted" )
 
 <?php 
 
+
+$js_source_paths = array(
+  '/new_food.js'
+);
 include( FOOTER_PATH );
