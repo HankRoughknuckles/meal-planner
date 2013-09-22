@@ -81,7 +81,7 @@ $.getScript("/inc/autocomplete.js", function(){
    */
   function refreshJQuery()
   {
-    autocompleteFactory( '.recommendation', foodRecommendationPath );
+    autocompleteFactory( '.recommendation', savedFoodRecommendationPath );
     refreshJSONify();
   }
 
