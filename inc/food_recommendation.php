@@ -6,9 +6,9 @@
  */
 
 session_start();
-if( $_GET['user_input'] )
+if( $_GET['ajax_output'] )
 {
-	$user_input = $_GET['user_input'];
+	$ajax_output = $_GET['ajax_output'];
 	$saved_foods = $_SESSION['saved_foods'];
 
   //$matched_results is the list of saved foods that match the name typed 
@@ -18,7 +18,7 @@ if( $_GET['user_input'] )
 
 	foreach( $saved_foods as $saved_food )
 	{
-	  if (stristr( $saved_food['user_def_food_name'], $user_input ) )
+	  if (stristr( $saved_food['user_def_food_name'], $ajax_output ) )
 	  {
 		  $matched_results[] = array( 
 		    'category'  => 'Your Saved Foods:',

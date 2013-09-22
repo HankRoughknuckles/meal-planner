@@ -35,6 +35,7 @@ function populateUnitsMenu( menu, food )
  *
  *  Creates an autocomplete JQuery UI widget on the target.  The file that
  *  will be called to process the Ajax information is procFile.
+ *  The name of the GET variable sent to procFile will be ajax_output
  */
 function autocompleteFactory( target, procFile )
 {
@@ -67,7 +68,7 @@ function autocompleteFactory( target, procFile )
 		      method: "GET",
 		      dataType: "json",
 		      data: {
-			      user_input: request.term
+			      ajax_output: request.term
 		    },
 		    success: function( data ){
           displayData = new Array; 
