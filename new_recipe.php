@@ -54,9 +54,9 @@ define( 'DEFAULT_FIELD_AMOUNT', 10 );
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//%		                                              					        	%
-//% 			                FUNCTIONS                                     %
-//%							                                                     		%
+//%		                                              					        	
+//% 			                      FUNCTIONS                                     
+//%							                                                     		
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 /**
@@ -509,9 +509,7 @@ function create_ingredient_js()
     $js .= 'var savedFoods ='. json_encode($_SESSION['saved_foods']).';';
     $js .= 'var foodRecommendationPath = "'.
         INCLUDE_PATH_BASE .'food_recommendation.php";';
-
     $js .= '</script>';
-    $js .= '<script src=' . RECIPE_PATH . 'new_recipe.js></script>';
 
     return $js;
 }
@@ -812,5 +810,7 @@ else
     }
 }
 
+$js_source_paths = array(
+  RECIPE_PATH.'new_recipe.js'
+);
 include( FOOTER_PATH ); 
-
