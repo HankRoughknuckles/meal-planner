@@ -23,10 +23,6 @@ session_start();
 
 $_SESSION['page_title'] = "New Food";
 
-
-//TODO: implement user accounts since THIS -1 VALUE IS JUST FOR TESTING 
-//UNTIL WE IMPLEMENT USER ACCOUNTS
-
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%
 //%     			                    FUNCTIONS
