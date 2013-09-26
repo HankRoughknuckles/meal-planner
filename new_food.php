@@ -379,9 +379,9 @@ function import_save_food_vars()
   if( $vars['cost'] == "" ){
 	  $vars['cost'] = NULL;
   }
-  // if( $vars['currency'] == "" ){
+  // TODO: clean up everything regarding currency.  This should just 
+  // support USD
 	$vars['currency'] = NULL;
-  // }
 
 
   return $vars;
