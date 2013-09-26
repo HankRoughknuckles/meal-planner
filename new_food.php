@@ -438,8 +438,8 @@ function display_init_page()
     }
 
     echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" 
-      method="post" id="food-search">';
-    echo '<input type="text" name="name" value="">';
+      method="post">';
+    echo '<input type="text" name="name" value="" id="food-search">';
     echo '<input type="hidden" name="status" value="name_selected">'; 
     //since there are multiple posts on this page, this field tells the 
     // site that the first stage, the food name submission stage is 
@@ -448,36 +448,7 @@ function display_init_page()
 }
 
 
-/*
- * fetch_query_results()
- * =====================
- *
- * queries the ESHA database for any foods matching the passed string.  
- * returns the ESHA formatted object that ESHA returns.
- *
- * @param   -   query_str   -   the name of the food to be searched for
- *
- * @return  -   search_result   -   the ESHA formatted object with the 
- *                                  query results
- */
-function fetch_query_results( $query_str )
-{
-    //get the list of foods that match the user-defined query
-    $search_result = 
-        json_decode( 
-            file_get_contents( 
-                "http://api.esha.com/foods?apikey=" .  ESHA_API_KEY 
-                . "&query=" . urlencode( $query_str ) . '&spell=true' ) 
-    ); 
-
-    $search_result = $search_result->items;
-    $_SESSION['matched_foods'] = $search_result;
-
-    return $search_result;
-}
-
-
-/*
+/**
  * make_results_table()
  * ====================
  *
@@ -491,26 +462,27 @@ function fetch_query_results( $query_str )
  */
 function make_results_table( $search_result )
 {
-    $html =  '<table>';
-    $i = 0;
+  echo '<pre>'; var_dump($search_result); echo '</pre>'; die();
+  $html =  '<table>';
+  $i = 0;
 
-    foreach( $search_result as $food ) 
-    {
-	$html .= '<tr>';
-	$html .= '<td>' . htmlspecialchars( $food->description ) . '</td>';
+  foreach( $search_result as $food ) 
+  {
+    $html .= '<tr>';
+    $html .= '<td>' . htmlspecialchars( $food->description ) . '</td>';
 
-	//make links that correspond to each returned food match. idx in the 
-	//GET corresponds to the index of the selected food in 
-	//the $_SESSION['matched_foods'] array
-	$html .= '<td><a href="' . BASE_URL . 
-            'new_food.php?status=food_selected&idx=' . $i . 
-            '">Select</a></td>';
-	$i++;
-	$html .= '</tr>';
-    }
-    $html .= '</table>';
+    //make links that correspond to each returned food match. idx in the 
+    //GET corresponds to the index of the selected food in 
+    //the $_SESSION['matched_foods'] array
+    $html .= '<td><a href="' . BASE_URL . 
+    'new_food.php?status=food_selected&idx=' . $i . 
+    '">Select</a></td>';
+    $i++;
+    $html .= '</tr>';
+  }
+  $html .= '</table>';
 
-    return $html;
+  return $html;
 }
 
 

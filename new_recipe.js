@@ -81,7 +81,9 @@ $.getScript("/inc/autocomplete.js", function(){
    */
   function refreshJQuery()
   {
-    autocompleteFactory( '.recommendation', savedFoodRecommendationPath );
+    autocompleteFactory( 
+      0, '.recommendation', savedFoodRecommendationPath 
+    );
     refreshJSONify();
   }
 
@@ -150,23 +152,22 @@ $.getScript("/inc/autocomplete.js", function(){
   }
 
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//%		                                              					        	
-//% 			                      MAIN CODE                                     
-//%							                                                     		
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  //%		                                              					        	
+  //% 			                      MAIN CODE                                     
+  //%							                                                     		
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   //ingredients will store the ingredients list for this recipe
   var ingredients = new Array(); 
 
   refreshJQuery();
 
   $("#submit_btn").click( function(){
-    
     $.each( ingredients, function( ingredientIndex, ingredient ){
-      if( ingredient['food_id'] == null )
-      {
+      if( ingredient['food_id'] == null ) {
         $("#new_foods_present").val("true");
       }
     });
   });
+
 });

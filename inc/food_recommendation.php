@@ -28,7 +28,7 @@ if( $_GET['ajax_output'] )
 		  );
 	  }
 	}
-
+  
 	echo json_encode( $matched_results );
 }
 ?>

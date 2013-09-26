@@ -31,15 +31,26 @@ function populateUnitsMenu( menu, food )
 }
 
 
-/**
+/*
  *  autocompleteFactory()
  *  =====================
  *
  *  Creates an autocomplete JQuery UI widget on the target.  The file that
  *  will be called to process the Ajax information is procFile.
  *  The name of the GET variable sent to procFile will be ajax_output
+ *
+ *  @param  - minLength   - the number of characters that must be typed
+ *                          before the autocomplete will give
+ *                          recommendations
+ *
+ *  @param  - target      - the CSS selector of the item to become an
+ *                          autocomplete (e.g. "#text_input", or ".name")
+ *
+ *  @param  - procFile    - the path to the file that will process the
+ *                          input given by the user.  This file will
+ *                          output the autocomplete results.
  */
-function autocompleteFactory( target, procFile )
+function autocompleteFactory( minLength, target, procFile )
 {
   //set up the category autocomplete widget
   $.widget( "custom.catcomplete", $.ui.autocomplete, {
@@ -57,26 +68,22 @@ function autocompleteFactory( target, procFile )
 	  }
   });
 
-  //attach the autocomplete to items that have class "recommendation"
-  //TODO: make the autocomplete show  the matched characters in bold or 
+  //TODO: make the autocomplete show the matched characters in bold or 
   //underline
   $(target).catcomplete({
 
-	  //define callback to format results
 	  source: function(request, response){
-
 	    $.ajax({
-		      url: procFile,
-		      method: "GET",
-		      dataType: "json",
-		      data: {
-			      ajax_output: request.term
+		    url: procFile,
+		    method: "GET",
+		    dataType: "json",
+		    data: {
+			    ajax_output: request.term
 		    },
 		    success: function( data ){
           displayData = new Array; 
           //TODO: build the array to display and also the hidden
           //one to store the food id
-
 
           //take the category and label values from the ajax
           //returned data, and put them into displayData
@@ -91,34 +98,33 @@ function autocompleteFactory( target, procFile )
 	    });
 	  },
 
+	  //TODO: eventually make this have the functionality to display a box
+    //around the text in the ingredient field if it was selected.
+    //clicking that box will delete the food in the entry
+	  select:
+	    function(e, ui) {
+		    var nameOfSelectedFood = ui.item.value;
+        var currentIngredientIndex =
+          $(this).attr("name").substring(0,1);
+        var matchedFood;
+        var unitsDropdownMenu = $( "#"+ currentIngredientIndex
+            + "_ing_unit" );
 
-	    //TODO: eventually make this have the functionality to display a box
-      //around the text in the ingredient field if it was selected.
-      //clicking that box will delete the food in the entry
-	    select:
-	      function(e, ui) {
-		      var nameOfSelectedFood = ui.item.value;
-          var currentIngredientIndex =
-            $(this).attr("name").substring(0,1);
-          var matchedFood;
-          var unitsDropdownMenu = $( "#"+ currentIngredientIndex
-              + "_ing_unit" );
+        //TODO: find a faster way to do this
+        //find the food from the db that matches the selection
+        $.each( savedFoods, function( i, savedFood ){
+          if( savedFood['user_def_food_name'] === nameOfSelectedFood ){
+            matchedFood = savedFood;
+          }
+        });
 
-          //TODO: find a faster way to do this
-          //find the food from the db that matches the selection
-          $.each( savedFoods, function( i, savedFood ){
-            if( savedFood['user_def_food_name'] === nameOfSelectedFood ){
-              matchedFood = savedFood;
-            }
-          });
+        console.log( "matchedFood = %o", matchedFood );
 
-          console.log( "matchedFood = %o", matchedFood );
-
-          //remove all existing unit options and replace them with the
-          //ones that esha offers for this particular food.
-          unitsDropdownMenu.children().remove();
-          populateUnitsMenu(unitsDropdownMenu, matchedFood);
-	      }//,
+        //remove all existing unit options and replace them with the
+        //ones that esha offers for this particular food.
+        unitsDropdownMenu.children().remove();
+        populateUnitsMenu(unitsDropdownMenu, matchedFood);
+	    }//,
 
     // change:
     //     function(){

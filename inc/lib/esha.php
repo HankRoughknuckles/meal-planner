@@ -123,15 +123,13 @@ function fetch_food_details( $esha_food_id, $qty, $esha_unit, $api_key)
 */
 function create_units_array ( $food )
 {
-    include UNITS_TABLE_PATH;
+  include UNITS_TABLE_PATH;
 
-    $units = array();
-    foreach( $food->units as $unit_code )
-    {
-	$units[] = $code_to_unit_table[ $unit_code ];
-    }
-
-    return $units;
+  $units = array();
+  foreach( $food->units as $unit_code ) {
+    $units[] = $code_to_unit_table[ $unit_code ];
+  }
+  return $units;
 }
 
 
@@ -147,3 +145,36 @@ function get_common_units()
 {
 	return common_units;
 }
+
+
+
+/**
+ * fetch_query_results()
+ * =====================
+ *
+ * queries the ESHA database for any foods matching the passed string.  
+ * returns the ESHA formatted object that ESHA returns.
+ *
+ * @param   -   query_str   -   the name of the food to be searched for
+ *
+ * @return  -   search_result   -   the ESHA formatted object with the 
+ *                                  query results
+ */
+function fetch_query_results( $query_str )
+{
+    //get the list of foods that match the user-defined query
+    $search_result = 
+        json_decode( 
+            file_get_contents( 
+                "http://api.esha.com/foods?apikey=" .  ESHA_API_KEY 
+                . "&query=" . urlencode( $query_str ) . '&spell=true' ) 
+    ); 
+
+    $search_result = $search_result->items;
+    $_SESSION['matched_foods'] = $search_result;
+
+    return $search_result;
+}
+
+
+
