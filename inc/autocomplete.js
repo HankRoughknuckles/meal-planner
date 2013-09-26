@@ -1,13 +1,15 @@
-function testFunction()
-{
-  alert('This is from testFunction inside autocomplete.js!');
-}
+/* 
+ * autocomplete.js
+ * ===============
+ *
+ * This file is responsible for making the Jquery UI autocomplete widget
+ * used in new_food.php, new_recipe.php, etc.
+ */
 
 
 /**
  *  populateUnitsMenu()
  *  ===================
- *
  *  Creates options in the passed dropdown menu that have the passed foods
  */
 function populateUnitsMenu( menu, food )
