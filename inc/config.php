@@ -1,7 +1,7 @@
 <?php
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%
-//%			         PATHS
+//%			                        PATHS
 //%				
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 define("BASE_URL",		"/");
@@ -63,15 +63,25 @@ define("JQUERY_UI_STYLE_PATH", 	BASE_URL .
 //path to Recipe stuff
 define("RECIPE_PATH", 	BASE_URL );
 
+
 //path to sign-in page
 define('SIGN_IN_PATH',  BASE_URL.'sign_in.php');
+
 
 //path to account registration page
 define('REGISTER_PATH',  BASE_URL.'register.php');
 
+
+//saved food recommendation path (contains the file to be called by ajax 
+//when getting autocomplete recommendations while looking for your saved 
+//foods)
+define('SAVED_FOOD_RECOMMENDATION_PATH',  INCLUDE_PATH_BASE 
+  .'food_recommendation.php');
+
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%									
-//%				DATABASE INFORMATION
+//%				                DATABASE INFORMATION
 //%					
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -87,13 +97,13 @@ define("NOT_LOGGED_IN", 	"-2");
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%									
-//%				ERROR CODES
+//%				                  ERROR CODES
 //%					
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 //Define the error codes
-define( 'SUCCESS'	,    	     '1' );
-define( 'PREP_FAIL'	,    	    '-1' );
-define( 'EXEC_FAIL'	,    	    '-2' );
+define( 'SUCCESS'	,    	        '1' );
+define( 'PREP_FAIL'	,    	      '-1' );
+define( 'EXEC_FAIL'	,    	      '-2' );
 define( 'ERR_NAME_EXISTS',	    '-3' );
 define( 'INSUFFICIENT_DATA',    '-4' );

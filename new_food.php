@@ -23,6 +23,7 @@ session_start();
 
 $_SESSION['page_title'] = "New Food";
 
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%
 //%     			                    FUNCTIONS
@@ -69,9 +70,6 @@ function display_page_header( $inTitle )
 */
 function make_pantry_save_form( $default_food_name, $unit_list )
 {
-    //TODO: make this return a string that contains all the html code 
-    //instead of directly outputting it through echo.
-    
     //TODO: do form validation for this text input to make sure all the 
     //inputs are in number fomat
     $html_text = '<form name="input" action="' . 
@@ -317,32 +315,29 @@ function save_food_in_pantry()
 */
 function import_save_food_vars()
 {
-    include UNITS_TABLE_PATH;
+  include UNITS_TABLE_PATH;
 
-    $vars = array();
+  $vars = array();
 
-    $vars['user_id'] = USER_ID;
+  $vars['user_id'] = USER_ID;
 
-    $vars['user_def_food_name'] = 
-        trim( $_POST['user_def_food_name'] ); 
+  $vars['user_def_food_name'] = 
+    trim( $_POST['user_def_food_name'] ); 
 
-    $vars['serving_size'] = 
-        $_POST['serving_size'];
+  $vars['serving_size'] = 
+    $_POST['serving_size'];
 
-    $vars['serving_units_esha'] = 
-        $unit_to_code_table[ trim( $_POST['serving_units'] ) ];
+  $vars['serving_units_esha'] = 
+    $unit_to_code_table[ trim( $_POST['serving_units'] ) ];
 
-    $vars['cost'] = 
-        $_POST['cost']; 
+  $vars['cost'] = 
+    $_POST['cost']; 
 
-    // $vars['currency'] = 
-    //     trim( $_POST['currency'] );
+  $vars['json_esha'] = 
+    addslashes( json_encode( $_SESSION['selected_food'] ) ); 
 
-    $vars['json_esha'] = 
-        addslashes( json_encode( $_SESSION['selected_food'] ) ); 
-
-    $vars['esha_food_id'] = 
-        trim( $_SESSION['selected_food']->id ); 
+  $vars['esha_food_id'] = 
+    trim( $_SESSION['selected_food']->id ); 
 
 
     $vars['calories'] = 
@@ -362,25 +357,34 @@ function import_save_food_vars()
     }
 
 
-    // replace any blank fields with NULL instead
-    if( $vars['user_def_food_name'] == "" ){
-	$vars['user_def_food_name'] = NULL;
-    }
-    if( $vars['serving_size'] == "" ){
-	$vars['serving_size'] = NULL;
-    }
-    if( $vars['serving_units_esha'] == "" ){
-	$vars['serving_units_esha'] = NULL;
-    }
-    if( $vars['cost'] == "" ){
-	$vars['cost'] = NULL;
-    }
-    // if( $vars['currency'] == "" ){
+  //TODO: this is just a temporary fix to make sure that no random bugs 
+  //occur if the food has 0 calories.  A more robust method should be 
+  //implemented for dealing with this problem
+  if( $vars['calories'] == 0 )
+  {
+    $vars['calories'] = 0.001;
+  }
+
+
+  // replace any blank fields with NULL instead
+  if( $vars['user_def_food_name'] == "" ){
+	  $vars['user_def_food_name'] = NULL;
+  }
+  if( $vars['serving_size'] == "" ){
+	  $vars['serving_size'] = NULL;
+  }
+  if( $vars['serving_units_esha'] == "" ){
+	  $vars['serving_units_esha'] = NULL;
+  }
+  if( $vars['cost'] == "" ){
+	  $vars['cost'] = NULL;
+  }
+  // if( $vars['currency'] == "" ){
 	$vars['currency'] = NULL;
-    // }
+  // }
 
 
-    return $vars;
+  return $vars;
 }
 
 
@@ -434,7 +438,7 @@ function display_init_page()
     }
 
     echo '<form name="input" action="' . BASE_URL . 'new_food.php' . '" 
-      method="post">';
+      method="post" id="food-search">';
     echo '<input type="text" name="name" value="">';
     echo '<input type="hidden" name="status" value="name_selected">'; 
     //since there are multiple posts on this page, this field tells the 
@@ -709,4 +713,8 @@ else if( isset($_GET["status"]) AND $_GET["status"] == "submitted" )
 
 <?php 
 
+
+$js_source_paths = array(
+  '/new_food.js'
+);
 include( FOOTER_PATH );

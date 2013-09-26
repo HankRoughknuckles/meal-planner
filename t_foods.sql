@@ -1,13 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 3.5.2.2
+-- version 4.0.4
 -- http://www.phpmyadmin.net
 --
--- Host: 127.0.0.1
--- Generation Time: Jun 10, 2013 at 08:29 AM
--- Server version: 5.5.27
--- PHP Version: 5.4.7
+-- Host: localhost
+-- Generation Time: Sep 15, 2013 at 03:09 AM
+-- Server version: 5.6.12-log
+-- PHP Version: 5.4.16
 
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 
@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Database: `calorie_calculator`
+-- Database: `meal_planner`
 --
 
 -- --------------------------------------------------------
@@ -27,6 +27,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE IF NOT EXISTS `t_foods` (
+  `user_id` int(11) NOT NULL COMMENT 'Foreign Key from the t_users table',
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `serving_size` decimal(10,0) DEFAULT NULL,
@@ -35,7 +36,9 @@ CREATE TABLE IF NOT EXISTS `t_foods` (
   `density` decimal(10,0) DEFAULT NULL,
   `cost_per_package` decimal(10,0) DEFAULT NULL,
   `servings_per_package` decimal(10,0) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

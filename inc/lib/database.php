@@ -122,7 +122,7 @@ class Database_handler
   }
 
 
-  /**
+/**
    * query_table()
    * =============
    *
