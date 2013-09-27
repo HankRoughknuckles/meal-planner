@@ -298,7 +298,7 @@ function db_fetch_saved_foods()
     //TODO: put this query method into another file as a function to keep 
     //the code DRY
     
-  $db = new DAtabase_handler();
+  $db = new Database_handler();
   $command = 'SELECT * FROM t_foods WHERE user_id 
     = '.$_SESSION['user_id'];
   $results = $db->query_table( $command );
