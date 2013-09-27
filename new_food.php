@@ -285,8 +285,8 @@ function save_food_in_pantry()
 	    /* 'currency'              => $currency, */
 	    'json_esha'             => $json_esha,
 	    'esha_food_id'          => $esha_food_id,
-	    'user_id'               => USER_ID,
-            'calories'              => $calories
+	    'user_id'               => $_SESSION['user_id'],
+      'calories'              => $calories
 	);
 
         $db = new Database_handler;
