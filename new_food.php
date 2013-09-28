@@ -319,7 +319,7 @@ function import_save_food_vars()
 
   $vars = array();
 
-  $vars['user_id'] = USER_ID;
+  $vars['user_id'] = $_SESSION['user_id'];
 
   $vars['user_def_food_name'] = 
     trim( $_POST['user_def_food_name'] ); 

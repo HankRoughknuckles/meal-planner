@@ -541,16 +541,17 @@ function save_recipe( $db, $recipe )
       't_recipes',
       array(
         'name'          => $recipe->get_name(),
-        'user_id'       => USER_ID,
+        'user_id'       => $_SESSION['user_id'],
         'recipe_object' => serialize( $recipe )
-    ));
+    )
+  );
  
     return $result;
   }
   else
   {
-    //TODO: extend this exception type to have its own custom error code, 
-    //etc.
+    //TODO: extend this exception type to have its own custom error 
+    //code, etc.
     throw new Exception('Desired recipe name already exists');
   }
 }
@@ -732,7 +733,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
     $body_html .= '<h2>Ingredient tally</h2>';
     $body_html .= make_cost_table( $ingredient_list );
     $body_html .= '<a href="'.BASE_URL.
-      'new_recipe.php?status=saved">Save that food!</a>';
+        'new_recipe.php?status=saved">Save that food!</a>';
 
     $_SESSION['current_recipe'] = 
       new Recipe( array(
@@ -744,7 +745,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
         'cost'          => $_SESSION['total_recipe_cost'],
         'yield'         => $_POST['yield'],
         'yield_unit'    => $_POST['yield_unit'],
-        'user_id'       => USER_ID
+        'user_id'       => $_SESSION['user_id']
       ));
 
     echo $body_html;
