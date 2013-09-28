@@ -73,7 +73,7 @@ $body_html = '';
 $db = new Database_handler();
 
 //get the ingredients from the database
-$recipes = $db->get_recipes( USER_ID );
+$recipes = $db->get_recipes( $_SESSION['user_id'] );
 
 
 //prepare the accordion menu list and then make the accordion

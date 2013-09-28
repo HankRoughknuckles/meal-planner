@@ -203,7 +203,8 @@ function get_ingredient_nutrition( $ingredient )
         $ingredient->amt,
         $unit_to_code_table[ $ingredient->unit ],
         ESHA_API_KEY
-    )[0]->value;
+      );
+    $ingredient_calories = $ingredient_calories[0]->value;
 
 
     //to prevent divide by zero errors
@@ -542,7 +543,7 @@ function save_recipe( $db, $recipe )
             't_recipes',
             array(
                 'name'          => $recipe->get_name(),
-                'user_id'       => USER_ID,
+                'user_id'       => $_SESSION['user_id'],
                 'recipe_object' => serialize( $recipe )
             )
         );
@@ -749,7 +750,7 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
                 'cost'          => $_SESSION['total_recipe_cost'],
                 'yield'         => $_POST['yield'],
                 'yield_unit'    => $_POST['yield_unit'],
-                'user_id'       => USER_ID
+                'user_id'       => $_SESSION['user_id']
             ));
 
         echo $body_html;
