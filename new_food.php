@@ -271,22 +271,22 @@ function save_food_in_pantry()
     // Set up and insert data into the database if there are no errors
     if( count( $save_food_vars['error_array'] ) == 0 ){
 
-	$params = array(
-	    'user_def_food_name'    => $user_def_food_name,
-	    'serving_size'          => $serving_size,
-	    'serving_units_esha'    => $serving_units_esha,
-	    'cost'                  => $cost,
-	    /* 'currency'              => $currency, */
-	    'json_esha'             => $json_esha,
-	    'esha_food_id'          => $esha_food_id,
-	    'user_id'               => USER_ID,
-            'calories'              => $calories
-	);
+	    $params = array(
+	        'user_def_food_name'    => $user_def_food_name,
+	        'serving_size'          => $serving_size,
+	        'serving_units_esha'    => $serving_units_esha,
+	        'cost'                  => $cost,
+	        /* 'currency'              => $currency, */
+	        'json_esha'             => $json_esha,
+	        'esha_food_id'          => $esha_food_id,
+	        'user_id'               => $_SESSION['user_id'],
+          'calories'              => $calories
+	    );
 
-        $db = new Database_handler;
-        $db->insert_row( 't_foods', $params ); 
+      $db = new Database_handler();
+      $db->insert_row( 't_foods', $params ); 
 
-        return null;
+      return null;
     }
     else
     {
