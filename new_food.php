@@ -346,7 +346,8 @@ function import_save_food_vars()
             $vars['serving_size'],
             $vars['serving_units_esha'],
             ESHA_API_KEY 
-        )[0]->value;
+        );
+    $vars['calories'] = $vars['calories'][0]->value;
 
     //TODO: this is just a temporary fix to make sure that no random bugs 
     //occur if the food has 0 calories.  A more robust method should be 
@@ -462,7 +463,6 @@ function display_init_page()
  */
 function make_results_table( $search_result )
 {
-  echo '<pre>'; var_dump($search_result); echo '</pre>'; die();
   $html =  '<table>';
   $i = 0;
 
