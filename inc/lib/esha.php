@@ -5,7 +5,7 @@
 */
 
 require_once "/inc/config.php";
-require_once LOGIN_PATH;
+require_once KEYS_PATH;
 require_once UNITS_TABLE_PATH;
 
 /**

@@ -37,11 +37,7 @@ define("FOOTER_PATH", 	INCLUDE_PATH."footer.php");
 
 //the path to the file that contains sensitive login information and api 
 //keys
-//TODO: Change this name to something that is not so similar to 
-//SIGN_IN_PATH
-define("LOGIN_PATH",	INCLUDE_PATH."sensitive/login.php"); 
-
-
+define("KEYS_PATH",	INCLUDE_PATH."sensitive/login.php"); 
 
 //path to the file that holds the nutrients lookup table for esha nutrient 
 //ID's

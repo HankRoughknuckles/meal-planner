@@ -2,7 +2,7 @@
 <head>
 	<?php
 	require_once("/inc/config.php");
-	require_once( LOGIN_PATH );
+	require_once( KEYS_PATH );
 
 	//set the page title
 	if( $pageTitle == "Index" ) 

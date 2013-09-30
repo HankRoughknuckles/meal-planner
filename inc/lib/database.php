@@ -4,7 +4,7 @@
 //TODO: rename this file to database_handler.php
 
 require_once "/inc/config.php";
-require_once LOGIN_PATH; 
+require_once KEYS_PATH; 
 require_once UNITS_TABLE_PATH;
 require_once BASE_URL.'ingredient.php';
 require_once BASE_URL.'recipe.php';
@@ -35,7 +35,7 @@ class Database_handler
    *	================
    *
    *	this function opens the connection using the database host, 
-   *	name, and sql username and password specified in LOGIN_PATH
+   *	name, and sql username and password specified in KEYS_PATH
    */
   protected function open_connection(){
 	  $this->conn = new PDO( 'mysql:host=' . DB_HOST . ';dbname=' . 

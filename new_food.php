@@ -14,7 +14,7 @@
 //TODO: implement error handling in case the user inputs a letter where 
 //only numbers should be.
 require_once "/inc/config.php";
-require_once LOGIN_PATH;
+require_once KEYS_PATH;
 require_once ESHA_PATH;
 require_once DB_PATH;
 require_once UNITS_TABLE_PATH;
@@ -462,7 +462,6 @@ function display_init_page()
  */
 function make_results_table( $search_result )
 {
-  echo '<pre>'; var_dump($search_result); echo '</pre>'; die();
   $html =  '<table>';
   $i = 0;
 
