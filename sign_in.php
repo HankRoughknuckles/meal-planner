@@ -57,8 +57,7 @@ function make_sign_in_form()
  * =======================
  * checks the input from the sign_in POST variables.  If any are blank, 
  * this returns the appropriate errors in the $errors array
- //TODO make this more specific about what the errors will say
-*/
+ */
 function validate_sign_in_form( $vars )
 {
   $errors = array();
@@ -68,20 +67,17 @@ function validate_sign_in_form( $vars )
 
 
 /**
- * authenticate_user()
+ * sign_in_user()
  * ===================
  *
  * checks to see if the passed $email and $password are registered in the 
  * database.  If not, then it will return an array with the appropriate 
  * errors.  
- *  //TODO make this more specific about what the errors will say
  *
  * Note: if the user is properly authenticated, this function will set the 
  * $_SESSION['user_id'] variable to the user's database id.
- *  //TODO: Clean this up, this function should not set the variable.  It 
- *  should be left to another function to do
  */
-function authenticate_user( $email, $entered_password )
+function sign_in_user( $email, $entered_password )
 {
   $errors = array();
   $db = new Database_handler();
@@ -91,7 +87,8 @@ function authenticate_user( $email, $entered_password )
   //check if email exists
   if( sizeof( $results ) == 0 )
   {
-    $errors['invalid_email'] = 'We\'re sorry, that email is not registered';
+    $errors['invalid_email'] = 'We\'re sorry, that email is not 
+      registered';
 
     return $errors;
   }
@@ -108,7 +105,7 @@ function authenticate_user( $email, $entered_password )
   }
 
   $_SESSION['user_id'] = $results[0]['id'];
-  return $errors;
+  $_SESSION['username'] = $results[0]['email'];
 }
 
 
@@ -131,27 +128,21 @@ if( $_SERVER['REQUEST_METHOD'] == 'GET' )
 
 elseif( $_SERVER['REQUEST_METHOD'] == 'POST' )
 {
-    $body_html = '';
+  $body_html = '';
 
-    $validation_errors = validate_sign_in_form( $_POST );
-    $auth_errors = authenticate_user( $_POST['email'], $_POST['password'] 
-    );
-    $errors = array_merge( $validation_errors, $auth_errors );
+  $validation_errors = validate_sign_in_form( $_POST );
+  $auth_errors = sign_in_user( $_POST['email'], $_POST['password'] );
+  $errors = array_merge( $validation_errors, $auth_errors );
 
-    if( !empty($errors) )
-    {
-      $body_html .= display_errors( $errors );
-      $body_html .= make_sign_in_form();
-    }
-    else
-    {
-      //no need to set $_SESSION['user_id'] since authenticate_user() 
-      //already did it. TODO: clean this up.  authenticate_user() should 
-      //not set that variable
-      header( "Location: " . BASE_URL . "index.php" );
-    }
+  if( empty($errors) )
+  {
+    header( "Location: " . BASE_URL . "index.php" );
+  }
 
-    echo $body_html;
+  $body_html .= display_errors( $errors );
+  $body_html .= make_sign_in_form();
+
+  echo $body_html;
 }
 
 include( FOOTER_PATH ); 
