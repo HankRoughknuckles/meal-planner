@@ -1,6 +1,5 @@
 README
 -------
-
 This app take in user information about food and recipes and calculates the cost of the food, the amount of calories (and other nutrients) in it, and the cost per calorie.  Eventually, I'll try to implement a meal planning system with functionality to allow users to create custom profiles with quotas of nutrients to meet on a weekly or daily basis.  This app will allow them to both keep track of the nutrients they consume as well as help them keep a budget for buying food.
 
 
