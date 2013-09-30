@@ -91,7 +91,7 @@ function authenticate_user( $email, $entered_password )
   //check if email exists
   if( sizeof( $results ) == 0 )
   {
-    $errors['invalid_email'] = 'Invalid email address';
+    $errors['invalid_email'] = 'We\'re sorry, that email is not registered';
 
     return $errors;
   }
