@@ -18,7 +18,7 @@ if( $_SESSION['user_id'] == NOT_LOGGED_IN ){ ?>
 
   <div class='login'>
     <ul>
-      <li><a href="<?php echo BASE_URL ?>sign_in.php">Sign Out</a></li>
+      <li><a href="<?php echo BASE_URL ?>sign_out.php">Sign Out</a></li>
     </ul>
   </div> <!-- END login div -->
 

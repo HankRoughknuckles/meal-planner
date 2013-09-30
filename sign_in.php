@@ -127,11 +127,6 @@ if( $_SERVER['REQUEST_METHOD'] == 'GET' )
     $body_html .= make_sign_in_form();
     echo $body_html;
   }
-  else
-  {
-    //TODO: make something that says "are you sure you want to log out?" 
-    //with a button that says confirm, or something
-  }
 }
 
 elseif( $_SERVER['REQUEST_METHOD'] == 'POST' )

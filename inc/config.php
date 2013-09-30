@@ -5,10 +5,7 @@
 //%				
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 define("BASE_URL",		"/");
-
-
 define("ROOT_PATH",		$_SERVER["DOCUMENT_ROOT"]."/");
-
 
 //the path of the folder that contains all the include files
 define("INCLUDE_PATH", 	ROOT_PATH."inc/");
@@ -29,11 +26,9 @@ define("UNITS_TABLE_PATH", 	LIB_PATH."units_table.php");
 //every file
 define("HEADER_PATH", 	INCLUDE_PATH."header.php");
 
-
 //the path to the file that contains the footer that goes at the bottom of 
 //every file
 define("FOOTER_PATH", 	INCLUDE_PATH."footer.php");
-
 
 //the path to the file that contains sensitive login information and api 
 //keys
@@ -45,7 +40,6 @@ define("NUTRIENTS_TABLE_PATH", 	INCLUDE_PATH."nutrients_table.php");
 
 //path to the default style sheet
 define("STYLE_PATH", 	BASE_URL."css/style.css");
-
 
 //path to the jQuery UI source code
 define("JQUERY_UI_PATH", 	BASE_URL."js/jquery-ui-1.10.3.custom.min.js");
@@ -60,9 +54,10 @@ define("JQUERY_UI_STYLE_PATH", 	BASE_URL .
 define("RECIPE_PATH", 	BASE_URL );
 
 
-//path to sign-in page
+//SIGN_IN_PATH      =   path to the page to sign in
+//SIGN_OUT_PATH     =   path to the page to sign out
 define('SIGN_IN_PATH',  BASE_URL.'sign_in.php');
-
+define('SIGN_OUT_PATH',  BASE_URL.'sign_out.php');
 
 //path to account registration page
 define('REGISTER_PATH',  BASE_URL.'register.php');
