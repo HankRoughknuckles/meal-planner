@@ -271,22 +271,22 @@ function save_food_in_pantry()
     // Set up and insert data into the database if there are no errors
     if( count( $save_food_vars['error_array'] ) == 0 ){
 
-	$params = array(
-	    'user_def_food_name'    => $user_def_food_name,
-	    'serving_size'          => $serving_size,
-	    'serving_units_esha'    => $serving_units_esha,
-	    'cost'                  => $cost,
-	    /* 'currency'              => $currency, */
-	    'json_esha'             => $json_esha,
-	    'esha_food_id'          => $esha_food_id,
-	    'user_id'               => USER_ID,
-            'calories'              => $calories
-	);
+	    $params = array(
+	        'user_def_food_name'    => $user_def_food_name,
+	        'serving_size'          => $serving_size,
+	        'serving_units_esha'    => $serving_units_esha,
+	        'cost'                  => $cost,
+	        /* 'currency'              => $currency, */
+	        'json_esha'             => $json_esha,
+	        'esha_food_id'          => $esha_food_id,
+	        'user_id'               => $_SESSION['user_id'],
+          'calories'              => $calories
+	    );
 
-        $db = new Database_handler;
-        $db->insert_row( 't_foods', $params ); 
+      $db = new Database_handler();
+      $db->insert_row( 't_foods', $params ); 
 
-        return null;
+      return null;
     }
     else
     {
@@ -319,7 +319,7 @@ function import_save_food_vars()
 
   $vars = array();
 
-  $vars['user_id'] = USER_ID;
+  $vars['user_id'] = $_SESSION['user_id'];
 
   $vars['user_def_food_name'] = 
     trim( $_POST['user_def_food_name'] ); 
@@ -346,7 +346,8 @@ function import_save_food_vars()
             $vars['serving_size'],
             $vars['serving_units_esha'],
             ESHA_API_KEY 
-        )[0]->value;
+        );
+    $vars['calories'] = $vars['calories'][0]->value;
 
     //TODO: this is just a temporary fix to make sure that no random bugs 
     //occur if the food has 0 calories.  A more robust method should be 
