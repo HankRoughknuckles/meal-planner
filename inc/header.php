@@ -14,10 +14,12 @@
 	<title>Meal Planner - "<?php echo $pageTitle; ?>"</title>
 
 	<link rel="stylesheet" type="text/css" href="<?php echo STYLE_PATH; ?>" />
-	
+	<link rel="stylesheet" href="<?php echo JQUERY_UI_STYLE_PATH; ?>" />
+  <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 	<script src="<?php echo JQUERY_UI_PATH; ?>"></script>
-	<link rel="stylesheet" href="<?php echo JQUERY_UI_STYLE_PATH; ?>" />
+  <script src="js/bootstrap.min.js"></script>
 </head>
 <body>
 
