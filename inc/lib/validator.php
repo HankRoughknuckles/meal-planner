@@ -11,7 +11,7 @@ function display_errors( $errors )
   $error_html = '';
   foreach( $errors as $error )
   {
-    $error_html .= '<p class="error_message">'.$error.'</p>';
+    $error_html .= '<p class="text-error">'.$error.'</p>';
   }
 
   return $error_html;
