@@ -21,72 +21,132 @@ session_start();
  * website. This function will also display in the form any errors as 
  * mentioned in the $errors argument
  */
-function make_registration_form( $errors = null, $entered_info = null )
+function make_registration_form( $errors = null, $old_input = null )
+{ ?>
+  <form name="input" action="<?php echo REGISTER_PATH; ?>" 
+  method="post"> 
+<!-- TODO: add form-horizontal class to this form and eliminate the table 
+structure -->
+    <table>
+
+    <?php 
+    $needles = array('email_syntax', 'email_uniqueness');
+    make_text_input('email', "Email Address", $old_input['email'], 
+      $needles, $errors);  
+
+    $needles = array('password_syntax', 'password_match');
+    make_password_input('password', 'Password', $old_input['password'], 
+      $needles, $errors);
+
+    $needles = array('password_syntax', 'password_match');
+    make_password_input('password_conf', 'Confirm Password', 
+      $old_input['password_conf'], $needles, $errors);
+    ?>
+
+    </table>
+    <input type="submit" value="Register">
+  </form>
+<?php }
+
+
+/**
+ * make_text_input()
+ * ================
+ * outputs the html for a text input.  Includes ability to display if the 
+ * input has an error that needs to be corrected by the user.  The input 
+ * will have the falue passed in $old_input
+ *
+ * @param - $name       - the variable name that the form will post to
+ * @param - $label      - the label for the input
+ * @param - $value      - the value that the input will display (useful if 
+ *                        the user previously information incorrectly and 
+ *                        you want to restore the old input they had 
+ *                        before)
+ * @param - $has_error  - if == TRUE - input will have red outline
+ */
+function make_text_input($name, $label, $value, $needles, $errors)
+{?>
+  <?php if( is_error_present($needles, $errors) ) { ?>
+  <div class="control-group error">
+  <?php } else { ?>
+  <div class="control-group">
+  <?php } ?>
+    <tr>
+      <td>
+        <th>
+          <label class="control-label" for="<?php echo $name;?>">
+            <?php echo $label;?>
+          </label>
+        </th>
+      </td>
+      <td>
+      <?php
+        make_base_input( array(
+          'type'    => "text",
+          'name'    => $name,
+          'id'      => $name,
+          'value'   => $value)
+        )
+      ?>
+      </td>
+    </tr>
+  </div>
+<?php }
+
+function make_password_input($name, $label, $value, $needles, $errors)
+{?>
+  <?php if( is_error_present($needles, $errors) ) { ?>
+  <div class="control-group error">
+  <?php } else { ?>
+  <div class="control-group">
+  <?php } ?>
+    <tr>
+      <td>
+        <th>
+          <label class="control-label" for="<?php echo $name;?>">
+            <?php echo $label;?>
+          </label>
+        </th>
+      </td>
+      <td>
+      <?php
+        make_base_input( array(
+          'type'    => "password",
+          'name'    => $name,
+          'id'      => $name,
+          'value'   => $value)
+        )
+      ?>
+      </td>
+    </tr>
+  </div>
+<?php }
+/**
+ * make_base_input()
+ *
+ * makes an input with the types specified in the input $options 
+ * associative array
+ */
+function make_base_input( $options )
 {
-  $form_html = "";
-  $form_html .= '<form name = "input" action="'.REGISTER_PATH.'" 
-    method="post">';
-  $form_html .= '<table>';
-
-  //Email Address
-  $form_html .= display_form_error( '<tr>', array('email_syntax', 
-    'email_uniqueness'), $errors );
-  $form_html .= '<td><th><label for="email">Email Address:</th></td>';
-  $form_html .= '<td><input type="text" name="email" id="email" 
-    size="50"';
-
-  if( isset($entered_info['email']) )
+  if( !isset($options['type']) OR !isset($options['name']) )
   {
-    $form_html .= ' value="'.$entered_info['email'].'"';
+    return "FALSE";
   }
-  $form_html .= '>';
-  $form_html .= '</td>';
-  $form_html .= '</tr>';
 
-
-
-  //Password
-  $form_html .= display_form_error( '<tr>', array('password_syntax', 
-    'password_match'), $errors );
-  $form_html .= '<td><th><label for="password">Password:</th></td>';
-  $form_html .= '<td><input type="password" name="password" id="password" 
-    size="50"';
-
-  if( isset($entered_info['password']) )
+  $input = "<input ";
+  foreach( $options as $key => $option )
   {
-    $form_html .= ' value="'.$entered_info['password'].'"';
+    if( $option )
+    {
+      $input .= "$key=\"$option\" ";
+    }
   }
-  $form_html .= '>';
-  $form_html .= '</td>';
-  $form_html .= '</tr>';
 
+  $input .= '>';
 
-
-  //Password Confirmation
-  $form_html .= display_form_error( '<tr>', array('password_syntax', 
-    'password_match'), $errors );
-  $form_html .= '<td><th><label for="password">Confirm 
-    Password:</th></td>';
-  $form_html .= '<td><input type="password" name="password_conf" 
-    id="password_conf" size="50"';
-
-  if( isset($entered_info['password_conf']) )
-  {
-    $form_html .= 'value="'.$entered_info['password_conf'].'"';
-  }
-  $form_html .= '>';
-  $form_html .= '</td>';
-  $form_html .= '</tr>';
-
-
-
-  $form_html .= '</table>';
-  $form_html .= '<input type="submit" value="Register">';
-  $form_html .= '</form>';
-
-  return $form_html;
+  echo $input;
 }
-
 
 /**
  * display_form_error()
@@ -96,7 +156,7 @@ function make_registration_form( $errors = null, $entered_info = null )
  * elements in $haystack, then this will return ' class="form-error"' to 
  * show that there is an error in that field
  *
- * @param   - $tag        -the html tag to add the error class too (if 
+ * @param   - $tag        -the html tag to add the error class to (if 
  *                          errors are indeed present)
  * @param   - $needles    -an array of error message names to match
  * @param   - $haystack   -an array of error messages to check for matches
@@ -128,6 +188,28 @@ function display_form_error( $tag, $needles, $haystack )
   return $tag;
 }
 
+
+/**
+ * is_error_present()
+ * ==================
+ *
+ * returns TRUE if any of the items in $needles is an index in 
+ * $error_list_haystack
+ */
+function is_error_present( $needles, $error_list_haystack )
+{
+  $error_is_present = false;
+
+  foreach( $needles as $needle )
+  {
+    if( isset($error_list_haystack[$needle]) ) 
+    { 
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
 
 /**
  * validate_registration_input()
@@ -283,8 +365,8 @@ if( $_SERVER['REQUEST_METHOD'] == 'GET' )
 
 else if( $_SERVER['REQUEST_METHOD'] == 'POST' )
 {
-  $error_msgs = validate_registration_input();
   $body_html = '';
+  $error_msgs = validate_registration_input();
 
   if( sizeof($error_msgs) == 0 )
   {
@@ -292,9 +374,9 @@ else if( $_SERVER['REQUEST_METHOD'] == 'POST' )
     //the user has to click on
 
     $password_hasher = new PasswordHash(8, false);
-    $hash = $password_hasher->HashPassword( $_POST['password'] );
+    $digest = $password_hasher->HashPassword( $_POST['password'] );
 
-    save_user( $_POST['email'], $hash );
+    save_user( $_POST['email'], $digest );
     $_SESSION['user_id'] = get_user_id( $_POST['email'] );
     header( "Location: " . BASE_URL . "index.php" );
   }
