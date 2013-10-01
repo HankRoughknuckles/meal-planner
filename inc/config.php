@@ -98,3 +98,5 @@ define( 'PREP_FAIL'	,    	      '-1' );
 define( 'EXEC_FAIL'	,    	      '-2' );
 define( 'ERR_NAME_EXISTS',	    '-3' );
 define( 'INSUFFICIENT_DATA',    '-4' );
+define( 'HAS_ERROR',            'TRUE' );
+define( 'HAS_NO_ERROR',         'FALSE' );
