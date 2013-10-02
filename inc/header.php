@@ -12,7 +12,7 @@
 	?>
 
 	<title>Meal Planner - "<?php echo $pageTitle; ?>"</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
 	<link rel="stylesheet" type="text/css" href="<?php echo STYLE_PATH; ?>" />
 	<link rel="stylesheet" href="<?php echo JQUERY_UI_STYLE_PATH; ?>" />
   <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
