@@ -3,6 +3,7 @@ require_once "/inc/config.php";
 require_once DB_PATH;
 require_once LIB_PATH.'PasswordHash.php';
 require_once LIB_PATH.'validator.php';
+require_once LIB_PATH.'html_forms.php';
 
 //Display the header
 $pageTitle = "Register";
@@ -23,14 +24,10 @@ session_start();
  */
 function make_registration_form( $errors = null, $old_input = null )
 { ?>
-  <form name="input" action="<?php echo REGISTER_PATH; ?>" 
+  <form name="input" class="form-horizontal" action="<?php echo REGISTER_PATH; ?>" 
   method="post"> 
-<!-- TODO: add form-horizontal class to this form and eliminate the table 
-structure -->
-    <table>
-
-<!-- TODO: the html formatting on this table is messed up.  Look at the 
-html source from the webpage. -->
+    <!-- TODO: the html formatting on this table is messed up.  Look at the 
+    html source from the webpage. -->
     <?php 
     $needles = array('email_syntax', 'email_uniqueness');
     make_text_input('email', "Email Address", $old_input['email'], 
@@ -45,167 +42,12 @@ html source from the webpage. -->
       $old_input['password_conf'], $needles, $errors);
     ?>
 
-    </table>
-    <input type="submit" value="Register">
+    <div class="controls">
+      <input type="submit" value="Register">
+    </div>
   </form>
 <?php }
 
-
-/**
- * make_text_input()
- * ================
- * Makes a text input with label for a form.  Includes ability to display 
- * if the input has an error that needs to be corrected by the user.  The 
- * input will have the falue passed in $old_input
- *
- * @param - $name       - the variable name that the form will post to
- * @param - $label      - the label for the input
- * @param - $value      - the value that the input will display (useful if 
- *                        the user previously information incorrectly and 
- *                        you want to restore the old input they had 
- *                        before)
- * @param - $has_error  - if == TRUE - input will have red outline
- */
-function make_text_input($name, $label, $value, $needles, $errors)
-{?>
-  <?php if( is_error_present($needles, $errors) ) { ?>
-  <div class="control-group error">
-  <?php } else { ?>
-  <div class="control-group">
-  <?php } ?>
-    <tr>
-      <td>
-        <th>
-          <?php make_label( $label, array( 
-            "for" => $name,
-            "class" => "control-label") 
-          ); ?>
-        </th>
-      </td>
-      <td>
-      <?php
-        make_base_input( array(
-          'type'    => "text",
-          'name'    => $name,
-          'id'      => $name,
-          'value'   => $value)
-        )
-      ?>
-      </td>
-    </tr>
-  </div>
-<?php }
-
-/**
- * make_password_input()
- * =====================
- *
- * creates an label and an input for a password, 
- *
- * @param - $name       - the variable name that the form will post to
- * @param - $label      - the label for the input
- * @param - $value      - the value that the input will display (useful if 
- *                        the user previously information incorrectly and 
- *                        you want to restore the old input they had 
- *                        before)
- * @param - $has_error  - if == TRUE - input will have red outline
- */
-function make_password_input($name, $label, $value, $needles, $errors)
-{?>
-  <?php if( is_error_present($needles, $errors) ) { ?>
-  <div class="control-group error">
-  <?php } else { ?>
-  <div class="control-group">
-  <?php } ?>
-    <tr>
-      <td>
-        <th>
-          <?php make_label( $label, array( 
-            "for" => $name,
-            "class" => "control-label") 
-          ); ?>
-        </th>
-      </td>
-      <td>
-      <?php
-        make_base_input( array(
-          'type'    => "password",
-          'name'    => $name,
-          'id'      => $name,
-          'value'   => $value)
-        )
-      ?>
-      </td>
-    </tr>
-  </div>
-<?php }
-
-
-/**
- * make_label()
- */
-function make_label( $value, $options )
-{
-  $options['tag'] = 'label';
-  $required_options = array('for');
-  $tag = make_html_tag( $options, $required_options );
-  $tag .= $value;
-  $tag .= make_html_tag( array( "tag" => "/label"), array() );
-  echo $tag;
-}
-
-
-/**
- * make_base_input()
- * =================
- * makes an input with the types specified in the input $options 
- * associative array
- */
-function make_base_input( $options )
-{
-  $required_options = array( 'type', 'name' );
-  $options['tag'] = 'input';
-  echo  make_html_tag( $options, $required_options );
-}
-
-
-/**
- * make_html_tag()
- * ===============
- * makes an html tag with the passed options.  Will return FALSE if any 
- * options with the names present in $required_options are not present.  
- * Will also return FALSE if $options does not have a 'tag' entry.
- */
-function make_html_tag( $options, $required_options = array() )
-{
-  //send error if required options are not present
-  foreach( $required_options as $req_option )
-  {
-    if( !isset($options[$req_option]) )
-    {
-      return "FALSE";
-    }
-  }
-  if( !isset($options['tag']) )
-  {
-    return "FALSE";
-  }
-
-  //build the tag
-  $tag = '<'.$options['tag'];
-  unset($options['tag']);
-  foreach( $options as $key => $option )
-  {
-    if( $option )
-    {
-      $tag .= " $key=\"$option\"";
-    }
-  }
-
-  $tag .= '>';
-
-  return $tag;
-}
 
 /**
  * display_form_error()
