@@ -11,7 +11,9 @@ if( isset($js_source_paths) )
     }
 }
 
-
+$html_code .= '</div>';
+$html_code .= '</div>';
+$html_code .= '</div>';
 $html_code .= '</body>';
 $html_code .= '</html>';
 

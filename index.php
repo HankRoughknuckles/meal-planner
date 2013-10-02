@@ -24,14 +24,4 @@ if( $_SESSION['user_id'] == NOT_LOGGED_IN ){ ?>
 
 <?php } ?>
 
-
-
-<div class="user-actions">
-<ul>
-  <li><a href="<?php echo BASE_URL ?>new_recipe.php">New Recipe</a></li>
-  <li><a href="<?php echo BASE_URL ?>new_food.php">New Food</a></li>
-  <li><a href="<?php echo BASE_URL ?>view_foods.php">My Foods</a></li>
-  <li><a href="<?php echo BASE_URL ?>view_recipes.php">My Recipes</a></li>
-</ul>
-</div>
 <?php include( FOOTER_PATH ); 
