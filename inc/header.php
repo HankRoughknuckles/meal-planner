@@ -9,8 +9,41 @@
 	{
 		$pageTitle = "Home";
 	}
-	?>
 
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%
+//%     			                    FUNCTIONS
+//%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function makeNavbar()
+{ 
+  // TODO: finish this
+?>
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <ul class="nav">  
+        <a class="brand" href="#">Meal Planner</a>  
+        <li><a href="#">About</a></li>  
+        <li><a href="#">Portfolio</a></li>  
+        <li><a href="#">Contact</a></li>  
+      </ul>
+    </div>
+    <!-- <a class="navbar_brand" href="#">Meal Planner</a> -->
+  </div>
+  <!-- <div class="navbar-collapse collapse"> -->
+  </div>
+</div>
+<?php } 
+
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//%
+//%     			                     MAIN CODE
+//%
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+?>
 	<title>Meal Planner - "<?php echo $pageTitle; ?>"</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
 	<link rel="stylesheet" type="text/css" href="<?php echo STYLE_PATH; ?>" />
@@ -24,6 +57,7 @@
 <body>
   
   <div class="container-fluid">
+  <?php makeNavbar(); ?>
 	  <h1><a href="<?php echo BASE_URL; ?>">Meal Planner</a></h1>
     <!-- TODO: make a homepage for when user is logged out, and a user profile page when logged in -->
 	  <h2><?php echo $pageTitle ?></h2>
