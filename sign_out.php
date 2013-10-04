@@ -23,6 +23,7 @@ if( !isset($_GET['status']) )
 else
 {
   $_SESSION['user_id'] = NOT_LOGGED_IN;
+  $_SESSION['username'] = "";
   header( "Location: " . BASE_URL . "index.php" );
 }
 
