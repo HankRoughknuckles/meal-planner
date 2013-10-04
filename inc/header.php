@@ -16,14 +16,12 @@ if( $pageTitle == "Index" )
 //%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 /**
- * make_navbar()
+ * make_top_bar()
  * =============
- * makes the navigation bar in the header
+ * makes the bar in the top of the header
  */
-function make_navbar()
-{ 
-  // TODO: finish this
-?>
+function make_top_bar()
+{ ?>
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container-fluid">
@@ -85,7 +83,7 @@ function make_profile_dropdown()
 </head>
 <body>
 
-<?php make_navbar(); ?>
+<?php make_top_bar(); ?>
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
