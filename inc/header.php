@@ -15,6 +15,11 @@ if( $pageTitle == "Index" )
 //%     			                    FUNCTIONS
 //%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+/**
+ * make_navbar()
+ * =============
+ * makes the navigation bar in the header
+ */
 function make_navbar()
 { 
   // TODO: finish this
@@ -22,21 +27,13 @@ function make_navbar()
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container-fluid">
-      <a class="brand" href="#">Meal Planner</a>  
+    <a class="brand" href="<?php echo BASE_URL;?>">Meal Planner</a>  
       <ul class="nav pull-right">  
       <?php if ($_SESSION['user_id'] == NOT_LOGGED_IN){ ?>
         <li><a href="<?php echo REGISTER_PATH;?>">Register</a></li>  
-        <?php make_sign_in_dropdown(); ?>
+        <li><a href="<?php echo SIGN_IN_PATH;?>">Sign in</a></li>  
       <?php } else { ?>
-        <div class="btn-group">
-          <button class="btn"><?php echo $_SESSION['username'];?></button>
-          <button class="btn dropdown-toggle" data-toggle="dropdown">
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu">
-            <li><a href="<?php echo SIGN_OUT_PATH;?>">Sign out</a></li>  
-          </ul>
-        </div>
+        <?php make_profile_dropdown(); ?>
       <?php } ?>
       </ul>
     </div>
@@ -45,10 +42,23 @@ function make_navbar()
 <?php } 
 
 
-function make_sign_in_dropdown()
+/**
+ * make_profile_dropdown()
+ * =======================
+ * makes the dropdown menu in the navbar for allowing the user to view 
+ * his/her profile and to sign out.
+ */
+function make_profile_dropdown()
 {?>
-<!-- TODO: make this into a dropdown that lets the user log in -->
-<li><a href="#">Sign in</a></li>  
+<div class="btn-group">
+  <button class="btn"><?php echo $_SESSION['username'];?></button>
+  <button class="btn dropdown-toggle" data-toggle="dropdown">
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li><a href="<?php echo SIGN_OUT_PATH;?>">Sign out</a></li>  
+  </ul>
+</div>
 
 <?php }
 
