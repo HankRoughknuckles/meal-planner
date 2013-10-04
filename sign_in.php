@@ -3,12 +3,9 @@ require_once("/inc/config.php");
 require_once LIB_PATH.'PasswordHash.php';
 require_once LIB_PATH.'validator.php';
 require_once DB_PATH;
+require_once HELPERS_PATH;
 
-//Display the header
-$pageTitle = "Sign in";
-include( HEADER_PATH );
-
-session_start();
+display_page_header("Sign in");
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%

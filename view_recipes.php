@@ -1,16 +1,15 @@
 <?php
 //TODO: make sure that this displays the actual yield unit that's in the 
 //database, rather than just the name of the recipe
-$pageTitle = "Recipes";
 
 require_once "/inc/config.php";
 require_once DB_PATH;
 require_once LIB_PATH.'accordion.php';
 require_once LIB_PATH.'javascript.php';
+require_once HELPERS_PATH;
 
-include HEADER_PATH;
+display_page_header("Recipes");
 
-session_start();
 //=====================================================================
 //                          FUNCTIONS
 //=====================================================================

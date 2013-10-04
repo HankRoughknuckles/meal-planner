@@ -1,14 +1,12 @@
 <?php
 require_once("/inc/config.php");
-$pageTitle = "Foods";
-
-include( HEADER_PATH );
 require_once DB_PATH;
 require_once LIB_PATH.'javascript.php';
 require_once LIB_PATH.'accordion.php';
+require_once HELPERS_PATH;
 
+display_page_header("Foods");
 
-session_start();
 //=====================================================================
 //                          FUNCTIONS
 //=====================================================================

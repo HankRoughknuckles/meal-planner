@@ -1,10 +1,8 @@
 <?php
 require_once("/inc/config.php");
-session_start();
+require_once HELPERS_PATH;
 
-//Display the header
-$pageTitle = "Sign Out";
-include( HEADER_PATH );
+display_page_header("Sign Out");
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%

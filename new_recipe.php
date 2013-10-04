@@ -39,12 +39,9 @@ require_once UNITS_TABLE_PATH;
 require_once DB_PATH;
 require_once ROOT_PATH . 'ingredient.php';
 require_once ROOT_PATH . 'recipe.php';
+require_once HELPERS_PATH;
 
-session_start();
-
-//Display the header
-$pageTitle = "New Recipe";
-include( HEADER_PATH );
+display_page_header("New Recipe");
 
 // Define constants
 
