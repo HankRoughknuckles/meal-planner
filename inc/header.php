@@ -60,6 +60,31 @@ function make_profile_dropdown()
 
 <?php }
 
+/**
+ * make_sidebar()
+ * ==============
+ * Makes the sidebar for easy navigation
+ */
+function make_sidebar()
+{
+if( $_SESSION['user_id'] != NOT_LOGGED_IN ) {?>
+<ul class="nav nav-pills nav-stacked">
+  <li>
+    <a href="<?php echo BASE_URL ?>new_recipe.php">New Recipe</a>
+  </li>
+  <li>
+    <a href="<?php echo BASE_URL ?>new_food.php">New Food</a>
+  </li>
+  <li>
+    <a href="<?php echo BASE_URL ?>view_foods.php">My Foods</a>
+  </li>
+  <li>
+    <a href="<?php echo BASE_URL ?>view_recipes.php">My Recipes</a>
+  </li>
+</ul>
+<?php }
+}
+
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%
@@ -87,20 +112,7 @@ function make_profile_dropdown()
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
-      <ul>
-        <li>
-          <a href="<?php echo BASE_URL ?>new_recipe.php">New Recipe</a>
-        </li>
-        <li>
-          <a href="<?php echo BASE_URL ?>new_food.php">New Food</a>
-        </li>
-        <li>
-          <a href="<?php echo BASE_URL ?>view_foods.php">My Foods</a>
-        </li>
-        <li>
-          <a href="<?php echo BASE_URL ?>view_recipes.php">My Recipes</a>
-        </li>
-      </ul>
+      <?php make_sidebar();?>
     </div>
     <div class="span10">
 	  <h2><?php echo $pageTitle ?></h2>
