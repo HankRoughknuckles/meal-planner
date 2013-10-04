@@ -1,7 +1,15 @@
 <?php
-require_once("/inc/config.php");
-require_once( KEYS_PATH );
+require_once "/inc/config.php";
+require_once KEYS_PATH;
+require_once VALIDATOR_PATH;
 session_start();
+
+//clear any form validation errors that might be present
+if( !isset($_SESSION['validator']) )
+{
+  $_SESSION['validator'] = new Validator();
+}
+$_SESSION['validator']->clear_errors();
 
 //set the page title
 if( $pageTitle == "Index" ) 

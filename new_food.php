@@ -490,7 +490,8 @@ if( $_SERVER["REQUEST_METHOD"] == "POST")
         if( isset($_POST['name']) )
         {
 	    $_SESSION['food_name_query'] = htmlspecialchars( $_POST['name'] );
-	    header( "location: " . BASE_URL . "new_food.php?status=find" );
+	    header( "location: ".BASE_URL.
+        "new_food.php?status=find&query=".$_POST['name']);
         }
         else
         {
