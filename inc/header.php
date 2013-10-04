@@ -28,8 +28,15 @@ function make_navbar()
         <li><a href="<?php echo REGISTER_PATH;?>">Register</a></li>  
         <?php make_sign_in_dropdown(); ?>
       <?php } else { ?>
-        <li><a href="#"><?php echo $_SESSION['username'];?></a></li>  
-        <li><a href="<?php echo SIGN_OUT_PATH;?>">Sign out</a></li>  
+        <div class="btn-group">
+          <button class="btn"><?php echo $_SESSION['username'];?></button>
+          <button class="btn dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="<?php echo SIGN_OUT_PATH;?>">Sign out</a></li>  
+          </ul>
+        </div>
       <?php } ?>
       </ul>
     </div>
@@ -41,7 +48,8 @@ function make_navbar()
 function make_sign_in_dropdown()
 {?>
 <!-- TODO: make this into a dropdown that lets the user log in -->
-  <li><a href="#">Sign in</a></li>  
+<li><a href="#">Sign in</a></li>  
+
 <?php }
 
 

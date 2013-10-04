@@ -6171,3 +6171,7 @@ a.badge:focus {
 body {
   padding-top: 50px;
 }
+
+.caret {
+  height: 8px;
+}
