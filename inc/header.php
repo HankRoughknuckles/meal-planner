@@ -25,11 +25,11 @@ function make_navbar()
       <a class="brand" href="#">Meal Planner</a>  
       <ul class="nav pull-right">  
       <?php if ($_SESSION['user_id'] == NOT_LOGGED_IN){ ?>
-        <li><a href="#">*THE_USERNAME_HERE*</a></li>  
-        <li><a href="#">Sign out</a></li>  
-      <?php } else { ?>
         <li><a href="<?php echo REGISTER_PATH;?>">Register</a></li>  
-        <?php make_login_dropdown(); ?>
+        <?php make_sign_in_dropdown(); ?>
+      <?php } else { ?>
+        <li><a href="#"><?php echo $_SESSION['username'];?></a></li>  
+        <li><a href="<?php echo SIGN_OUT_PATH;?>">Sign out</a></li>  
       <?php } ?>
       </ul>
     </div>
@@ -38,10 +38,10 @@ function make_navbar()
 <?php } 
 
 
-function make_login_dropdown()
+function make_sign_in_dropdown()
 {?>
 <!-- TODO: make this into a dropdown that lets the user log in -->
-  <li><a href="#">Log in</a></li>  
+  <li><a href="#">Sign in</a></li>  
 <?php }
 
 
