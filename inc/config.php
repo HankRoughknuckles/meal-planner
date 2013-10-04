@@ -83,7 +83,7 @@ define("DB_NAME", 	"meal_planner");
 
 define("DB_HOST",	"localhost");
 
-//TODO: delete this when you implement user accounts
+//TODO: delete USER_ID = -1 when you implement user accounts
 define("USER_ID",	        "-1");
 define("NOT_LOGGED_IN", 	"-2");
 
