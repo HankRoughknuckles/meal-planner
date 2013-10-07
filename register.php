@@ -4,6 +4,7 @@ require_once DB_PATH;
 require_once LIB_PATH.'PasswordHash.php';
 require_once LIB_PATH.'validator.php';
 require_once HELPERS_PATH;
+require_once VALIDATOR_PATH;
 
 //Display the header
 display_page_header("Register");
@@ -28,16 +29,13 @@ function make_registration_form( $errors = null, $old_input = null )
     html source from the webpage. -->
     <?php 
     $needles = array('email_syntax', 'email_uniqueness');
-    make_text_input('email', "Email Address", $old_input['email'], 
-      $needles, $errors);  
+    $_SESSION['validator']->make_text_input('email', "Email Address", "");  
 
     $needles = array('password_syntax', 'password_match');
-    make_password_input('password', 'Password', $old_input['password'], 
-      $needles, $errors);
+    $_SESSION['validator']->make_password_input('password', 'Password', "");
 
     $needles = array('password_syntax', 'password_match');
-    make_password_input('password_conf', 'Confirm Password', 
-      $old_input['password_conf'], $needles, $errors);
+    $_SESSION['validator']->make_password_input('password_conf', 'Confirm Password', "");
     ?>
 
     <div class="controls">

@@ -203,21 +203,18 @@ class Validator{
    *                        "error" theme to show that the user didn't enter 
    *                        information correctly
    */
-  function make_text_input($name, $label, $value)
+  function make_text_input($name, $label, $value=NULL)
   {?>
-    <?php if( is_error_present($name) ) { ?>
+    <?php if( $this->is_error_present($name) ) { ?>
     <div class="control-group error">
     <?php } else { ?>
     <div class="control-group">
     <?php } ?>
 
-      <?php make_label( $label, array( 
-      "for" => $name,
-      "class" => "control-label") 
-      ); ?>
+      <?php $this->make_label( $name, $label ); ?>
 
       <div class="controls">
-        <?php make_base_input( array(
+        <?php $this->make_base_input( array(
         'type'    => "text",
         'name'    => $name,
         'id'      => $name,
@@ -241,25 +238,22 @@ class Validator{
    *                        before)
    * @param - $has_error  - if == TRUE - input will have red outline
    */
-  function make_password_input($name, $label, $value, $needles, $errors)
+  function make_password_input($name, $label, $value=NULL)
   {?>
-    <?php if( is_error_present($needles, $errors) ) { ?>
+    <?php if( $this->is_error_present($name) ) { ?>
     <div class="control-group error">
     <?php } else { ?>
     <div class="control-group">
     <?php } ?>
 
-      <?php make_label( $label, array( 
-        "for" => $name,
-        "class" => "control-label") 
-      );?>
+      <?php $this->make_label( $name, $label ); ?>
 
       <div class="controls">
-        <?php make_base_input( array(
-          'type'    => "password",
-          'name'    => $name,
-          'id'      => $name,
-          'value'   => $value)
+        <?php $this->make_base_input( array(
+        'type'    => "password",
+        'name'    => $name,
+        'id'      => $name,
+        'value'   => $value)
         ); ?>
       </div>
     </div>
@@ -269,9 +263,11 @@ class Validator{
   /**
    * make_label()
    */
-  function make_label( $value, $options )
+  function make_label( $for, $value, $options=array() )
   {
     $options['tag'] = 'label';
+    $options['class'] = 'control-label';
+    $options['for'] = $for;
     $required_options = array('for');
     $tag = make_html_tag( $options, $required_options );
     $tag .= $value;
