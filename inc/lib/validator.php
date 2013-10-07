@@ -195,23 +195,15 @@ class Validator{
    *                        the user previously information incorrectly and 
    *                        you want to restore the old input they had 
    *                        before)
-   * @param - $needles    - list of errors that, if present in the $errors 
-   *                        variable, will cause the input to have an 
-   *                        "error" theme.
-   * @param - $errors     - if any entries in $needles are present as 
-   *                        indices here, then the input will have an 
-   *                        "error" theme to show that the user didn't enter 
-   *                        information correctly
+   *                        Default value = NULL
    */
-  function make_text_input($name, $label, $value=NULL)
+  function make_text_input($name, $value=NULL)
   {?>
     <?php if( $this->is_error_present($name) ) { ?>
     <div class="control-group error">
     <?php } else { ?>
     <div class="control-group">
     <?php } ?>
-
-      <?php $this->make_label( $name, $label ); ?>
 
       <div class="controls">
         <?php $this->make_base_input( array(
@@ -238,15 +230,13 @@ class Validator{
    *                        before)
    * @param - $has_error  - if == TRUE - input will have red outline
    */
-  function make_password_input($name, $label, $value=NULL)
+  function make_password_input($name, $value=NULL)
   {?>
     <?php if( $this->is_error_present($name) ) { ?>
     <div class="control-group error">
     <?php } else { ?>
     <div class="control-group">
     <?php } ?>
-
-      <?php $this->make_label( $name, $label ); ?>
 
       <div class="controls">
         <?php $this->make_base_input( array(

@@ -28,14 +28,13 @@ function make_registration_form( $errors = null, $old_input = null )
     <!-- TODO: the html formatting on this table is messed up.  Look at the 
     html source from the webpage. -->
     <?php 
-    $needles = array('email_syntax', 'email_uniqueness');
-    $_SESSION['validator']->make_text_input('email', "Email Address", "");  
 
-    $needles = array('password_syntax', 'password_match');
-    $_SESSION['validator']->make_password_input('password', 'Password', "");
-
-    $needles = array('password_syntax', 'password_match');
-    $_SESSION['validator']->make_password_input('password_conf', 'Confirm Password', "");
+    $_SESSION['validator']->make_label('email', 'Email address:');
+    $_SESSION['validator']->make_text_input('email');  
+    $_SESSION['validator']->make_label('password', 'Password:');
+    $_SESSION['validator']->make_password_input('password');
+    $_SESSION['validator']->make_label('password_conf', 'Confirm Password:');
+    $_SESSION['validator']->make_password_input('password_conf');
     ?>
 
     <div class="controls">
