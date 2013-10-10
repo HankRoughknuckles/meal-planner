@@ -20,17 +20,18 @@ display_page_header("Register");
  * Returns the html for a web form for the user to register on the 
  * website. This function will also display in the form any errors as 
  * mentioned in the $errors argument
+ * Note: $old_input must be an associative array with indices of the 
+ * same name as the input variable. I.e. - if the registration form has 
+ * a field with the name "email", then $old_input must have an entry of 
+ * "email" => "some_email"
  */
 function make_registration_form( $errors = null, $old_input = null )
 { ?>
   <form name="input" class="form-horizontal" action="<?php echo REGISTER_PATH; ?>" 
   method="post"> 
-    <!-- TODO: the html formatting on this table is messed up.  Look at the 
-    html source from the webpage. -->
     <?php 
-
     $_SESSION['validator']->make_label('email', 'Email address:');
-    $_SESSION['validator']->make_text_input('email');  
+    $_SESSION['validator']->make_text_input('email', $old_input['email']);
     $_SESSION['validator']->make_label('password', 'Password:');
     $_SESSION['validator']->make_password_input('password');
     $_SESSION['validator']->make_label('password_conf', 'Confirm Password:');
@@ -96,11 +97,11 @@ function validate_registration_input()
 {
   extract($_POST);
   $_SESSION['validator']->load_post($_POST);
-  $_SESSION['validator']->validate_email_syntax('email');
-  $_SESSION['validator']->validate_email_uniqueness('email');
-  $_SESSION['validator']->validate_password_syntax('password');
+  $_SESSION['validator']->validate_email_syntax($email);
+  $_SESSION['validator']->validate_email_uniqueness($email);
+  $_SESSION['validator']->validate_password_syntax($password);
   $_SESSION['validator']->validate_password_match(
-                            'password', 'password_conf');
+    $password, $password_conf);
 }
 
 
