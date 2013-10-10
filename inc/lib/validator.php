@@ -9,11 +9,6 @@ require_once DB_PATH;
 require_once LIB_PATH.'html_tags.php';
 
 class Validator{
-  //$_post is identical to the $_POST variable that comes in when a POST 
-  //http request is sent in. Index = variable name, value = variable 
-  //value. 
-  //TODO: this variable might need to be removed
-  protected $_post; 
   // $_form_errors has the following form:
   // {
   //  field_name1 = {
@@ -25,41 +20,6 @@ class Validator{
   //  }
   //}
   protected $_form_errors;
-
-  /**
-   * load_post()
-   * ===========
-   * load the POST variable into Validator to allow for form validation 
-   * checking.  Note: this function should be called before any validation 
-   * functions should be called.  If there is no POST variable loaded, 
-   * the validation functions will break.
-   *
-   * @param   - $input  - the $_POST variable to be loaded.
-   */
-  function load_post( $input )
-  {
-    $this->_post = $input;
-  }
-
-
-  /**
-   *
-   *
-   *
-   *
-   */
-  function post_loaded()
-  {
-    if( $this->get_post() )
-    {
-      return TRUE;
-    }
-    else
-    {
-      return FALSE;
-    }
-  }
-
 
   /**
    * is_error_present()
@@ -288,12 +248,6 @@ class Validator{
     ?>
       </div> <!-- /div "controls" -->
     </div> <!-- /div "control-group" or "control-group error" -->
-<?php }
-
-
-  //getters and setters
-  public function get_post() 
-  { 
-      return $this->_post;
+<?php 
   }
 }
