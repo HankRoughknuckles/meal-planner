@@ -96,12 +96,11 @@ function display_form_error( $tag, $needles, $haystack )
 function validate_registration_input()
 {
   extract($_POST);
-  $_SESSION['validator']->load_post($_POST);
-  $_SESSION['validator']->validate_email_syntax($email);
-  $_SESSION['validator']->validate_email_uniqueness($email);
-  $_SESSION['validator']->validate_password_syntax($password);
-  $_SESSION['validator']->validate_password_match(
-    $password, $password_conf);
+  $_SESSION['validator']->validate_email_syntax('email', $email);
+  $_SESSION['validator']->validate_email_uniqueness('email', $email);
+  $_SESSION['validator']->validate_password_syntax('password', $password);
+  $_SESSION['validator']->validate_password_match( 'password', $password, 
+    'password_conf', $password_conf);
 }
 
 
@@ -170,6 +169,7 @@ if( $_SERVER['REQUEST_METHOD'] == 'GET' )
 {
   if( !isset($_GET['status']) )
   {
+    $_SESSION['validator'] = new Validator();
     $body_html = make_registration_form();
     echo $body_html;
   }

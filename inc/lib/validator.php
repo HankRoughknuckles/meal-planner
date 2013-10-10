@@ -10,8 +10,20 @@ require_once LIB_PATH.'html_tags.php';
 
 class Validator{
   //$_post is identical to the $_POST variable that comes in when a POST 
-  //http request is sent in. Index = variable name, value = variable value
+  //http request is sent in. Index = variable name, value = variable 
+  //value. 
+  //TODO: this variable might need to be removed
   protected $_post; 
+  // $_form_errors has the following form:
+  // {
+  //  field_name1 = {
+  //    error_msg_a,
+  //    error_msg_b,
+  //  },
+  //  field_name2 = {
+  //    error_msg_c
+  //  }
+  //}
   protected $_form_errors;
 
   /**
@@ -71,9 +83,12 @@ class Validator{
   function display_errors()
   {
     $error_html = '';
-    foreach( $this->_form_errors as $error )
+    foreach( $this->_form_errors as $field )
     {
-      $error_html .= '<p class="text-error">'.$error.'</p>';
+      foreach( $field as $error_msg )
+      {
+        $error_html .= '<p class="text-error">'.$error_msg.'</p>';
+      }
     }
 
     return $error_html;
@@ -110,11 +125,11 @@ class Validator{
    * validates that the email has the proper form 
    * (i.e. - xxxxxxx@xxxx.com, etc.)
    */
-  function validate_email_syntax( $name )
+  function validate_email_syntax( $field_name, $value )
   {
-    if( !filter_var( $name, FILTER_VALIDATE_EMAIL ) )
+    if( !filter_var( $value, FILTER_VALIDATE_EMAIL ) )
     {
-      $this->_form_errors[$name] = 'Your email address is not 
+      $this->_form_errors[$field_name][] = 'Your email address is not 
         valid, please enter a valid email address';
     }
   }
@@ -126,16 +141,16 @@ class Validator{
    * validates that no other email address exists that shares the one 
    * passed
    */
-  function validate_email_uniqueness( $email )
+  function validate_email_uniqueness( $field_name, $value )
   {
     $db = new Database_handler();
 
     $matches = $db->query_table('SELECT email FROM t_users WHERE email 
-      = "'.$email.'"');
+      = "'.$value.'"');
 
     if( $matches )
     {
-      $this->_form_errors['email_uniqueness'] = 'An email already exists 
+      $this->_form_errors[$field_name][] = 'An email already exists 
         with that name, please check that you have not already 
         registered.';
     }
@@ -148,11 +163,11 @@ class Validator{
    * validates that the password matches the syntax required by the 
    * website (i.e., number of characters, etc.)
    */
-  function validate_password_syntax( $password )
+  function validate_password_syntax( $field_name, $value )
   {
-    if( strlen( $password ) < 5 )
+    if( strlen( $value ) < 5 )
     {
-      $this->_form_errors['password_syntax'] = 'Please choose a password 
+      $this->_form_errors[$field_name][] = 'Please choose a password 
         that is greater than 5 characters long.';
     }
   }
@@ -163,11 +178,11 @@ class Validator{
    * =========================
    * validates that the two passed passwords match eachother
    */
-  function validate_password_match( $pass1, $pass2 )
+  function validate_password_match( $field_name_1, $value_1, $field_name_2, $value_2 )
   {
-    if( $pass1 != $pass2 )
+    if( $value_1 != $value_2 )
     {
-      $this->_form_errors['password_match'] = 'Passwords do not match, 
+      $this->_form_errors[$field_name_2][] = 'Passwords do not match, 
         please enter and confirm your password again.';
     }
   }
@@ -178,7 +193,7 @@ class Validator{
    * ================
    * Makes a text input with label for a form.  Includes ability to display 
    * if the input has an error that needs to be corrected by the user.  The 
-   * input will have the falue passed in $old_input
+   * input will have the falue passed in $value
    *
    * @param - $name       - the variable name that the form will post to
    * @param - $label      - the label for the input
@@ -189,23 +204,14 @@ class Validator{
    *                        Default value = NULL
    */
   function make_text_input($name, $value=NULL)
-  {?>
-    <?php if( $this->is_error_present($name) ) { ?>
-    <div class="control-group error">
-    <?php } else { ?>
-    <div class="control-group">
-    <?php } ?>
-
-      <div class="controls">
-        <?php $this->make_base_input( array(
-        'type'    => "text",
-        'name'    => $name,
-        'id'      => $name,
-        'value'   => $value)
-        ); ?>
-      </div>
-    </div>
-  <?php }
+  {
+    $this->make_base_input( array(
+      'type'    => "text",
+      'name'    => $name,
+      'id'      => $name,
+      'value'   => $value)
+    );
+  }
 
   /**
    * make_password_input()
@@ -222,23 +228,14 @@ class Validator{
    * @param - $has_error  - if == TRUE - input will have red outline
    */
   function make_password_input($name, $value=NULL)
-  {?>
-    <?php if( $this->is_error_present($name) ) { ?>
-    <div class="control-group error">
-    <?php } else { ?>
-    <div class="control-group">
-    <?php } ?>
-
-      <div class="controls">
-        <?php $this->make_base_input( array(
-        'type'    => "password",
-        'name'    => $name,
-        'id'      => $name,
-        'value'   => $value)
-        ); ?>
-      </div>
-    </div>
-  <?php }
+  {
+    $this->make_base_input( array(
+      'type'    => "password",
+      'name'    => $name,
+      'id'      => $name,
+      'value'   => $value)
+    );
+  }
 
 
   /**
@@ -264,11 +261,21 @@ class Validator{
    * associative array
    */
   function make_base_input( $options )
-  {
-    $required_options = array( 'type', 'name' );
-    $options['tag'] = 'input';
-    echo  make_html_tag( $options, $required_options );
-  }
+  {?>
+    <?php if( $this->is_error_present($options['name']) ) { ?>
+    <div class="control-group error">
+    <?php } else { ?>
+    <div class="control-group">
+    <?php }?>
+      <div class="controls">
+    <?php
+      $required_options = array( 'type', 'name' );
+      $options['tag'] = 'input';
+      echo  make_html_tag( $options, $required_options ); 
+    ?>
+      </div> <!-- /div "controls" -->
+    </div> <!-- /div "control-group" or "control-group error" -->
+<?php }
 
 
   //getters and setters
