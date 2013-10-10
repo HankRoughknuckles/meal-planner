@@ -82,16 +82,14 @@ class Validator{
   //Display the errors contained in the $errors array on screen
   function display_errors()
   {
-    $error_html = '';
     foreach( $this->_form_errors as $field )
     {
       foreach( $field as $error_msg )
-      {
-        $error_html .= '<p class="text-error">'.$error_msg.'</p>';
+      {?>
+        <p class="text-error"><?php echo $error_msg; ?></p>
+      <?php
       }
     }
-
-    return $error_html;
   }
 
 
@@ -120,6 +118,21 @@ class Validator{
 
 
   /**
+   * make_error()
+   * ============
+   * registers an error in the _form_errors array to allow the Validator 
+   * class to see which fileds have errors in them.
+   * 
+   * @param - $field_name   - the name of the field as it appears in the 
+   *                          html
+   * @param - $error_msg    - the error message to register for the field
+   */
+  function make_error( $field_name, $error_msg )
+  {
+    $this->_form_errors[$field_name][] = $error_msg;
+  }
+
+  /**
    * validate_email_syntax()
    * =======================
    * validates that the email has the proper form 
@@ -129,8 +142,8 @@ class Validator{
   {
     if( !filter_var( $value, FILTER_VALIDATE_EMAIL ) )
     {
-      $this->_form_errors[$field_name][] = 'Your email address is not 
-        valid, please enter a valid email address';
+      $this->make_error( $field_name, 'Your email address is not valid, 
+        please enter a valid email address');
     }
   }
 
@@ -150,9 +163,8 @@ class Validator{
 
     if( $matches )
     {
-      $this->_form_errors[$field_name][] = 'An email already exists 
-        with that name, please check that you have not already 
-        registered.';
+      $this->make_error( $field_name, 'An email already exists with that 
+        name, please check that you have not already registered.' );
     }
   }
 
@@ -167,8 +179,8 @@ class Validator{
   {
     if( strlen( $value ) < 5 )
     {
-      $this->_form_errors[$field_name][] = 'Please choose a password 
-        that is greater than 5 characters long.';
+      $this->make_error( $field_name, 'Please choose a password that is 
+        greater than 5 characters long.');
     }
   }
 
@@ -183,8 +195,8 @@ class Validator{
   {
     if( $value_1 != $value_2 )
     {
-      $this->_form_errors[$field_name_2][] = 'Passwords do not match, 
-        please enter and confirm your password again.';
+      $this->make_error( $field_name_2, 'Passwords do not match, please 
+        enter and confirm your password again.');
     }
   }
 

@@ -195,8 +195,8 @@ else if( $_SERVER['REQUEST_METHOD'] == 'POST' )
   }
   else
   {
-    $body_html .= $_SESSION['validator']->display_errors();
-    $body_html .= make_registration_form( $error_msgs, $_POST );
+    $_SESSION['validator']->display_errors();
+    make_registration_form( $error_msgs, $_POST );
   }
 
   echo $body_html;
