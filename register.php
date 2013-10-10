@@ -27,14 +27,15 @@ display_page_header("Register");
  */
 function make_registration_form( $errors = null, $old_input = null )
 { ?>
-  <form name="input" class="form-horizontal" action="<?php echo REGISTER_PATH; ?>" 
-  method="post"> 
+  <form name="input" class="form-horizontal" 
+    action="<?php echo REGISTER_PATH; ?>" method="post"> 
     <?php 
     $_SESSION['validator']->make_label('email', 'Email address:');
     $_SESSION['validator']->make_text_input('email', $old_input['email']);
     $_SESSION['validator']->make_label('password', 'Password:');
     $_SESSION['validator']->make_password_input('password');
-    $_SESSION['validator']->make_label('password_conf', 'Confirm Password:');
+    $_SESSION['validator']->make_label('password_conf', 'Confirm 
+      Password:');
     $_SESSION['validator']->make_password_input('password_conf');
     ?>
 
@@ -161,9 +162,9 @@ function get_user_id( $email )
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//%		                                              					        	%
-//% 			                    MAIN CODE                                 %
-//%							                                                     		%
+//%
+//% 			                    MAIN CODE
+//%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if( $_SERVER['REQUEST_METHOD'] == 'GET' )
 {
