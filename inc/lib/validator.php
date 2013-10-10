@@ -178,7 +178,8 @@ class Validator{
    * =========================
    * validates that the two passed passwords match eachother
    */
-  function validate_password_match( $field_name_1, $value_1, $field_name_2, $value_2 )
+  function validate_password_match( 
+    $field_name_1, $value_1, $field_name_2, $value_2 )
   {
     if( $value_1 != $value_2 )
     {
@@ -191,15 +192,15 @@ class Validator{
   /**
    * make_text_input()
    * ================
-   * Makes a text input with label for a form.  Includes ability to display 
-   * if the input has an error that needs to be corrected by the user.  The 
-   * input will have the falue passed in $value
+   * Makes a text input with label for a form.  Includes ability to 
+   * display if the input has an error that needs to be corrected by the 
+   * user.  The input will have the falue passed in $value
    *
    * @param - $name       - the variable name that the form will post to
    * @param - $label      - the label for the input
-   * @param - $value      - the value that the input will display (useful if 
-   *                        the user previously information incorrectly and 
-   *                        you want to restore the old input they had 
+   * @param - $value      - the value that the input will display (useful 
+   *                        if the user previously information incorrectly 
+   *                        and you want to restore the old input they had 
    *                        before)
    *                        Default value = NULL
    */
@@ -221,9 +222,9 @@ class Validator{
    *
    * @param - $name       - the variable name that the form will post to
    * @param - $label      - the label for the input
-   * @param - $value      - the value that the input will display (useful if 
-   *                        the user previously information incorrectly and 
-   *                        you want to restore the old input they had 
+   * @param - $value      - the value that the input will display (useful 
+   *                        if the user previously information incorrectly 
+   *                        and you want to restore the old input they had 
    *                        before)
    * @param - $has_error  - if == TRUE - input will have red outline
    */
