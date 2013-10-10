@@ -112,19 +112,10 @@ class Validator{
    */
   function validate_email_syntax( $name )
   {
-    if( $this->post_loaded() && isset($this->_post[$name]) )
+    if( !filter_var( $name, FILTER_VALIDATE_EMAIL ) )
     {
-      if( !filter_var( $this->_post[$name], FILTER_VALIDATE_EMAIL ) )
-      {
-        $this->_form_errors[$name] = 'Your email address is not 
-          valid, please enter a valid email address';
-      }
-    }
-    else
-    {
-      //error
-      echo "post variable is not loaded or $name is not an index in post. 
-        make sure you called load_post() before you called this function";
+      $this->_form_errors[$name] = 'Your email address is not 
+        valid, please enter a valid email address';
     }
   }
 
